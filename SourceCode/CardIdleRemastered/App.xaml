@@ -1,0 +1,15 @@
+﻿<Application x:Class="CardIdleRemastered.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Startup="LaunchCardIdle"
+             >             
+    <Application.Resources>
+        <SolidColorBrush x:Key="DarkTheme" Color="#262627"/>
+        <SolidColorBrush x:Key="DynLevelBorder" Color="White"/>        
+        <SolidColorBrush x:Key="DynGridHeaders" Color="Gold"/>        
+        <SolidColorBrush x:Key="DynRunningGame" Color="Cyan"/>        
+        <SolidColorBrush x:Key="DynStatsHeaders" Color="Gold"/>        
+        <SolidColorBrush x:Key="DynStatsValues" Color="Cyan"/>        
+        <SolidColorBrush x:Key="DynIdleButtons" Color="Gold"/>        
+    </Application.Resources>
+</Application>

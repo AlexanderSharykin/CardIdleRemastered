@@ -1,0 +1,586 @@
+﻿<Window x:Class="CardIdleRemastered.BadgesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:res="clr-namespace:CardIdleRemastered.Properties"
+        xmlns:loc="clr-namespace:CardIdleRemastered"        
+        xmlns:cmd="clr-namespace:CardIdleRemastered.Commands"
+        Title="{x:Static res:Resources.Title}" Height="Auto" Width="Auto" 
+        Closing="BadgesWindowClosing" Loaded="BadgesWindowLoaded" 
+        WindowStartupLocation="CenterScreen" 
+        Background="{DynamicResource DarkTheme}">
+
+    <Window.Resources>
+        <loc:EnumLocalizationConverter x:Key="enumTranslator" />
+        <cmd:NavigationCommand x:Key="redirect"/>
+        
+        <Style TargetType="{x:Type TabItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid>
+                            <Border Name="Border" Margin="5" 
+                                    Background="White" 
+                                    Opacity="0.6"
+                                    BorderBrush="White" BorderThickness="2">
+                                <ContentPresenter Name="ContentSite"
+                                          VerticalAlignment="Center" HorizontalAlignment="Center"
+                                          ContentSource="Header"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Panel.ZIndex" Value="100" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="Gold" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CmdButton" TargetType="Button">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Background" Value="WhiteSmoke" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Background" Value="{DynamicResource DynGridHeaders}"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+
+        <Style TargetType="{x:Type DataGridRowHeader}">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="true">
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <DataTrigger Binding="{Binding Path=CardIdleProcess.IsRunning}" Value="true">
+                    <Setter Property="Background" Value="{DynamicResource DynRunningGame}"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="propName" TargetType="Label">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{DynamicResource DynStatsHeaders}"/>
+        </Style>
+
+        <Style x:Key="propValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{DynamicResource DynStatsValues}"/>
+            <Setter Property="MinWidth" Value="50"/>
+            <Setter Property="Margin" Value="0,5,15,0"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="{Binding Path=Background}"/>
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="200" />
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="25*"/>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="25*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Name="gHeader" Grid.Row="0" Grid.Column="1" 
+              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="-10,0,-10,-10"
+              Background="#324252">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Margin="25" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Image Name="picAvatar" Source="{Binding Path=Avatar}" MinWidth="10" MinHeight="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill"/>
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=IsCardIdleActive}" Value="True">
+                                <Setter Property="BorderThickness" Value="2"/>
+                                <Setter Property="BorderBrush" Value="LimeGreen"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
+
+            <StackPanel Grid.Column="1" Margin="0,25,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Name="lblUserName" Content="{Binding Path=UserName}"  
+                       VerticalAlignment="Top"
+                       FontSize="24" Foreground="White"/>
+                <Button Content="{x:Static res:Resources.Logout}" Command="{Binding Path=LogoutCmd}" 
+                        BorderThickness="0" Background="Transparent" Foreground="White"
+                        VerticalAlignment="Top" Margin="5" Padding="5">
+                </Button>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Margin="0,25,0,0">
+                <Label Name="lblLevel" Content="{x:Static res:Resources.SteamLevel}" HorizontalAlignment="Center" 
+                       FontSize="24" Foreground="White"/>
+                <Border BorderBrush="{DynamicResource DynLevelBorder}" BorderThickness="2" CornerRadius="18" 
+                        HorizontalAlignment="Center"
+                        MinWidth="36" MinHeight="36">
+                    <Label Name="txtLevel" Content="{Binding Path=Level}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontSize="14" Foreground="White"/>
+
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <TabControl Grid.Column="1" Grid.Row="1" Margin="-50,0,0,0"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Background="Transparent" BorderThickness="0"
+                    TabStripPlacement="Left">
+
+            <TabItem Padding="0,5,0,0">
+                <TabItem.Header>
+                    <TextBlock Padding="5" Text="{x:Static res:Resources.BadgesHeader}" FontSize="18">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform CenterX="0" CenterY="0" Angle="270" />
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </TabItem.Header>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Name ="grdBadges"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                    
+                              ItemsSource="{Binding Path=Badges}" AutoGenerateColumns="False" 
+                              CanUserAddRows="False" CanUserDeleteRows="False" 
+                              ColumnHeaderHeight="36" Opacity="0.8" GridLinesVisibility="Horizontal" 
+                              FontWeight="Medium" FontSize="14" SelectionMode="Single" 
+                              LoadingRow="SetLoadingRowNumber">
+                        <DataGrid.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.Game}" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding Path=AppImage}" 
+                                               ToolTip="{Binding Path=Title}"                                                                                               
+                                               Cursor="Hand" 
+                                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                                               
+                                               Width="230" Height="110" Stretch="Fill">
+
+                                            <!-- http://stackoverflow.com/questions/3885007/wpf-image-command-binding -->
+                                            <!-- http://stackoverflow.com/a/31905177/1506454 -->
+                                            <Image.InputBindings>
+                                                <MouseBinding Gesture="MiddleClick" Command="{Binding VisitStorePageCmd}" />
+                                            </Image.InputBindings>
+                                        </Image>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{x:Static res:Resources.Hours}" Binding="{Binding Path=HoursPlayed}" IsReadOnly="True" 
+                                    Width="*"
+                                    ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                            <DataGridTextColumn Header="{x:Static res:Resources.Cards}" Binding="{Binding Path=RemainingCard}" IsReadOnly="True" 
+                                    Width="*"
+                                    ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.Idle}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                            <Button Command="{Binding Path=StartIdleCmd}" 
+                                                    Content=">" ToolTip="{x:Static res:Resources.Start}">
+                                                <Button.Style>
+                                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CmdButton}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Path=HasTrial}" Value="True">
+                                                                <Setter Property="Background" Value="Gold"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button Command="{Binding Path=StopIdleCmd}" Content="=" 
+                                                    ToolTip="{x:Static res:Resources.Stop}"
+                                                    Style="{StaticResource CmdButton}" Margin="0,5,0,0"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.QueueHeader}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                            <Button Content="^"
+                                                    ToolTip="{x:Static res:Resources.EnqueueFirst}"
+                                                    Command="{Binding Path=EnqueueCmd}" CommandParameter="0"
+                                                    Style="{StaticResource CmdButton}"/>
+                                            <Button 
+                                                    ToolTip="{x:Static res:Resources.EnqueueLast}"
+                                                    Command="{Binding Path=EnqueueCmd}" CommandParameter="1"
+                                                    Style="{StaticResource CmdButton}" Margin="0,5,0,0">
+                                                <TextBlock Text="^" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <TextBlock.LayoutTransform>
+                                                        <RotateTransform CenterX="0" CenterY="0" Angle="180" />
+                                                    </TextBlock.LayoutTransform>
+                                                </TextBlock>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.Blacklist}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Command="{Binding Path=BlacklistCmd, ConverterParameter=1}" Content="x">
+                                            <Button.Style>
+                                                <Style TargetType="{x:Type Button}"  BasedOn="{StaticResource CmdButton}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=IsBlacklisted}" Value="True">
+                                                            <Setter Property="Background" Value="Black"/>
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <DockPanel Grid.Row="1" Name="Tools" Margin="0,4,0,5" 
+                       HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <Label Content="{x:Static res:Resources.ToolSearch}" Foreground="White"/>
+                            <TextBox Text="{Binding Path=GameTitle, UpdateSourceTrigger=LostFocus}" 
+                             MinWidth="100" Padding="5,0,5,0" 
+                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,5,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Label Content="{x:Static res:Resources.ToolShow}" Foreground="White"/>
+                            <ComboBox 
+                                  MinWidth="100"
+                                  VerticalContentAlignment="Center"
+                                  ItemsSource="{Binding Path=BadgeFilters}" 
+                                  SelectedItem="{Binding Path=Filter, Converter={StaticResource enumTranslator}}" 
+                                  />
+
+                        </StackPanel>
+
+                        <Grid >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Content="^" 
+                                    Margin="10,0,0,0" 
+                                    FontSize="18"
+                                    ToolTip="{x:Static res:Resources.EnqueueTop}"
+                                    Command="{Binding Path=EnqueueCmd}"
+                                    CommandParameter="0"
+                                    VerticalContentAlignment="Bottom"
+                                    HorizontalAlignment="Right"
+                                                    Style="{StaticResource CmdButton}"/>
+                            <Button Grid.Column="1" Margin="5,0,0,0" 
+                                                    ToolTip="{x:Static res:Resources.EnqueueBottom}"
+                                    Command="{Binding Path=EnqueueCmd}"
+                                                    CommandParameter="1"
+                                                    Style="{StaticResource CmdButton}"
+                                    HorizontalAlignment="Center">
+                                <TextBlock Text="^" FontSize="18">
+                                    <TextBlock.LayoutTransform>
+                                        <RotateTransform CenterX="0" CenterY="0" Angle="180" />
+                                    </TextBlock.LayoutTransform>
+                                </TextBlock>
+                            </Button>
+                            <Button Grid.Column="2" Margin="5,0,0,0" 
+                                    Content="#" 
+                                    FontSize="18" 
+                                    ToolTip="{x:Static res:Resources.DequeueAll}"
+                                    Command="{Binding Path=DequeueCmd}"
+                                    Style="{StaticResource CmdButton}"
+                                    HorizontalAlignment="Center"/>
+                            <Button Grid.Column="3" Margin="25,0,0,0" 
+                                    FontSize="18"  Content="&#x2699;" 
+                                    FontWeight="ExtraBold"
+                                    ToolTip="{x:Static res:Resources.Settings}"                                    
+                                    Style="{StaticResource CmdButton}"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top" Click="SettingsDialog"/>
+                        </Grid>
+                    </DockPanel>
+
+                    <StackPanel Grid.Row="2" Name="Stats" 
+                                Orientation="Horizontal" HorizontalAlignment="Center" Margin="15,0">
+                        <Label Content ="{x:Static res:Resources.NextSync}" Style="{StaticResource propName}"/>
+                        <TextBlock Text ="{Binding Path=SyncTime}" Style="{StaticResource propValue}"/>
+
+                        <Label Content ="{x:Static res:Resources.TotalGames}" Style="{StaticResource propName}"/>
+                        <TextBlock Text="{Binding Path=TotalGames}" Style="{StaticResource propValue}"/>
+
+                        <Label Content ="{x:Static res:Resources.TotalCards}" Style="{StaticResource propName}"/>
+                        <TextBlock Text="{Binding Path=TotalCards}" Style="{StaticResource propValue}"/>
+                    </StackPanel>
+
+
+                </Grid>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Padding="5" Text="{x:Static res:Resources.QueueHeader}" FontSize="18">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform CenterX="0" CenterY="0" Angle="270" />
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </TabItem.Header>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Name ="grdQueue"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                    
+                              ItemsSource="{Binding Path=IdleQueueBadges}" AutoGenerateColumns="False" 
+                              CanUserAddRows="False" CanUserDeleteRows="False" 
+                              ColumnHeaderHeight="36" Opacity="0.8" GridLinesVisibility="Horizontal" 
+                              FontWeight="Medium" FontSize="14" SelectionMode="Single" 
+                              LoadingRow="SetLoadingRowNumber">
+
+                        <DataGrid.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.Game}" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding Path=AppImage}" ToolTip="{Binding Path=Title}"  
+                                               Cursor="Hand" 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               Width="230" Height="110" Stretch="Fill">
+
+                                            <!-- http://stackoverflow.com/questions/3885007/wpf-image-command-binding -->
+                                            <!-- http://stackoverflow.com/a/31905177/1506454 -->
+                                            <Image.InputBindings>
+                                                <MouseBinding Gesture="MiddleClick" Command="{Binding VisitStorePageCmd}" />
+                                            </Image.InputBindings>
+                                        </Image>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn 
+                                Header="{x:Static res:Resources.Hours}" 
+                                Binding="{Binding Path=HoursPlayed}" 
+                                IsReadOnly="True" 
+                                CanUserSort="False"
+                                Width="*"
+                                ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                            <DataGridTextColumn 
+                                Header="{x:Static res:Resources.Cards}"                                                 
+                                Binding="{Binding Path=RemainingCard}" 
+                                IsReadOnly="True" 
+                                CanUserSort="False"
+                                Width="*"
+                                ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.Priority}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                            <Button Content="^"
+                                                    ToolTip="{x:Static res:Resources.PriorityHigher}"
+                                                    Command="{Binding Path=SetPriorityCmd}" CommandParameter="-1"
+                                                    Style="{StaticResource CmdButton}"/>
+                                            <Button
+                                                    ToolTip="{x:Static res:Resources.PriorityLower}"
+                                                    Command="{Binding Path=SetPriorityCmd}" CommandParameter="1"
+                                                    Style="{StaticResource CmdButton}" Margin="0,5,0,0">
+                                                <TextBlock Text="^" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <TextBlock.LayoutTransform>
+                                                        <RotateTransform CenterX="0" CenterY="0" Angle="180" />
+                                                    </TextBlock.LayoutTransform>
+                                                </TextBlock>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.DequeueHeader}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Command="{Binding Path=DequeueCmd}" Content="#" Style="{StaticResource CmdButton}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+
+
+                    <Grid Grid.Row="1" Margin="0,21,0,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                            <Label Content="{x:Static res:Resources.ToolIdleMode}" Foreground="White"/>
+                            <ComboBox 
+                                  MinWidth="100"
+                                  VerticalContentAlignment="Center"
+                                  ItemsSource="{Binding Path=Idler.IdleModes}" 
+                                  SelectedItem="{Binding Path=Idler.Mode, Converter={StaticResource enumTranslator}}" >
+                            </ComboBox>
+
+                        </StackPanel>
+                        
+                        <Button Content="{x:Static res:Resources.Start}"
+                                Command ="{Binding IdleCmd}" CommandParameter="1"
+                            Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            Margin="0,0,10,0"
+                            Padding="10,4,10,4" 
+                             
+                            FontSize="18"
+                            BorderThickness="2" 
+                            Background="{DynamicResource DynIdleButtons}"                             
+                            HorizontalContentAlignment="Center" 
+                            VerticalContentAlignment="Center"/>
+
+                        <Button Content="{x:Static res:Resources.Stop}"     
+                                Command ="{Binding IdleCmd}" CommandParameter="0"
+                                
+                                Grid.Column="2" 
+                                HorizontalAlignment="Left"
+                                Margin="10,0,0,0"
+                                Padding="10,4,10,4" 
+                                
+                                FontSize="18"
+                                BorderThickness="2" 
+                                Background="{DynamicResource DynIdleButtons}"                             
+                                HorizontalContentAlignment="Center" 
+                                VerticalContentAlignment="Center"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem FontSize="18">
+                <TabItem.Header>
+                    <TextBlock Padding="5" Text="{x:Static res:Resources.AboutHeader}" FontSize="18">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform CenterX="0" CenterY="0" Angle="270" />
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </TabItem.Header>
+                <Grid Background="{StaticResource DarkTheme}" Opacity="0.8">
+                    <Grid  MaxHeight="320" Margin="20">
+                        <Grid.Resources>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Orientation" Value="Horizontal"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                            <Style x:Key="Title" TargetType="Label">
+                                <Setter Property="Foreground" Value="Cyan"/>
+                            </Style>
+                            <Style x:Key="Developer" TargetType="Label">
+                                <Setter Property="Foreground" Value="Gold"/>
+                            </Style>
+                            <Style x:Key="Message" TargetType="Label">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            <Style x:Key="Link" TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="Lime"/>
+                                <Setter Property="TextDecorations" Value="Underline"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="3*"/>
+                            <RowDefinition Height="3*"/>
+                            <RowDefinition Height="3*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel>
+                            <Label Content="Card Idle Remastered" Style="{StaticResource ResourceKey=Title}"/>
+                            <Label Content="(&#xa9; ASh)" Style="{StaticResource ResourceKey=Developer}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1">
+                            <Label Content="is a WPF remake of" Style="{StaticResource ResourceKey=Message}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2">
+                            <Label Content="Idle Master" Style="{StaticResource ResourceKey=Title}"/>
+                            <Label Content="(&#xa9; jshackles)" Style="{StaticResource ResourceKey=Developer}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="4">
+                            <Label Content="Source codes are available on GitHub" Style="{StaticResource ResourceKey=Message}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="5">
+                            <TextBlock Name="lblCardIdle"  Text="https://github.com/AlexanderSharykin/CardIdleRemastered" Style="{StaticResource ResourceKey=Link}">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding Gesture="LeftClick" Command="{StaticResource ResourceKey=redirect}" CommandParameter="{Binding ElementName=lblCardIdle, Path=Text}"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Grid.Row="6">
+                            <TextBlock Name="lblIM" Text="https://github.com/jshackles/idle_master" Style="{StaticResource ResourceKey=Link}">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding Gesture="LeftClick" Command="{StaticResource ResourceKey=redirect}" CommandParameter="{Binding ElementName=lblIM, Path=Text}"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Column="1" Grid.Row="2">
+            <Label Content="{x:Static res:Resources.NoConnection}" Foreground="Red" FontSize="16" FontWeight="Medium" HorizontalAlignment="Center">
+                <Label.Style>
+                    <Style TargetType="{x:Type Label}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=IsSteamRunning}" Value="True">
+                                <Setter Property="Visibility" Value="Hidden"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Label.Style>
+            </Label>
+        </StackPanel>
+
+    </Grid>
+</Window>

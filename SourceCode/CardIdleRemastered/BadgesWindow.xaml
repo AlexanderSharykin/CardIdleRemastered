@@ -128,10 +128,23 @@
                 <Label Name="lblUserName" Content="{Binding Path=UserName}"  
                        VerticalAlignment="Top"
                        FontSize="24" Foreground="White"/>
-                <Button Content="{x:Static res:Resources.Logout}" Command="{Binding Path=LogoutCmd}" 
-                        BorderThickness="0" Background="Transparent" Foreground="White"
+                <Label Content="{x:Static res:Resources.Logout}"
+                        Background="Transparent" BorderThickness="0"
                         VerticalAlignment="Top" Margin="5" Padding="5">
-                </Button>
+                    <Label.Style>
+                        <Style TargetType="{x:Type Label}">
+                            <Setter Property="Foreground" Value="White"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="Red"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Label.Style>
+                    <Label.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding Path=LogoutCmd}" />
+                    </Label.InputBindings>
+                </Label>
             </StackPanel>
 
             <StackPanel Grid.Column="2" Margin="0,25,0,0">

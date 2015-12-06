@@ -9,15 +9,17 @@ namespace CardIdleRemastered
 {
     public class IdleManager: ObservableModel
     {
+        public static readonly byte DefaultIdleInstanceCount = 16;
         private bool _isActive;
         private IdleMode _mode;
         private AccountModel _account;
-        private byte _maxIdleInstanceCount = 16;
+        private byte _maxIdleInstanceCount;
         private Random _rand = new Random();
 
         public IdleManager(AccountModel acc)
         {
             _account = acc;
+            _maxIdleInstanceCount = DefaultIdleInstanceCount;
         }
 
         public bool IsActive

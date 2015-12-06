@@ -43,6 +43,8 @@ namespace CardIdleRemastered
         {
             var vis = new AppVisualSettings();
             vis.BackgroundUrl = BackgroundUrl;
+            vis.IdleProcessCount = IdleProcessCount;
+
             foreach (var b in AppBrushes)
             {
                 vis.AppBrushes.Add(new AppBrush(b.Name, b.BrushColor));

@@ -30,6 +30,7 @@ namespace CardIdleRemastered
             //Thread.CurrentThread.CurrentUICulture = new CultureInfo("en");
 
             _defaultVisuals = GetCurrentSettings();
+            _defaultVisuals.IdleProcessCount = IdleManager.DefaultIdleInstanceCount;
             ApplySavedVisuals();
 
             DispatcherUnhandledException += LogUnhandledException;

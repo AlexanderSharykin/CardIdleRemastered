@@ -45,9 +45,7 @@ namespace CardIdleRemastered
                 .Join(Account.AllBadges, s => s, b => b.StringId, (s, badge) => badge)
                 .ToList();
             foreach (var badge in blacklist)
-                badge.IsBlacklisted = true;
-
-            Account.Badges.Refresh();
+                badge.IsBlacklisted = true;            
         }
 
         private void SetLoadingRowNumber(object sender, DataGridRowEventArgs e)

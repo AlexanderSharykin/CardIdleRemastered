@@ -57,7 +57,6 @@ namespace CardIdleRemastered
                 OnPropertyChanged();
                 if (CardIdleActive && _remainingCard == 0)
                     CardIdleProcess.Stop();
-
             }
         }
 
@@ -96,6 +95,7 @@ namespace CardIdleRemastered
                     {
                         if (IdleStopped != null)
                             IdleStopped(this, EventArgs.Empty);
+                        OnPropertyChanged("CardIdleActive");
                     };
                 }
                 return _idleProcess;

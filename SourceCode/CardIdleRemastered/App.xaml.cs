@@ -102,6 +102,9 @@ namespace CardIdleRemastered
                     account.Background = LoadImage(account.BackgroundUrl);
 
             account.Filter = (BadgeModelFilter)Settings.Default.BadgeFilter;
+            if (account.Filter == BadgeModelFilter.Running)
+                account.Filter = BadgeModelFilter.All;
+            
             account.Idler.Mode = (IdleMode)Settings.Default.IdleMode;
 
             account.IgnoreClient = Settings.Default.ignoreclient;

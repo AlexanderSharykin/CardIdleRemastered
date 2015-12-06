@@ -53,7 +53,14 @@ namespace CardIdleRemastered
             IdleQueueBadges = new ObservableCollection<BadgeModel>();
             _filter = BadgeModelFilter.All;
 
+            
             _badges = CollectionViewSource.GetDefaultView(AllBadges);
+            var quick = (ICollectionViewLiveShaping)_badges;
+            quick.LiveFilteringProperties.Add("IsBlacklisted");
+            quick.LiveFilteringProperties.Add("HasTrial");
+            quick.LiveFilteringProperties.Add("CardIdleActive");
+            quick.LiveFilteringProperties.Add("IsInQueue");
+            quick.IsLiveFiltering = true;
         }
 
         private bool TitleSearch(object o)

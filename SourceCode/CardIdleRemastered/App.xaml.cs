@@ -25,16 +25,23 @@ namespace CardIdleRemastered
     {
         public AppVisualSettings _defaultVisuals;
 
-        private void LaunchCardIdle(object sender, StartupEventArgs e)
+        private async void LaunchCardIdle(object sender, StartupEventArgs e)
         {
             //Thread.CurrentThread.CurrentUICulture = new CultureInfo("en");
+
+            // http://stackoverflow.com/questions/1472498/wpf-global-exception-handler
+            // http://stackoverflow.com/a/1472562/1506454
+            DispatcherUnhandledException += LogUnhandledDispatcherException;
+            AppDomain.CurrentDomain.UnhandledException += LogUnhandledDomainException;
+            TaskScheduler.UnobservedTaskException += LogTaskSchedulerUnobservedTaskException;
+
+            Logger.Info(String.Format("{0} {1}bit", Environment.OSVersion, Environment.Is64BitOperatingSystem ? 64 : 32));            
 
             _defaultVisuals = GetCurrentSettings();
             _defaultVisuals.IdleProcessCount = IdleManager.DefaultIdleInstanceCount;
             ApplySavedVisuals();
 
-            DispatcherUnhandledException += LogUnhandledException;
-
+            // Set the Browser emulation version for embedded browser control
             try
             {
                 RegistryKey ie_root = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION");
@@ -42,22 +49,41 @@ namespace CardIdleRemastered
                 String programName = Path.GetFileName(Environment.GetCommandLineArgs()[0]);
                 key.SetValue(programName, (int)10001, RegistryValueKind.DWord);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Logger.Exception(ex, "Registry IE FEATURE_BROWSER_EMULATION");
             }
-            
-            if (string.IsNullOrWhiteSpace(Settings.Default.sessionid) || string.IsNullOrWhiteSpace(Settings.Default.steamLogin))            
-                new BrowserWindow().Show();
+
+            bool registered = !String.IsNullOrWhiteSpace(Settings.Default.sessionid) && !String.IsNullOrWhiteSpace(Settings.Default.steamLogin);
+            if (registered)
+            {
+                Logger.Info("Session test");
+                registered = await CookieClient.IsLogined();
+            }
+
+            if (registered)            
+                OpenAccount();                            
             else
             {
-                OpenAccount();
+                new BrowserWindow().Show();
+                Logger.Info("Login required");
             }
         }
 
-        private void LogUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs arg)
+        private void LogTaskSchedulerUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs arg)
         {
-            Logger.Exception(arg.Exception);
+            Logger.Exception(arg.Exception, "TaskScheduler.UnobservedTaskException");
+        }
+
+        private void LogUnhandledDomainException(object sender, UnhandledExceptionEventArgs arg)
+        {
+            Logger.Exception(arg.ExceptionObject as Exception, "AppDomain.CurrentDomain.UnhandledException", String.Format("IsTerminating = {0}", arg.IsTerminating));           
+        }
+
+        private void LogUnhandledDispatcherException(object sender, DispatcherUnhandledExceptionEventArgs arg)
+        {
+            Logger.Exception(arg.Exception, "DispatcherUnhandledException");
+            arg.Handled = true;
         }
 
         public static App CardIdle
@@ -75,8 +101,10 @@ namespace CardIdleRemastered
             account.InitSteamTimer();
             account.StartTimers();
 
-            Current.MainWindow = w;
+            Current.MainWindow = w;            
             w.Show();
+
+            Logger.Info("Welcome back");
         }
 
         private AccountModel CreateAccount()
@@ -209,6 +237,7 @@ namespace CardIdleRemastered
             Settings.Default.IdleMode = 0;
             Settings.Default.BadgeFilter = 0;
             Settings.Default.Save();
+            Logger.Info("See you later");
 
             foreach (var brush in _defaultVisuals.AppBrushes)            
                 Current.Resources[brush.Name] = new SolidColorBrush(brush.BrushColor.Value);            

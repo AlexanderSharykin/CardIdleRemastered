@@ -30,8 +30,6 @@ namespace CardIdleRemastered
             }
             catch (WebException we)
             {
-                if (we.Status == WebExceptionStatus.ConnectFailure)
-                    return null;
                 throw;
             }
 

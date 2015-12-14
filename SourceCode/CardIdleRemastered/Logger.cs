@@ -21,6 +21,11 @@ namespace CardIdleRemastered
             Write(contents, ExceptionPath);
         }
 
+        public static void Info(string text)
+        {
+            Write(String.Concat(DateTime.Now, "   ", text, Environment.NewLine), ExceptionPath);
+        }
+
         private static void Write(string contents, string path)
         {
             Console.WriteLine(contents);

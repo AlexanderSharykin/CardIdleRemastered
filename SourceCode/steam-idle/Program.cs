@@ -18,17 +18,16 @@ namespace steam_idle
             long appId = long.Parse(args[0]);
             String NL = Environment.NewLine;
             try
-            {                
+            {
                 Environment.SetEnvironmentVariable("SteamAppId", appId.ToString());
+
+                if (!SteamAPI.Init())                
+                    return;                
             }
             catch (Exception ex)
             {
-                MessageBox.Show(String.Format("{1}{0} {2}{0}", NL, ex.Message, ex.StackTrace), ex.GetType().FullName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            if (!SteamAPI.Init())
-            {
+                MessageBox.Show(String.Format("{1}{0} {2}{0}", NL, ex.Message, ex.StackTrace), ex.GetType().FullName,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

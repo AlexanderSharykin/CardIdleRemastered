@@ -9,52 +9,15 @@ namespace CardIdleRemastered
 {
     public class CookieClient : WebClient
     {
-        internal CookieContainer Cookie = new CookieContainer();
+        private readonly CookieContainer Cookie;
 
-        internal Uri ResponseUri;
-
-        protected override WebRequest GetWebRequest(Uri address)
+        public CookieClient()
         {
-            var request = base.GetWebRequest(address);
-            if (request is HttpWebRequest)
-                (request as HttpWebRequest).CookieContainer = Cookie;
-            return request;
+            Cookie = GenerateCookies();
+            Encoding = Encoding.UTF8;
         }
 
-        protected override WebResponse GetWebResponse(WebRequest request, System.IAsyncResult result)
-        {
-            WebResponse baseResponse = null;
-            try
-            {
-                baseResponse = base.GetWebResponse(request);
-            }
-            catch (WebException we)
-            {
-                throw;
-            }
-
-            var cookies = (baseResponse as HttpWebResponse).Cookies;
-
-            // Check, if cookie should be deleted. This means that sessionID is now invalid and user has to log in again.
-            // Maybe this shoud be done other way (authenticate exception), but because of shared settings and timers in frmMain...
-            if (cookies.Count > 0)
-            {
-                if (cookies["steamLogin"].Value == "deleted")
-                {
-                    Settings.Default.sessionid = string.Empty;
-                    Settings.Default.steamLogin = string.Empty;
-                    Settings.Default.steamparental = string.Empty;
-                    Settings.Default.steamMachineAuth = string.Empty;
-                    Settings.Default.steamRememberLogin = string.Empty;
-                    Settings.Default.Save();
-                }
-            }
-
-            this.ResponseUri = baseResponse.ResponseUri;
-            return baseResponse;
-        }
-
-        public static CookieContainer GenerateCookies()
+        private CookieContainer GenerateCookies()
         {
             var cookies = new CookieContainer();
             var target = new Uri("http://steamcommunity.com");
@@ -66,16 +29,52 @@ namespace CardIdleRemastered
             return cookies;
         }
 
-        public static string GetSteamMachineAuthCookieName()
+        private static string GetSteamMachineAuthCookieName()
         {
             if (Settings.Default.steamLogin != null && Settings.Default.steamLogin.Length > 17)
                 return string.Format("steamMachineAuth{0}", Settings.Default.steamLogin.Substring(0, 17));
             return "steamMachineAuth";
         }
 
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            var request = base.GetWebRequest(address);
+            if (request is HttpWebRequest)
+                (request as HttpWebRequest).CookieContainer = Cookie;
+            return request;
+        }
+
+        protected override WebResponse GetWebResponse(WebRequest request, IAsyncResult result)
+        {
+            HttpWebResponse baseResponse = base.GetWebResponse(request) as HttpWebResponse;
+
+            if (baseResponse == null)
+                return null;
+
+            var cookies = baseResponse.Cookies;
+
+            // Check, if cookie should be deleted. This means that sessionID is now invalid and user has to log in again.            
+            if (cookies.Count > 0)
+            {
+                // fix from https://github.com/jshackles/idle_master/pull/197
+                var login = cookies["steamLogin"];
+                if (login != null && login.Value == "deleted")
+                {
+                    Settings.Default.sessionid = string.Empty;
+                    Settings.Default.steamLogin = string.Empty;
+                    Settings.Default.steamparental = string.Empty;
+                    Settings.Default.steamMachineAuth = string.Empty;
+                    Settings.Default.steamRememberLogin = string.Empty;
+                    Settings.Default.Save();
+                }
+            }
+
+            return baseResponse;
+        }
+
         public static async Task<string> GetHttpAsync(string url, int count = 3)
         {
-            while (true)
+            //while (true)
             {
                 var client = new CookieClient();
                 var content = string.Empty;
@@ -94,8 +93,8 @@ namespace CardIdleRemastered
                     Logger.Exception(ex, "CookieClient -> GetHttpAsync, for url = " + url);
                 }
 
-                if (!string.IsNullOrWhiteSpace(content) || count == 0)
-                    return content;
+                //if (!string.IsNullOrWhiteSpace(content) || count == 0)
+                return content;
 
                 count = count - 1;
             }
@@ -104,15 +103,11 @@ namespace CardIdleRemastered
         public static async Task<bool> IsLogined()
         {
             var response = await GetHttpAsync(Settings.Default.myProfileURL);
+            if (String.IsNullOrWhiteSpace(response))
+                return false;
             var document = new HtmlDocument();
             document.LoadHtml(response);
             return document.DocumentNode.SelectSingleNode("//a[@class=\"global_action_link\"]") == null;
-        }
-
-        public CookieClient()
-        {
-            Cookie = GenerateCookies();
-            Encoding = Encoding.UTF8;
-        }
+        }        
     }
 }

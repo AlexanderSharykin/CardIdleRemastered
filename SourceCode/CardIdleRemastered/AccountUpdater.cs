@@ -179,7 +179,7 @@ namespace CardIdleRemastered
                 var cardNode = badge.SelectSingleNode(".//span[@class=\"progress_info_bold\"]");
                 var cards = cardNode == null ? string.Empty : Regex.Match(cardNode.InnerText, @"[0-9]+").Value;
 
-                var badgeInMemory =_account.AllBadges.FirstOrDefault(b => b.StringId == appid);                
+                var badgeInMemory =_account.AllBadges.FirstOrDefault(b => b.AppId == appid);                
                 if (badgeInMemory != null)
                 {
                     badgeInMemory.UpdateStats(cards, hours);                    
@@ -191,7 +191,7 @@ namespace CardIdleRemastered
                 }
                 else
                 {
-                    var b = new BadgeModel(_account, appid, name, cards, hours);                    
+                    var b = new BadgeModel(appid, name, cards, hours);                    
 
                     if (b.RemainingCard > 0)
                     {

@@ -28,6 +28,7 @@ namespace CardIdleRemastered
         private async void LaunchCardIdle(object sender, StartupEventArgs e)
         {
             //Thread.CurrentThread.CurrentUICulture = new CultureInfo("en");
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("ru-Ru");
 
             // http://stackoverflow.com/questions/1472498/wpf-global-exception-handler
             // http://stackoverflow.com/a/1472562/1506454
@@ -141,15 +142,6 @@ namespace CardIdleRemastered
             if (Settings.Default.MaxIdleProcessCount > 0)
                 account.Idler.MaxIdleInstanceCount = Settings.Default.MaxIdleProcessCount;
 
-            account.BlacklistBadge = (badge) =>
-            {
-                if (badge.IsBlacklisted)
-                    Settings.Default.blacklist.Add(badge.AppId.ToString());
-                else
-                    Settings.Default.blacklist.Remove(badge.AppId.ToString());
-                Settings.Default.Save();
-            };
-
             account.PropertyChanged += SaveConfiguration;
             account.Idler.PropertyChanged += SaveConfiguration;
 
@@ -157,7 +149,7 @@ namespace CardIdleRemastered
             {
                 Settings.Default.IdleQueue.Clear();
                 foreach (var b in account.IdleQueueBadges)                
-                    Settings.Default.IdleQueue.Add(b.StringId);                
+                    Settings.Default.IdleQueue.Add(b.AppId);                
                 Settings.Default.Save();
             };
 

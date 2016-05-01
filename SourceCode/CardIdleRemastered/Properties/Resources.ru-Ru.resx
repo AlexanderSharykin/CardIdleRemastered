@@ -120,6 +120,9 @@
   <data name="AboutHeader" xml:space="preserve">
     <value>О программе</value>
   </data>
+  <data name="AddGame" xml:space="preserve">
+    <value>Добавить игру в список</value>
+  </data>
   <data name="Apply" xml:space="preserve">
     <value>Применить</value>
   </data>
@@ -201,6 +204,12 @@
   <data name="Game" xml:space="preserve">
     <value>Игра</value>
   </data>
+  <data name="GameSelectionLabel" xml:space="preserve">
+    <value>Введите URL страницы игры в Стиме или ID игры</value>
+  </data>
+  <data name="GameSelectionTitle" xml:space="preserve">
+    <value>Выберите игру</value>
+  </data>
   <data name="Hours" xml:space="preserve">
     <value>Время, ч</value>
   </data>
@@ -240,6 +249,12 @@
   <data name="QueueHeader" xml:space="preserve">
     <value>Очередь</value>
   </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Убрать</value>
+  </data>
+  <data name="RemoveGame" xml:space="preserve">
+    <value>Убрать игру из списка</value>
+  </data>
   <data name="Reset" xml:space="preserve">
     <value>Сбросить</value>
   </data>
@@ -257,6 +272,9 @@
   </data>
   <data name="Stop" xml:space="preserve">
     <value>Стоп</value>
+  </data>
+  <data name="TimeIdleHeader" xml:space="preserve">
+    <value>Время в игре</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Card Idle</value>

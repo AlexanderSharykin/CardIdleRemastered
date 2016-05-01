@@ -120,6 +120,9 @@
   <data name="AboutHeader" xml:space="preserve">
     <value>About</value>
   </data>
+  <data name="AddGame" xml:space="preserve">
+    <value>Add game to time idle list</value>
+  </data>
   <data name="Apply" xml:space="preserve">
     <value>Apply</value>
   </data>
@@ -201,6 +204,12 @@
   <data name="Game" xml:space="preserve">
     <value>Game</value>
   </data>
+  <data name="GameSelectionLabel" xml:space="preserve">
+    <value>Enter store page URL or game ID</value>
+  </data>
+  <data name="GameSelectionTitle" xml:space="preserve">
+    <value>Select a game to idle</value>
+  </data>
   <data name="Hours" xml:space="preserve">
     <value>Hours</value>
   </data>
@@ -240,6 +249,12 @@
   <data name="QueueHeader" xml:space="preserve">
     <value>Queue</value>
   </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="RemoveGame" xml:space="preserve">
+    <value>Remove game from time idle list</value>
+  </data>
   <data name="Reset" xml:space="preserve">
     <value>Reset</value>
   </data>
@@ -257,6 +272,9 @@
   </data>
   <data name="Stop" xml:space="preserve">
     <value>Stop</value>
+  </data>
+  <data name="TimeIdleHeader" xml:space="preserve">
+    <value>Time Idle</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Card Idle</value>

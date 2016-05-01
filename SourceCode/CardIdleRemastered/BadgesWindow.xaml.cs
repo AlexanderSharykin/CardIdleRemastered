@@ -36,16 +36,25 @@ namespace CardIdleRemastered
             await Account.Sync();
 
             var queue = Settings.Default.IdleQueue.Cast<string>()
-                .Join(Account.AllBadges, s => s, b => b.StringId, (s, badge) => badge)
+                .Join(Account.AllBadges, s => s, b => b.AppId, (s, badge) => badge)
                 .ToList();
             foreach (var badge in queue)
-                badge.EnqueueCmd.Execute(null);
+                Account.EnqueueBadgeLowCmd.Execute(badge);
 
             var blacklist = Settings.Default.blacklist.Cast<string>()
-                .Join(Account.AllBadges, s => s, b => b.StringId, (s, badge) => badge)
+                .Join(Account.AllBadges, s => s, b => b.AppId, (s, badge) => badge)
                 .ToList();
             foreach (var badge in blacklist)
-                badge.IsBlacklisted = true;            
+                badge.IsBlacklisted = true;
+
+            var games = Settings.Default.Games.Cast<string>().ToList();
+            int idx = 0;
+            foreach (var id in games)
+            {
+                var game = await new SteamParser().GetBadge(id);
+                Account.Games.Insert(idx, game);
+                idx++;
+            }
         }
 
         private void SetLoadingRowNumber(object sender, DataGridRowEventArgs e)

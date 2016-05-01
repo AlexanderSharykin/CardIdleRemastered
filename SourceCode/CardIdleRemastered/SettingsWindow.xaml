@@ -34,7 +34,8 @@
             </Grid.ColumnDefinitions>
             <Label Content="{x:Static res:Resources.CfgCustomBackground}" Foreground="White"/>
             <TextBox Grid.Column="1" HorizontalAlignment="Stretch"
-                Text="{Binding Path=BackgroundUrl, UpdateSourceTrigger=LostFocus}"/>
+                     VerticalContentAlignment="Center"
+                     Text="{Binding Path=BackgroundUrl, UpdateSourceTrigger=LostFocus}"/>
         </Grid>
         <Grid Grid.Row="1" Margin="0,0,0,10" >
             <Grid.ColumnDefinitions>
@@ -78,8 +79,10 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Button HorizontalAlignment="Left" Content="{x:Static res:Resources.Reset}" Click="ResetClick"/>
-            <Button Grid.Column="1" HorizontalAlignment="Right" Content="{x:Static res:Resources.Apply}" Click="ApplyClick"/>
-            <Button Grid.Column="2" HorizontalAlignment="Right" Content="{x:Static res:Resources.Cancel}" Click="CancelClick"/>
+            <Button Grid.Column="1" HorizontalAlignment="Right" Content="{x:Static res:Resources.Apply}" 
+                    Click="ApplyClick"/>
+            <Button Grid.Column="2" HorizontalAlignment="Right" Content="{x:Static res:Resources.Cancel}" 
+                    Click="CancelClick"/>
         </Grid>
     </Grid>
 </Window>

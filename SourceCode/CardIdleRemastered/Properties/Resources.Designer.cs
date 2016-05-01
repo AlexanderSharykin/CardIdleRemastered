@@ -70,6 +70,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add game to time idle list.
+        /// </summary>
+        public static string AddGame {
+            get {
+                return ResourceManager.GetString("AddGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apply.
         /// </summary>
         public static string Apply {
@@ -313,6 +322,24 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter store page URL or game ID.
+        /// </summary>
+        public static string GameSelectionLabel {
+            get {
+                return ResourceManager.GetString("GameSelectionLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a game to idle.
+        /// </summary>
+        public static string GameSelectionTitle {
+            get {
+                return ResourceManager.GetString("GameSelectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hours.
         /// </summary>
         public static string Hours {
@@ -430,6 +457,24 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        public static string Remove {
+            get {
+                return ResourceManager.GetString("Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove game from time idle list.
+        /// </summary>
+        public static string RemoveGame {
+            get {
+                return ResourceManager.GetString("RemoveGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reset.
         /// </summary>
         public static string Reset {
@@ -480,6 +525,15 @@ namespace CardIdleRemastered.Properties {
         public static string Stop {
             get {
                 return ResourceManager.GetString("Stop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time Idle.
+        /// </summary>
+        public static string TimeIdleHeader {
+            get {
+                return ResourceManager.GetString("TimeIdleHeader", resourceCulture);
             }
         }
         

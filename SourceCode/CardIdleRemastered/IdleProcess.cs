@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CardIdleRemastered.Commands
+namespace CardIdleRemastered
 {
     public class IdleProcess: ObservableModel
     {
@@ -27,7 +23,7 @@ namespace CardIdleRemastered.Commands
             if (IsRunning)
                 return;
 
-            _steamIdle = Process.Start(new ProcessStartInfo(@"steam-idle.exe", _badge.AppId.ToString()) { WindowStyle = ProcessWindowStyle.Hidden });  
+            _steamIdle = Process.Start(new ProcessStartInfo(@"steam-idle.exe", _badge.AppId) { WindowStyle = ProcessWindowStyle.Hidden });  
             if (_steamIdle != null)
                 _steamIdle.Exited += SteamIdleOnProcessExited;
             OnPropertyChanged("IsRunning");

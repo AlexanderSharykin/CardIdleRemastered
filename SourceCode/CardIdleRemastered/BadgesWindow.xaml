@@ -12,40 +12,40 @@
     <Window.Resources>
         <loc:EnumLocalizationConverter x:Key="enumTranslator" />
         <cmd:NavigationCommand x:Key="redirect"/>
-        
+
+        <!-- http://stackoverflow.com/questions/27045396/wpf-datagrid-highlight-selected-row-even-when-selecteditem-is-a-bound-property -->
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="CornflowerBlue"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="CornflowerBlue"/>
+
         <Style TargetType="{x:Type TabItem}">
+            <Setter Property="FontSize" Value="18"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
                         <Grid>
                             <Border Name="Border" Margin="5" 
-                                    Background="White" 
-                                    Opacity="0.6"
-                                    BorderBrush="White" BorderThickness="2">
-                                <ContentPresenter Name="ContentSite"
+                                    Background="#B0FFFFFF"                                     
+                                    BorderBrush="#B0FFFFFF" BorderThickness="2">
+
+                                <ContentPresenter Name="ContentSite" Margin="5"
                                           VerticalAlignment="Center" HorizontalAlignment="Center"
-                                          ContentSource="Header"/>
+                                          ContentSource="Header">
+                                    <ContentPresenter.LayoutTransform>
+                                        <RotateTransform CenterX="0" CenterY="0" Angle="270" />
+                                    </ContentPresenter.LayoutTransform>
+                                </ContentPresenter>
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Panel.ZIndex" Value="100" />
                                 <Setter TargetName="Border" Property="BorderBrush" Value="Gold" />
+                                <Setter TargetName="Border" Property="Background" Value="LightSteelBlue" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-
-        <Style x:Key="CmdButton" TargetType="Button">
-            <Setter Property="Width" Value="32"/>
-            <Setter Property="Height" Value="32"/>
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="BorderThickness" Value="2" />
-            <Setter Property="Background" Value="WhiteSmoke" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
 
         <Style TargetType="{x:Type DataGridColumnHeader}">
@@ -62,6 +62,7 @@
         </Style>
 
         <Style TargetType="DataGridCell">
+            <Setter Property="BorderThickness" Value="0"/>
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="true">
                     <Setter Property="Foreground" Value="White"/>
@@ -111,7 +112,10 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Border Margin="25" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Image Name="picAvatar" Source="{Binding Path=Avatar}" MinWidth="10" MinHeight="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill"/>
+                <Image Name="picAvatar" Source="{Binding Path=Avatar}" 
+                       MinWidth="10" MinHeight="10" 
+                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                       Stretch="UniformToFill"/>
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">
                         <Style.Triggers>
@@ -160,20 +164,12 @@
             </StackPanel>
         </Grid>
 
-        <TabControl Grid.Column="1" Grid.Row="1" Margin="-50,0,0,0"
+        <TabControl Name="Tabs" Grid.Column="1" Grid.Row="1" Margin="-50,0,0,0"
                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                     Background="Transparent" BorderThickness="0"
                     TabStripPlacement="Left">
 
-            <TabItem Padding="0,5,0,0">
-                <TabItem.Header>
-                    <TextBlock Padding="5" Text="{x:Static res:Resources.BadgesHeader}" FontSize="18">
-                        <TextBlock.LayoutTransform>
-                            <RotateTransform CenterX="0" CenterY="0" Angle="270" />
-                        </TextBlock.LayoutTransform>
-                    </TextBlock>
-                </TabItem.Header>
-
+            <TabItem Padding="0,5,0,0" Header="{x:Static res:Resources.BadgesHeader}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -200,15 +196,17 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Image Source="{Binding Path=AppImage}" 
-                                               ToolTip="{Binding Path=Title}"                                                                                               
+                                               ToolTip="{Binding Path=Title}" 
                                                Cursor="Hand" 
-                                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                                               
+                                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                                Width="230" Height="110" Stretch="Fill">
 
                                             <!-- http://stackoverflow.com/questions/3885007/wpf-image-command-binding -->
                                             <!-- http://stackoverflow.com/a/31905177/1506454 -->
                                             <Image.InputBindings>
-                                                <MouseBinding Gesture="MiddleClick" Command="{Binding VisitStorePageCmd}" />
+                                                <MouseBinding Gesture="MiddleClick" 
+                                                              Command="{StaticResource redirect}" 
+                                                              CommandParameter="{Binding Path=StorePageUrl}" />
                                             </Image.InputBindings>
                                         </Image>
                                     </DataTemplate>
@@ -224,8 +222,9 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                                            <Button Command="{Binding Path=StartIdleCmd}" 
-                                                    Content=">" ToolTip="{x:Static res:Resources.Start}">
+                                            <Button Command="{Binding Path=DataContext.StartBadgeIdleCmd, ElementName=grdBadges}" 
+                                                    CommandParameter="{Binding Path=.}"
+                                                    Content="&#9655;" ToolTip="{x:Static res:Resources.Start}">
                                                 <Button.Style>
                                                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CmdButton}">
                                                         <Style.Triggers>
@@ -236,7 +235,9 @@
                                                     </Style>
                                                 </Button.Style>
                                             </Button>
-                                            <Button Command="{Binding Path=StopIdleCmd}" Content="=" 
+                                            <Button Command="{Binding Path=DataContext.StopBadgeIdleCmd, ElementName=grdBadges}" 
+                                                    CommandParameter="{Binding Path=.}"
+                                                    Content="&#10074;&#10074;" 
                                                     ToolTip="{x:Static res:Resources.Stop}"
                                                     Style="{StaticResource CmdButton}" Margin="0,5,0,0"/>
                                         </StackPanel>
@@ -247,20 +248,16 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                                            <Button Content="^"
+                                            <Button Content="&#9650;"
                                                     ToolTip="{x:Static res:Resources.EnqueueFirst}"
-                                                    Command="{Binding Path=EnqueueCmd}" CommandParameter="0"
+                                                    Command="{Binding Path=DataContext.EnqueueBadgeHighCmd, ElementName=grdBadges}" 
+                                                    CommandParameter="{Binding Path=.}"
                                                     Style="{StaticResource CmdButton}"/>
-                                            <Button 
+                                            <Button Content="&#9660;"
                                                     ToolTip="{x:Static res:Resources.EnqueueLast}"
-                                                    Command="{Binding Path=EnqueueCmd}" CommandParameter="1"
-                                                    Style="{StaticResource CmdButton}" Margin="0,5,0,0">
-                                                <TextBlock Text="^" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                    <TextBlock.LayoutTransform>
-                                                        <RotateTransform CenterX="0" CenterY="0" Angle="180" />
-                                                    </TextBlock.LayoutTransform>
-                                                </TextBlock>
-                                            </Button>
+                                                    Command="{Binding Path=DataContext.EnqueueBadgeLowCmd, ElementName=grdBadges}" 
+                                                    CommandParameter="{Binding Path=.}"
+                                                    Style="{StaticResource CmdButton}" Margin="0,5,0,0"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -268,7 +265,9 @@
                             <DataGridTemplateColumn Header="{x:Static res:Resources.Blacklist}" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Command="{Binding Path=BlacklistCmd, ConverterParameter=1}" Content="x">
+                                        <Button Command="{Binding Path=DataContext.BlacklistBadgeCmd, ElementName=grdBadges}" 
+                                                CommandParameter="{Binding Path=.}"
+                                                Content="&#10761;">
                                             <Button.Style>
                                                 <Style TargetType="{x:Type Button}"  BasedOn="{StaticResource CmdButton}">
                                                     <Style.Triggers>
@@ -290,7 +289,7 @@
                        HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
                             <Label Content="{x:Static res:Resources.ToolSearch}" Foreground="White"/>
-                            <TextBox Text="{Binding Path=GameTitle, UpdateSourceTrigger=LostFocus}" 
+                            <TextBox Text="{Binding Path=GameTitle, Delay=400, UpdateSourceTrigger=PropertyChanged}" 
                              MinWidth="100" Padding="5,0,5,0" 
                              VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,5,0"/>
                         </StackPanel>
@@ -313,32 +312,27 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Button Content="^" 
+                            <Button Content="&#9650;" 
                                     Margin="10,0,0,0" 
-                                    FontSize="18"
                                     ToolTip="{x:Static res:Resources.EnqueueTop}"
-                                    Command="{Binding Path=EnqueueCmd}"
+                                    Command="{Binding Path=EnqueueAllCmd}"
+                                    VerticalContentAlignment="Stretch"
                                     CommandParameter="0"
-                                    VerticalContentAlignment="Bottom"
                                     HorizontalAlignment="Right"
-                                                    Style="{StaticResource CmdButton}"/>
+                                    Style="{StaticResource CmdButton}"/>
                             <Button Grid.Column="1" Margin="5,0,0,0" 
-                                                    ToolTip="{x:Static res:Resources.EnqueueBottom}"
-                                    Command="{Binding Path=EnqueueCmd}"
-                                                    CommandParameter="1"
-                                                    Style="{StaticResource CmdButton}"
+                                    Content="&#9660;"
+                                    ToolTip="{x:Static res:Resources.EnqueueBottom}"
+                                    Command="{Binding Path=EnqueueAllCmd}"
+                                    CommandParameter="1"
+                                    Style="{StaticResource CmdButton}"
                                     HorizontalAlignment="Center">
-                                <TextBlock Text="^" FontSize="18">
-                                    <TextBlock.LayoutTransform>
-                                        <RotateTransform CenterX="0" CenterY="0" Angle="180" />
-                                    </TextBlock.LayoutTransform>
-                                </TextBlock>
                             </Button>
                             <Button Grid.Column="2" Margin="5,0,0,0" 
                                     Content="#" 
                                     FontSize="18" 
                                     ToolTip="{x:Static res:Resources.DequeueAll}"
-                                    Command="{Binding Path=DequeueCmd}"
+                                    Command="{Binding Path=DequeueAllCmd}"
                                     Style="{StaticResource CmdButton}"
                                     HorizontalAlignment="Center"/>
                             <Button Grid.Column="3" Margin="25,0,0,0" 
@@ -366,15 +360,7 @@
                 </Grid>
             </TabItem>
 
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Padding="5" Text="{x:Static res:Resources.QueueHeader}" FontSize="18">
-                        <TextBlock.LayoutTransform>
-                            <RotateTransform CenterX="0" CenterY="0" Angle="270" />
-                        </TextBlock.LayoutTransform>
-                    </TextBlock>
-                </TabItem.Header>
-
+            <TabItem Header="{x:Static res:Resources.QueueHeader}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -408,7 +394,9 @@
                                             <!-- http://stackoverflow.com/questions/3885007/wpf-image-command-binding -->
                                             <!-- http://stackoverflow.com/a/31905177/1506454 -->
                                             <Image.InputBindings>
-                                                <MouseBinding Gesture="MiddleClick" Command="{Binding VisitStorePageCmd}" />
+                                                <MouseBinding Gesture="MiddleClick" 
+                                                              Command="{StaticResource redirect}" 
+                                                              CommandParameter="{Binding Path=StorePageUrl}" />
                                             </Image.InputBindings>
                                         </Image>
                                     </DataTemplate>
@@ -432,20 +420,16 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                                            <Button Content="^"
+                                            <Button Content="&#9650;"
                                                     ToolTip="{x:Static res:Resources.PriorityHigher}"
-                                                    Command="{Binding Path=SetPriorityCmd}" CommandParameter="-1"
+                                                    Command="{Binding Path=DataContext.SetHigherPriorityCmd, ElementName=grdQueue}" 
+                                                    CommandParameter="{Binding Path=.}"
                                                     Style="{StaticResource CmdButton}"/>
-                                            <Button
+                                            <Button Content="&#9660;"
                                                     ToolTip="{x:Static res:Resources.PriorityLower}"
-                                                    Command="{Binding Path=SetPriorityCmd}" CommandParameter="1"
-                                                    Style="{StaticResource CmdButton}" Margin="0,5,0,0">
-                                                <TextBlock Text="^" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                    <TextBlock.LayoutTransform>
-                                                        <RotateTransform CenterX="0" CenterY="0" Angle="180" />
-                                                    </TextBlock.LayoutTransform>
-                                                </TextBlock>
-                                            </Button>
+                                                    Command="{Binding Path=DataContext.SetLowerPriorityCmd, ElementName=grdQueue}" 
+                                                    CommandParameter="{Binding Path=.}"
+                                                    Style="{StaticResource CmdButton}" Margin="0,5,0,0"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -453,7 +437,9 @@
                             <DataGridTemplateColumn Header="{x:Static res:Resources.DequeueHeader}" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Command="{Binding Path=DequeueCmd}" Content="#" Style="{StaticResource CmdButton}"/>
+                                        <Button Command="{Binding Path=DataContext.DequeueBadgeCmd, ElementName=grdQueue}" 
+                                                CommandParameter="{Binding Path=.}"
+                                                Content="#" Style="{StaticResource CmdButton}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -478,7 +464,7 @@
                             </ComboBox>
 
                         </StackPanel>
-                        
+
                         <Button Content="{x:Static res:Resources.Start}"
                                 Command ="{Binding IdleCmd}" CommandParameter="1"
                             Grid.Column="1"
@@ -508,15 +494,117 @@
                     </Grid>
                 </Grid>
             </TabItem>
+            
+            <TabItem Header="{x:Static res:Resources.TimeIdleHeader}">
+                <Grid Margin="0,10,0,0">
+                    <Grid.Resources>
+                        <Style x:Key="TileBorder" TargetType="Border">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="BorderBrush" Value="MediumPurple"/>
+                            <Setter Property="Background" Value="#B0FFFFFF"/>
+                            <Setter Property="Opacity" Value="1"/>
+                            <Setter Property="Padding" Value="10"/>
+                        </Style>
+                        
+                        <DataTemplate x:Key="GameTile" DataType="{x:Type loc:BadgeModel}">
+                            <Border  Style="{StaticResource TileBorder}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
 
-            <TabItem FontSize="18">
-                <TabItem.Header>
-                    <TextBlock Padding="5" Text="{x:Static res:Resources.AboutHeader}" FontSize="18">
-                        <TextBlock.LayoutTransform>
-                            <RotateTransform CenterX="0" CenterY="0" Angle="270" />
-                        </TextBlock.LayoutTransform>
-                    </TextBlock>
-                </TabItem.Header>
+                                <Image Source="{Binding Path=ImageUrl}" 
+                                               ToolTip="{Binding Path=Title}"                                                
+                                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                               Width="180" Height="85"/>
+
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" 
+                                            Margin="0,10" 
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center">
+                                    <Button Command="{Binding Path=DataContext.StartBadgeIdleCmd, ElementName=Tabs}" 
+                                            CommandParameter="{Binding Path=.}"
+                                            Content="&#9655;" 
+                                            ToolTip="{x:Static res:Resources.Start}"
+                                            Style="{StaticResource CmdButton}" />
+
+                                    <Button Command="{Binding Path=DataContext.StopBadgeIdleCmd, ElementName=Tabs}" 
+                                            CommandParameter="{Binding Path=.}"
+                                            Content="&#10074;&#10074;" 
+                                            ToolTip="{x:Static res:Resources.Stop}"
+                                            Style="{StaticResource CmdButton}" Margin="10,0"/>
+
+                                    <Button Command="{Binding Path=DataContext.RemoveGameCmd, ElementName=Tabs}" 
+                                            CommandParameter="{Binding Path=.}"
+                                            Content="&#10761;" 
+                                            ToolTip="{x:Static res:Resources.RemoveGame}"
+                                            Style="{StaticResource CmdButton}"/>
+                                </StackPanel>
+                            </Grid>
+                            </Border>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="NewTile" DataType="{x:Type loc:BadgeModel}">
+
+                            <Border Style="{StaticResource TileBorder}">
+                                <Grid VerticalAlignment="Top"
+                                      ToolTip="{x:Static res:Resources.AddGame}"
+                                      Cursor="Hand" 
+                                      Width="180">
+                                    
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="85"/>
+                                        <RowDefinition Height="52"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Border Background="Gray"/>
+
+                                    <TextBlock Text="+" FontSize="32" FontWeight="Bold" Foreground="White" 
+                                               Margin="0"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+
+                                    <Grid.InputBindings>
+                                        <MouseBinding Gesture="LeftClick" Command="{Binding Path=DataContext.AddGameCmd, ElementName=Tabs}"/>
+                                    </Grid.InputBindings>
+                                </Grid>
+                                
+                            </Border>
+                        </DataTemplate>
+                    </Grid.Resources>
+                    
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding Path=Games}"                                  
+                                  VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type loc:BadgeModel}">
+                                <ContentControl Content="{Binding}" Margin="5">
+                                    <ContentControl.Style>
+                                        <Style TargetType="ContentControl">
+                                            <Setter Property="ContentTemplate" Value="{StaticResource GameTile}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding AppId}" Value="-1">
+                                                    <Setter Property="ContentTemplate" Value="{StaticResource NewTile}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <TabItem FontSize="18" Header="{x:Static res:Resources.AboutHeader}">
                 <Grid Background="{StaticResource DarkTheme}" Opacity="0.8">
                     <Grid  MaxHeight="320" Margin="20">
                         <Grid.Resources>

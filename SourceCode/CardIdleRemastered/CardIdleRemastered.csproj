@@ -57,8 +57,9 @@
   <ItemGroup>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\libs\HtmlAgilityPack.dll</HintPath>
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Steamworks.NET, Version=5.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\Steamworks.NET.dll</HintPath>
@@ -67,7 +68,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -77,9 +77,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xceed.Wpf.Toolkit, Version=2.5.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+    <Reference Include="Xceed.Wpf.Toolkit, Version=2.7.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\libs\Xceed.Wpf.Toolkit.dll</HintPath>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.7\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -95,25 +95,18 @@
     <Compile Include="BadgesWindow.xaml.cs">
       <DependentUpon>BadgesWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Commands\AbstractCommand.cs" />
-    <Compile Include="Commands\BlackListCommand.cs" />
-    <Compile Include="Commands\DequeueAllCommand.cs" />
-    <Compile Include="Commands\DequeueBadgeCommand.cs" />
-    <Compile Include="Commands\EnqueueAllCommand.cs" />
-    <Compile Include="Commands\EnqueueBadgeCommand.cs" />
-    <Compile Include="Commands\IdleProcess.cs" />
-    <Compile Include="Commands\IdleStopCommand.cs" />
-    <Compile Include="Commands\IdleStartCommand.cs" />
-    <Compile Include="Commands\LogoutCommand.cs" />
     <Compile Include="Commands\NavigationCommand.cs" />
-    <Compile Include="Commands\SetPriorityCommand.cs" />
-    <Compile Include="Commands\IdleQueueManageCommand.cs" />
+    <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="CookieClient.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="EnumLocalizationConverter.cs" />
+    <Compile Include="GameSelectionWindow.xaml.cs">
+      <DependentUpon>GameSelectionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IdleManager.cs" />
     <Compile Include="IdleMode.cs" />
+    <Compile Include="IdleProcess.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="ObservableModel.cs" />
     <Compile Include="Properties\Annotations.cs" />
@@ -132,6 +125,7 @@
     </Compile>
     <Compile Include="AppVisualSettings.cs" />
     <Compile Include="TranslationConverter.cs" />
+    <Compile Include="SteamParser.cs" />
     <Page Include="BadgesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -148,6 +142,10 @@
       <DependentUpon>BrowserWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="GameSelectionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -175,6 +173,7 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

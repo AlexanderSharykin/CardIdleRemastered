@@ -2,7 +2,6 @@
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using HtmlAgilityPack;
 using CardIdleRemastered.Properties;
 
 namespace CardIdleRemastered
@@ -74,40 +73,23 @@ namespace CardIdleRemastered
 
         public static async Task<string> GetHttpAsync(string url, int count = 3)
         {
-            //while (true)
+            var client = new CookieClient();
+            var content = string.Empty;
+            try
             {
-                var client = new CookieClient();
-                var content = string.Empty;
-                try
+                // If user is NOT authenticated (cookie got deleted in GetWebResponse()), return empty result
+                if (String.IsNullOrEmpty(Settings.Default.sessionid))
                 {
-                    // If user is NOT authenticated (cookie got deleted in GetWebResponse()), return empty result
-                    if (String.IsNullOrEmpty(Settings.Default.sessionid))
-                    {
-                        return string.Empty;
-                    }
-
-                    content = await client.DownloadStringTaskAsync(url);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Exception(ex, "CookieClient -> GetHttpAsync, for url = " + url);
+                    return string.Empty;
                 }
 
-                //if (!string.IsNullOrWhiteSpace(content) || count == 0)
-                return content;
-
-                count = count - 1;
+                content = await client.DownloadStringTaskAsync(url);
             }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex, "CookieClient -> GetHttpAsync, for url = " + url);
+            }
+            return content;
         }
-
-        public static async Task<bool> IsLogined()
-        {
-            var response = await GetHttpAsync(Settings.Default.myProfileURL);
-            if (String.IsNullOrWhiteSpace(response))
-                return false;
-            var document = new HtmlDocument();
-            document.LoadHtml(response);
-            return document.DocumentNode.SelectSingleNode("//a[@class=\"global_action_link\"]") == null;
-        }        
     }
 }

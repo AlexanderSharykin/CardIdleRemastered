@@ -59,7 +59,7 @@ namespace CardIdleRemastered
             if (registered)
             {
                 Logger.Info("Session test");
-                registered = await CookieClient.IsLogined();
+                registered = await new SteamParser().IsLogined(Settings.Default.myProfileURL);
             }
 
             if (registered)            
@@ -121,15 +121,6 @@ namespace CardIdleRemastered
             account.AvatarUrl = Settings.Default.SteamAvatarUrl;
             account.CustomBackgroundUrl = Settings.Default.CustomBackgroundUrl;
             account.BackgroundUrl = Settings.Default.SteamBackgroundUrl;
-
-            if (!String.IsNullOrWhiteSpace(account.AvatarUrl))
-                account.Avatar = LoadImage(account.AvatarUrl);
-
-            if (!String.IsNullOrWhiteSpace(account.CustomBackgroundUrl))
-                account.CustomBackground = LoadImage(account.CustomBackgroundUrl);
-            else
-                if (!String.IsNullOrWhiteSpace(account.BackgroundUrl))
-                    account.Background = LoadImage(account.BackgroundUrl);
 
             account.Filter = (BadgeModelFilter)Settings.Default.BadgeFilter;
             if (account.Filter == BadgeModelFilter.Running)
@@ -264,8 +255,7 @@ namespace CardIdleRemastered
             {
                 if (e.PropertyName == "BackgroundUrl")
                 {
-                    account.CustomBackgroundUrl = vis.BackgroundUrl;
-                    account.CustomBackground = LoadImage(vis.BackgroundUrl);
+                    account.CustomBackgroundUrl = vis.BackgroundUrl;                    
                 }
                 if (e.PropertyName == "IdleProcessCount")
                     account.Idler.MaxIdleInstanceCount = vis.IdleProcessCount;

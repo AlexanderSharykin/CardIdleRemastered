@@ -11,7 +11,17 @@ namespace steam_idle
     {
         [STAThread]
         static void Main(string[] args)
-        {
+        {            
+            /*
+             * Dependencies
+             * Steamworks.NET
+             * https://github.com/rlabrecque/Steamworks.NET/tree/master/Standalone
+             * 
+             * CSteamworks.dll
+             * steam_api.dll
+             * https://github.com/rlabrecque/Steamworks.NET/tree/master/Plugins/x86
+             */
+
             if (args == null || args.Length == 0)
                 return;
 

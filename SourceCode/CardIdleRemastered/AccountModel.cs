@@ -13,7 +13,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using CardIdleRemastered.Commands;
 using CardIdleRemastered.Properties;
-using Steamworks;
 
 namespace CardIdleRemastered
 {
@@ -23,8 +22,7 @@ namespace CardIdleRemastered
         private readonly IdleManager _idler;
         private string _userName;
         private string _level = "0";
-        private BitmapImage _avatar;
-
+        
         private readonly ICollectionView _badges;
         private BadgeModelFilter _filter;               
 
@@ -32,11 +30,9 @@ namespace CardIdleRemastered
         private ICommand _logoutCmd;
 
         private int _totalCards;
-        private int _totalGames;
-        private BitmapImage _background;
+        private int _totalGames;        
         private string _syncTime;
-        private string _gameTitle;
-        private BitmapImage _customBackground;
+        private string _gameTitle;        
         private string _avatarUrl;
         private string _backgroundUrl;
         private string _customBackgroundUrl;
@@ -48,6 +44,8 @@ namespace CardIdleRemastered
             _updater = new AccountUpdater(this);
             _idler = new IdleManager(this);
 
+            UserName = "Card Idle";
+            AvatarUrl = "Resources/Avatar.png";
             AllBadges = new ObservableCollection<BadgeModel>();
 
             IdleQueueBadges = new ObservableCollection<BadgeModel>();
@@ -119,16 +117,6 @@ namespace CardIdleRemastered
 
         public string ProfileUrl { get; set; }
 
-        public BitmapImage Avatar
-        {
-            get { return _avatar; }
-            set
-            {
-                _avatar = value;
-                OnPropertyChanged();
-            }
-        }
-
         public string AvatarUrl
         {
             get { return _avatarUrl; }
@@ -139,38 +127,18 @@ namespace CardIdleRemastered
             }
         }
 
-        public BitmapImage Background
+        public string BackgroundUrl
         {
             get
             {
-                if (_customBackground != null)
-                    return _customBackground;
-                return _background;
+                if (String.IsNullOrWhiteSpace(_customBackgroundUrl) == false)
+                    return _customBackgroundUrl;
+                return _backgroundUrl;
             }
             set
-            {
-                _background = value;                
-                OnPropertyChanged();
-            }
-        }
-
-        public string BackgroundUrl
-        {
-            get { return _backgroundUrl; }
-            set
-            {
+            {                
                 _backgroundUrl = value;
                 OnPropertyChanged();
-            }
-        }
-
-        public BitmapImage CustomBackground
-        {
-            get { return _customBackground; }
-            set
-            {
-                _customBackground = value;
-                OnPropertyChanged("Background");
             }
         }
 
@@ -181,6 +149,7 @@ namespace CardIdleRemastered
             {
                 _customBackgroundUrl = value;
                 OnPropertyChanged();
+                OnPropertyChanged("BackgroundUrl");
             }
         }
 
@@ -294,7 +263,7 @@ namespace CardIdleRemastered
                 SetFilter();
                 OnPropertyChanged();
             }
-        }
+        }        
 
         public bool IsCardIdleActive
         {
@@ -312,8 +281,15 @@ namespace CardIdleRemastered
         public bool IsSteamRunning
         {
             get
-            {
-                return SteamAPI.IsSteamRunning() || IgnoreClient;
+            {                
+                try
+                {
+                    return Steamworks.SteamAPI.IsSteamRunning() || IgnoreClient;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -632,7 +608,7 @@ namespace CardIdleRemastered
 
         private async void SelectGame(int id)
         {
-            SelectedGame = await new SteamParser().GetBadge(id);
+            SelectedGame = await new SteamParser().GetGameInfo(id);
         }
 
         public BadgeModel SelectedGame

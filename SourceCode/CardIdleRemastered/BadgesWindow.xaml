@@ -1,13 +1,17 @@
 ﻿<Window x:Class="CardIdleRemastered.BadgesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:res="clr-namespace:CardIdleRemastered.Properties"
         xmlns:loc="clr-namespace:CardIdleRemastered"        
         xmlns:cmd="clr-namespace:CardIdleRemastered.Commands"
         Title="{x:Static res:Resources.Title}" Height="Auto" Width="Auto" 
         Closing="BadgesWindowClosing" Loaded="BadgesWindowLoaded" 
         WindowStartupLocation="CenterScreen" 
-        Background="{DynamicResource DarkTheme}">
+        Background="{DynamicResource DarkTheme}"
+        mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=loc:AccountModel, IsDesignTimeCreatable=True}">
 
     <Window.Resources>
         <loc:EnumLocalizationConverter x:Key="enumTranslator" />
@@ -90,11 +94,12 @@
 
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="{Binding Path=Background}"/>
+            <ImageBrush ImageSource="{Binding Path=BackgroundUrl}"/>
         </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="200" />
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -112,7 +117,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Border Margin="25" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Image Name="picAvatar" Source="{Binding Path=Avatar}" 
+                <Image Name="picAvatar" Source="{Binding Path=AvatarUrl}" 
                        MinWidth="10" MinHeight="10" 
                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                        Stretch="UniformToFill"/>
@@ -195,7 +200,7 @@
                             <DataGridTemplateColumn Header="{x:Static res:Resources.Game}" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Source="{Binding Path=AppImage}" 
+                                        <Image Source="{Binding Path=ImageUrl}" 
                                                ToolTip="{Binding Path=Title}" 
                                                Cursor="Hand" 
                                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -343,20 +348,6 @@
                                     HorizontalAlignment="Left" VerticalAlignment="Top" Click="SettingsDialog"/>
                         </Grid>
                     </DockPanel>
-
-                    <StackPanel Grid.Row="2" Name="Stats" 
-                                Orientation="Horizontal" HorizontalAlignment="Center" Margin="15,0">
-                        <Label Content ="{x:Static res:Resources.NextSync}" Style="{StaticResource propName}"/>
-                        <TextBlock Text ="{Binding Path=SyncTime}" Style="{StaticResource propValue}"/>
-
-                        <Label Content ="{x:Static res:Resources.TotalGames}" Style="{StaticResource propName}"/>
-                        <TextBlock Text="{Binding Path=TotalGames}" Style="{StaticResource propValue}"/>
-
-                        <Label Content ="{x:Static res:Resources.TotalCards}" Style="{StaticResource propName}"/>
-                        <TextBlock Text="{Binding Path=TotalCards}" Style="{StaticResource propValue}"/>
-                    </StackPanel>
-
-
                 </Grid>
             </TabItem>
 
@@ -386,7 +377,7 @@
                             <DataGridTemplateColumn Header="{x:Static res:Resources.Game}" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Source="{Binding Path=AppImage}" ToolTip="{Binding Path=Title}"  
+                                        <Image Source="{Binding Path=ImageUrl}" ToolTip="{Binding Path=Title}"  
                                                Cursor="Hand" 
                                                HorizontalAlignment="Center" VerticalAlignment="Center"
                                                Width="230" Height="110" Stretch="Fill">
@@ -669,7 +660,19 @@
             </TabItem>
         </TabControl>
 
-        <StackPanel Grid.Column="1" Grid.Row="2">
+        <StackPanel Grid.Row="2" Grid.Column="1" Name="Stats" 
+                                Orientation="Horizontal" HorizontalAlignment="Center" Margin="15,0">
+            <Label Content ="{x:Static res:Resources.NextSync}" Style="{StaticResource propName}"/>
+            <TextBlock Text ="{Binding Path=SyncTime}" Style="{StaticResource propValue}"/>
+
+            <Label Content ="{x:Static res:Resources.TotalGames}" Style="{StaticResource propName}"/>
+            <TextBlock Text="{Binding Path=TotalGames}" Style="{StaticResource propValue}"/>
+
+            <Label Content ="{x:Static res:Resources.TotalCards}" Style="{StaticResource propName}"/>
+            <TextBlock Text="{Binding Path=TotalCards}" Style="{StaticResource propValue}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Grid.Row="3">
             <Label Content="{x:Static res:Resources.NoConnection}" Foreground="Red" FontSize="16" FontWeight="Medium" HorizontalAlignment="Center">
                 <Label.Style>
                     <Style TargetType="{x:Type Label}">

@@ -51,7 +51,7 @@ namespace CardIdleRemastered
             int idx = 0;
             foreach (var id in games)
             {
-                var game = await new SteamParser().GetBadge(id);
+                var game = await new SteamParser().GetGameInfo(id);
                 Account.Games.Insert(idx, game);
                 idx++;
             }

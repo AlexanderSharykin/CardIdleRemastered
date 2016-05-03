@@ -47,9 +47,7 @@ namespace CardIdleRemastered
         public string ImageUrl
         {
             get { return "http://cdn.akamai.steamstatic.com/steam/apps/" + AppId + "/header_292x136.jpg"; }
-        }
-
-        public BitmapImage AppImage { get; set; }
+        }        
 
         public double HoursPlayed
         {

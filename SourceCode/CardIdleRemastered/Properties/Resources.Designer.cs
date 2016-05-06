@@ -404,6 +404,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (login).
+        /// </summary>
+        public static string Login {
+            get {
+                return ResourceManager.GetString("Login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (logout).
         /// </summary>
         public static string Logout {

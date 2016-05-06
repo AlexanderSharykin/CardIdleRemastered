@@ -228,6 +228,9 @@
   <data name="LevelBorder" xml:space="preserve">
     <value>Рамка уровня</value>
   </data>
+  <data name="Login" xml:space="preserve">
+    <value>(войти)</value>
+  </data>
   <data name="Logout" xml:space="preserve">
     <value>(выйти)</value>
   </data>

@@ -232,6 +232,9 @@
   <data name="LevelBorder" xml:space="preserve">
     <value>Level Border</value>
   </data>
+  <data name="Login" xml:space="preserve">
+    <value>(login)</value>
+  </data>
   <data name="Logout" xml:space="preserve">
     <value>(logout)</value>
   </data>

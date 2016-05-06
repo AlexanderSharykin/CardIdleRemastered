@@ -90,9 +90,8 @@
     <Compile Include="AccountModel.cs" />
     <Compile Include="AccountUpdater.cs" />
     <Compile Include="AppBrush.cs" />
-    <Compile Include="BadgeModelFilter.cs" />
     <Compile Include="BadgeModel.cs" />
-    <Compile Include="BadgesWindow.xaml.cs">
+    <Compile Include="Views\BadgesWindow.xaml.cs">
       <DependentUpon>BadgesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Commands\NavigationCommand.cs" />
@@ -100,12 +99,12 @@
     <Compile Include="CookieClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="EnumLocalizationConverter.cs" />
-    <Compile Include="GameSelectionWindow.xaml.cs">
+    <Compile Include="Converters\EnumLocalizationConverter.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Views\GameSelectionWindow.xaml.cs">
       <DependentUpon>GameSelectionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="IdleManager.cs" />
-    <Compile Include="IdleMode.cs" />
     <Compile Include="IdleProcess.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="ObservableModel.cs" />
@@ -115,22 +114,17 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Resources.ru-RU.Designer.cs">
-      <DependentUpon>Resources.ru-RU.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="SettingsWindow.xaml.cs">
+    <Compile Include="Views\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppVisualSettings.cs" />
-    <Compile Include="TranslationConverter.cs" />
+    <Compile Include="Converters\TranslationConverter.cs" />
     <Compile Include="SteamParser.cs" />
-    <Page Include="BadgesWindow.xaml">
+    <Page Include="Views\BadgesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="BrowserWindow.xaml">
+    <Page Include="Views\BrowserWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -138,15 +132,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BrowserWindow.xaml.cs">
+    <Compile Include="Views\BrowserWindow.xaml.cs">
       <DependentUpon>BrowserWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="GameSelectionWindow.xaml">
+    <Page Include="Views\GameSelectionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SettingsWindow.xaml">
+    <Page Include="Views\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -182,12 +176,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.ru-RU.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.ru-RU.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

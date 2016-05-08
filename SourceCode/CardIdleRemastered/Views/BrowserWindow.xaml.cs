@@ -15,8 +15,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-//using IdleMaster;
 using CardIdleRemastered.Properties;
+using Microsoft.Win32;
+using Path = System.IO.Path;
 
 namespace CardIdleRemastered
 {
@@ -25,9 +26,39 @@ namespace CardIdleRemastered
     /// </summary>
     public partial class BrowserWindow : Window
     {
+        private static bool _browserEmulation;
+
         public BrowserWindow()
         {
             InitializeComponent();
+            SetIeMode();
+        }
+
+        private void SetIeMode()
+        {
+            if (_browserEmulation)
+                return;
+
+            // Set the Browser emulation version for embedded browser control
+            try
+            {
+                RegistryKey ie_root =
+                    Registry.CurrentUser.CreateSubKey(
+                        @"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION");
+                RegistryKey key =
+                    Registry.CurrentUser.OpenSubKey(
+                        @"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
+                String programName = Path.GetFileName(Environment.GetCommandLineArgs()[0]);
+                key.SetValue(programName, (int) 10001, RegistryValueKind.DWord);
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex, "Registry IE FEATURE_BROWSER_EMULATION");
+            }
+            finally
+            {
+                _browserEmulation = true;
+            }
         }
 
         public int SecondsWaiting = 30;
@@ -224,16 +255,6 @@ namespace CardIdleRemastered
                 Settings.Default.Save();
                 Close();
             }
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            bool connected = !string.IsNullOrWhiteSpace(Settings.Default.sessionid) &&
-                             !string.IsNullOrWhiteSpace(Settings.Default.steamLogin);
-
-            if (connected)            
-                App.CardIdle.OpenAccount();
-            
         }
     }
 }

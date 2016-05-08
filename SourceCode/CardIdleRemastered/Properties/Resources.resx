@@ -214,6 +214,9 @@
   <data name="GameSelectionTitle" xml:space="preserve">
     <value>Select a game to idle</value>
   </data>
+  <data name="GamesRunning" xml:space="preserve">
+    <value>Games running: {0}</value>
+  </data>
   <data name="Hours" xml:space="preserve">
     <value>Hours</value>
   </data>
@@ -243,6 +246,9 @@
   </data>
   <data name="NoConnection" xml:space="preserve">
     <value>Not connected to Steam</value>
+  </data>
+  <data name="NotInGame" xml:space="preserve">
+    <value>Not in game</value>
   </data>
   <data name="Priority" xml:space="preserve">
     <value>Priority</value>

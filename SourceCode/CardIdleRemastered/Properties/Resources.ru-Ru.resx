@@ -210,6 +210,9 @@
   <data name="GameSelectionTitle" xml:space="preserve">
     <value>Выберите игру</value>
   </data>
+  <data name="GamesRunning" xml:space="preserve">
+    <value>Игр запущено: {0}</value>
+  </data>
   <data name="Hours" xml:space="preserve">
     <value>Время, ч</value>
   </data>
@@ -239,6 +242,9 @@
   </data>
   <data name="NoConnection" xml:space="preserve">
     <value>Нет соединения</value>
+  </data>
+  <data name="NotInGame" xml:space="preserve">
+    <value>Не в игре</value>
   </data>
   <data name="Priority" xml:space="preserve">
     <value>Приоритет</value>

@@ -350,6 +350,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Games running: {0}.
+        /// </summary>
+        public static string GamesRunning {
+            get {
+                return ResourceManager.GetString("GamesRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hours.
         /// </summary>
         public static string Hours {
@@ -436,6 +445,15 @@ namespace CardIdleRemastered.Properties {
         public static string NoConnection {
             get {
                 return ResourceManager.GetString("NoConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not in game.
+        /// </summary>
+        public static string NotInGame {
+            get {
+                return ResourceManager.GetString("NotInGame", resourceCulture);
             }
         }
         

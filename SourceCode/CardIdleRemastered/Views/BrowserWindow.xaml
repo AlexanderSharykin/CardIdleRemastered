@@ -2,12 +2,23 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:res="clr-namespace:CardIdleRemastered.Properties"
-        Title="{x:Static res:Resources.SteamLogin}" Height="Auto" Width="Auto" Loaded="Window_Loaded" Closing="Window_Closing" >
+        Title="{x:Static res:Resources.SteamLogin}" 
+        Height="Auto" Width="Auto" 
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded">
     <Grid>
         <WebBrowser Name="wbAuth"  
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     Navigated="wbAuth_Navigated" Navigating="wbAuth_Navigating"
                     />
 
+        <!--<Button Width="120" Height="50" >
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../Resources/Avatar.png" />
+                <TextBlock Text="Click Here" 
+                   VerticalAlignment="Center" 
+                   HorizontalAlignment="Center" />
+            </StackPanel>
+        </Button>-->
     </Grid>
 </Window>

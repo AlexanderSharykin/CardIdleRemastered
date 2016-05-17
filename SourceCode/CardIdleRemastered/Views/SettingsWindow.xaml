@@ -22,8 +22,7 @@
     
     <Grid Margin="15">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>            
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -37,16 +36,8 @@
                      VerticalContentAlignment="Center"
                      Text="{Binding Path=BackgroundUrl, UpdateSourceTrigger=LostFocus}"/>
         </Grid>
-        <Grid Grid.Row="1" Margin="0,0,0,10" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Label Content="{x:Static res:Resources.CfgIdleProcessCount}" Foreground="White"/>
-            <xctk:ByteUpDown Grid.Column="1" Value="{Binding Path=IdleProcessCount}" Increment="1" Maximum="32" Minimum="1"/>
-        </Grid>
 
-        <DataGrid Grid.Row="2"                    
+        <DataGrid Grid.Row="1"                    
                     ItemsSource="{Binding Path=AppBrushes}" 
                     AutoGenerateColumns="False" Loaded="SettingsWindowLoaded">
             <DataGrid.Resources>
@@ -72,7 +63,7 @@
             </DataGrid.Columns>
         </DataGrid>
         
-        <Grid Grid.Row="3" Grid.ColumnSpan="2">
+        <Grid Grid.Row="2" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>

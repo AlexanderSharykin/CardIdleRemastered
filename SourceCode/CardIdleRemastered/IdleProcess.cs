@@ -5,12 +5,12 @@ namespace CardIdleRemastered
 {
     public class IdleProcess: ObservableModel
     {
-        private BadgeModel _badge;
+        private string  _appId;
         private Process _steamIdle;
 
-        public IdleProcess(BadgeModel badge)
+        public IdleProcess(string appId)
         {
-            _badge = badge;
+            _appId = appId;
         }
 
         public bool IsRunning
@@ -23,7 +23,7 @@ namespace CardIdleRemastered
             if (IsRunning)
                 return;
 
-            _steamIdle = Process.Start(new ProcessStartInfo(@"steam-idle.exe", _badge.AppId) { WindowStyle = ProcessWindowStyle.Hidden });  
+            _steamIdle = Process.Start(new ProcessStartInfo(@"steam-idle.exe", _appId) { WindowStyle = ProcessWindowStyle.Hidden });  
             if (_steamIdle != null)
                 _steamIdle.Exited += SteamIdleOnProcessExited;
             OnPropertyChanged("IsRunning");

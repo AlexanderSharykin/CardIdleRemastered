@@ -10,11 +10,18 @@ namespace CardIdleRemastered
     public class IdleManager: ObservableModel
     {
         public static readonly byte DefaultIdleInstanceCount = 16;
-        private bool _isActive;
-        private IdleMode _mode;
+
         private AccountModel _account;
+
+        private bool _isActive;
+        private IdleMode _mode;        
         private byte _maxIdleInstanceCount;
+
         private Random _rand = new Random();
+        
+        private IdleMode _currentMode;
+        private List<BadgeWrapper> _badgeBuffer;
+        private DispatcherTimer _tmCounter;
 
         public IdleManager(AccountModel acc)
         {
@@ -62,11 +69,6 @@ namespace CardIdleRemastered
             }
         }
 
-        
-        private List<BadgeWrapper> _badgeBuffer;        
-        private IdleMode _currentMode;
-        private DispatcherTimer _tmCounter;
-
         public async void Start()
         {
             if (IsActive)
@@ -92,7 +94,7 @@ namespace CardIdleRemastered
             {
                 if (_currentMode == IdleMode.OneByOne)
                 {
-                    var next = _account.IdleQueueBadges.FirstOrDefault();
+                    var next = _account.IdleQueueBadges.FirstOrDefault(b=>b.RemainingCard > 0);
                     if (next != null)
                         await AddGame(next);
                 }
@@ -126,10 +128,10 @@ namespace CardIdleRemastered
             _badgeBuffer.Add(new BadgeWrapper{Badge = next, IsTrial = trial, Hours = next.HoursPlayed});            
             next.IdleStopped += BadgeIdleProcessStopped;
 
-            next.CardIdleProcess.Start();
+            next.CardIdleProcess.Start();            
             if (trial)
                 next.PropertyChanged += BadgeHoursChanged;
-            next.PropertyChanged += BadgeQueueStateChanged;
+            next.PropertyChanged += BadgeQueueStateChanged;            
 
             // Make a short but random amount of time pass before starting next game
             var wait = _rand.Next(40, 80);

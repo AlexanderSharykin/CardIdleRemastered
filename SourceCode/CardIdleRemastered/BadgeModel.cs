@@ -12,15 +12,22 @@ namespace CardIdleRemastered
 {
     public class BadgeModel:ObservableModel
     {
+        private int _remainingCard;
+        private double _hoursPlayed;
+
+        private IdleProcess _idleProcess;
+        private bool _isBlacklisted;
+        private bool _isInQueue;
+
+        public BadgeModel()
+        {
+        }
+
         public BadgeModel(string id, string title, string card, string hours)
         {
             AppId = id;
             Title = title;
             UpdateStats(card, hours);
-        }
-
-        public BadgeModel()
-        {
         }
 
         public string Title { get; set; }
@@ -30,6 +37,11 @@ namespace CardIdleRemastered
         public string StorePageUrl
         {
             get { return "http://store.steampowered.com/app/" + AppId; }
+        }
+
+        public string ImageUrl
+        {
+            get { return "http://cdn.akamai.steamstatic.com/steam/apps/" + AppId + "/header_292x136.jpg"; }
         }
 
         public int RemainingCard
@@ -44,11 +56,6 @@ namespace CardIdleRemastered
             }
         }
 
-        public string ImageUrl
-        {
-            get { return "http://cdn.akamai.steamstatic.com/steam/apps/" + AppId + "/header_292x136.jpg"; }
-        }        
-
         public double HoursPlayed
         {
             get { return _hoursPlayed; }
@@ -59,42 +66,10 @@ namespace CardIdleRemastered
                 OnPropertyChanged("HasTrial");
             }
         }
-        
-        private int _remainingCard;
-        private double _hoursPlayed;
-
-        private IdleProcess _idleProcess;
-        private bool _isBlacklisted;
-        private bool _isInQueue;
-
-        public IdleProcess CardIdleProcess
-        {
-            get
-            {
-                if (_idleProcess == null)
-                {
-                    _idleProcess = new IdleProcess(this);
-                    _idleProcess.IdleStopped += (sender, args) =>
-                    {
-                        if (IdleStopped != null)
-                            IdleStopped(this, EventArgs.Empty);
-                        OnPropertyChanged("CardIdleActive");
-                    };
-                }
-                return _idleProcess;
-            }            
-        }
-
-        public event EventHandler IdleStopped;
 
         public bool HasTrial
         {
             get { return !CardIdleActive && HoursPlayed < 2; }
-        }
-
-        public bool CardIdleActive
-        {
-            get { return CardIdleProcess.IsRunning; }
         }
 
         public bool IsBlacklisted
@@ -112,14 +87,38 @@ namespace CardIdleRemastered
             get { return _isInQueue; }
             set
             {
-                _isInQueue = value; 
+                _isInQueue = value;
                 OnPropertyChanged();
             }
         }
 
-        public bool CanCardDrops()
+        public IdleProcess CardIdleProcess
         {
-            return RemainingCard > 0;
+            get
+            {
+                if (_idleProcess == null)
+                {
+                    _idleProcess = new IdleProcess(AppId);
+                    _idleProcess.PropertyChanged += (sender, args) =>
+                    {
+                        if (args.PropertyName == "IsRunning")
+                            OnPropertyChanged("CardIdleActive");
+                    };
+                    _idleProcess.IdleStopped += (sender, args) =>
+                    {
+                        if (IdleStopped != null)
+                            IdleStopped(this, EventArgs.Empty);                        
+                    };
+                }
+                return _idleProcess;
+            }            
+        }
+
+        public event EventHandler IdleStopped;
+
+        public bool CardIdleActive
+        {
+            get { return CardIdleProcess.IsRunning; }
         }
 
         public void UpdateStats(string remaining, string hours)

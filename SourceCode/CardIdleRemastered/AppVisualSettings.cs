@@ -4,18 +4,26 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace CardIdleRemastered
 {
     public class AppVisualSettings: ObservableModel
     {
-        private string _backgroundUrl;
-        private byte _idleProcessCount;
+        private static AppVisualSettings _defaultVisuals;
 
-        public AppVisualSettings()
+        public static AppVisualSettings DefaultVisualSettings
         {
-            AppBrushes = new ObservableCollection<AppBrush>();
+            get
+            {
+                if (_defaultVisuals == null)
+                    _defaultVisuals = new AppVisualSettings();
+                return _defaultVisuals;
+            }
         }
+
+        private string _backgroundUrl;
+        private ObservableCollection<AppBrush> _appBrushes;
 
         public string BackgroundUrl
         {
@@ -27,23 +35,37 @@ namespace CardIdleRemastered
             }
         }
 
-        public byte IdleProcessCount
+        public ObservableCollection<AppBrush> AppBrushes
         {
-            get { return _idleProcessCount; }
-            set
+            get
             {
-                _idleProcessCount = value;
-                OnPropertyChanged();
+                if (_appBrushes == null)
+                    _appBrushes = new ObservableCollection<AppBrush>();
+                return _appBrushes;
             }
+            private set { _appBrushes = value; }
         }
 
-        public ObservableCollection<AppBrush> AppBrushes { get; private set; }
+        public void GetBrushes()
+        {            
+            var res = App.CardIdle.Resources;
+            var br = res.Keys.OfType<string>()
+                .Where(key => key.StartsWith("Dyn"))
+                .Select(resKey => new AppBrush(resKey, ((SolidColorBrush)res[resKey]).Color))
+                .ToList();
+            AppBrushes = new ObservableCollection<AppBrush>(br);
+        }
+
+        public void ResetBrushes()
+        {
+            foreach (var brush in AppBrushes)
+                App.CardIdle.Resources[brush.Name] = new SolidColorBrush(brush.BrushColor.Value);
+        }
 
         public AppVisualSettings Copy()
         {
             var vis = new AppVisualSettings();
             vis.BackgroundUrl = BackgroundUrl;
-            vis.IdleProcessCount = IdleProcessCount;
 
             foreach (var b in AppBrushes)
             {

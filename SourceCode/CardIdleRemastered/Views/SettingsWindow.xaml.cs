@@ -37,8 +37,7 @@ namespace CardIdleRemastered
 
         private void CopySettings(AppVisualSettings src, AppVisualSettings target)
         {
-            target.BackgroundUrl = src.BackgroundUrl;
-            target.IdleProcessCount = src.IdleProcessCount;
+            target.BackgroundUrl = src.BackgroundUrl;            
 
             target.AppBrushes.Clear();
             foreach (var b in src.AppBrushes)
@@ -47,8 +46,7 @@ namespace CardIdleRemastered
 
         private void ResetSettings(AppVisualSettings src, AppVisualSettings target)
         {
-            target.BackgroundUrl = src.BackgroundUrl;
-            target.IdleProcessCount = src.IdleProcessCount;
+            target.BackgroundUrl = src.BackgroundUrl;            
 
             for (int i = 0; i < src.AppBrushes.Count; i++)
                 target.AppBrushes[i].BrushColor = src.AppBrushes[i].BrushColor;
@@ -56,7 +54,7 @@ namespace CardIdleRemastered
 
         private void ResetClick(object sender, RoutedEventArgs e)
         {
-            var vis = App.CardIdle.DefaultVisualSettings;
+            var vis = AppVisualSettings.DefaultVisualSettings;
             ResetSettings(vis, CurrentSettings);
             CopySettings(vis, _memo);
             App.CardIdle.SaveSettings(vis);

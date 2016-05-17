@@ -12,11 +12,10 @@ namespace CardIdleRemastered
     public class AccountUpdater
     {
         private AccountModel _account;
-
-        private DispatcherTimer _tmSync;
-        private int _counter;
-        private DispatcherTimer _tmCounter;
+        private DispatcherTimer _tmSync;       
+        private DispatcherTimer _tmCounter;        
         private TimeSpan _interval;
+        private int _counter;
 
         public AccountUpdater(AccountModel account)
         {
@@ -25,12 +24,10 @@ namespace CardIdleRemastered
             _tmSync = new DispatcherTimer();
             _tmSync.Tick += SyncBanges;
             Interval = new TimeSpan(0, 5, 0);
-            //_tmSync.Start();
 
             _tmCounter = new DispatcherTimer();
             _tmCounter.Tick += UpdateSecondCounter;
             _tmCounter.Interval = new TimeSpan(0, 0, 1);
-            //_tmCounter.Start();
         }
 
         public void Start()
@@ -82,9 +79,45 @@ namespace CardIdleRemastered
 
         public async Task Sync()
         {
-            var tBadges = new SteamParser().LoadBadgesAsync(_account);
-            var tProfile = new SteamParser().LoadProfileAsync(_account);
+            var tBadges = LoadBadgesAsync();
+            var tProfile = LoadProfileAsync();
             await Task.WhenAll(tBadges, tProfile);
+        }
+
+        private async Task LoadProfileAsync()
+        {
+            var profile = await new SteamParser().LoadProfileAsync(_account.ProfileUrl);
+            _account.BackgroundUrl = profile["BackgroundUrl"];
+            _account.AvatarUrl = profile["AvatarUrl"];            
+            _account.UserName = profile["UserName"];            
+            _account.Level = profile["Level"];            
+        }
+
+        private async Task LoadBadgesAsync()
+        {
+            var badges = await new SteamParser().LoadBadgesAsync(_account.ProfileUrl);
+
+            foreach (var badge in badges)
+            {
+                var b = _account.AllBadges.FirstOrDefault(x => x.AppId == badge.AppId);
+                if (badge.RemainingCard > 0)
+                {
+                    if (b == null)
+                        _account.AddBadge(badge);
+                    else
+                    {
+                        b.RemainingCard = badge.RemainingCard;
+                        b.HoursPlayed = badge.HoursPlayed;
+                    }
+                }
+                else
+                {
+                    if (b != null)
+                        _account.RemoveBadge(b);
+                }
+            }
+
+            _account.UpdateTotalValues();
         }
     }
 }

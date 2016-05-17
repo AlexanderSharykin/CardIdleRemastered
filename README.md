@@ -16,7 +16,24 @@ OS Windows 7 and higher
 
 You should be logged into your Steam account via Steam client to start idling.
 
-Card Idle works in a Single or Multi (Automatic) Idle mode.
+Card Idle works in a Single, Multi (Automatic) or Time Idle mode.
+
+Time Idle Mode
+-------
+
+Open **Time Idle** tab
+
+Click on Plus to add a new game to list
+
+In the selection dialog enter game ID or store page url 
+
+Confirm selection
+
+Click Start button under game image
+
+**Time Idle mode doesn't require login**
+
+Card Idle saves games list before quit
 
 Single Game Idle Mode
 -------
@@ -25,7 +42,7 @@ Open **Badges** tab
 
 Decide which game to idle and find it in the list using a grid scroll or a quick-search field
 
-Click Start button **[>]**
+Click Start button
 
 Wait until all cards drop and idle process stops
 
@@ -34,15 +51,15 @@ Automatic Game Idle Mode
 
 Open **Badges** Tab
 
-Decide which games to idle and add them to the idle queue by clicking Enqueue button [^]
+Decide which games to idle and add them to the idle queue by clicking Enqueue button
 
-Enqueue Selected button [^] under the grid will add all games to the queue
+Enqueue Selected button under the grid will add all games to the queue
 
 Open **Queue** Tab
 
 Change idle priority if necessary
 
-Click Dequeue button [#] to remove a game from the queue if necessary
+Click Dequeue button to remove a game from the queue if necessary
 
 Select Idle mode. Default mode is "One by One" which means that Card Idle runs one game idle process at a time and starts the next game only when all cards received. 
 
@@ -50,7 +67,7 @@ Other two modes ("Trial First" and "Trial Last") were introduces for games which
 
 Launch automatic idle: click **[Start]** button
 
-Click [Stop] button to interrupt automatic idle if necessary
+Click **[Stop]** button to interrupt automatic idle if necessary
 
 **Card Idle stops all idle processes on quit or logout.**
 

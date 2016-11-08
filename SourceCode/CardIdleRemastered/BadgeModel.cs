@@ -121,6 +121,18 @@ namespace CardIdleRemastered
             get { return CardIdleProcess.IsRunning; }
         }
 
+        public bool CheckProperty(BadgeProperty property)
+        {
+            switch (property)
+            {
+                case BadgeProperty.Running: return CardIdleActive;
+                case BadgeProperty.HasTrial: return HasTrial;
+                case BadgeProperty.Enqueued: return IsInQueue;
+                case BadgeProperty.Blacklisted: return IsBlacklisted;
+                default: throw new ArgumentException();
+            }           
+        }
+
         public void UpdateStats(string remaining, string hours)
         {
             RemainingCard = string.IsNullOrWhiteSpace(remaining) ? 0 : int.Parse(remaining);

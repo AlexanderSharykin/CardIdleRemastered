@@ -130,19 +130,16 @@
   <data name="Avatar" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Avatar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="BadgeModelFilter_All" xml:space="preserve">
-    <value>All</value>
-  </data>
-  <data name="BadgeModelFilter_Blacklisted" xml:space="preserve">
+  <data name="BadgeProperty_Blacklisted" xml:space="preserve">
     <value>In Black List</value>
   </data>
-  <data name="BadgeModelFilter_HasTrial" xml:space="preserve">
+  <data name="BadgeProperty_Enqueued" xml:space="preserve">
+    <value>Enqueued</value>
+  </data>
+  <data name="BadgeProperty_HasTrial" xml:space="preserve">
     <value>Has Trial Period</value>
   </data>
-  <data name="BadgeModelFilter_NotEnqueued" xml:space="preserve">
-    <value>Not Enqueued</value>
-  </data>
-  <data name="BadgeModelFilter_Running" xml:space="preserve">
+  <data name="BadgeProperty_Running" xml:space="preserve">
     <value>Running</value>
   </data>
   <data name="BadgesHeader" xml:space="preserve">
@@ -302,7 +299,7 @@
     <value>Find games by name</value>
   </data>
   <data name="ToolShow" xml:space="preserve">
-    <value>Show</value>
+    <value>Filters</value>
   </data>
   <data name="TotalCards" xml:space="preserve">
     <value>Cards</value>

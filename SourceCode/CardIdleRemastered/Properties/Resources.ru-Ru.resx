@@ -126,19 +126,16 @@
   <data name="Apply" xml:space="preserve">
     <value>Применить</value>
   </data>
-  <data name="BadgeModelFilter_All" xml:space="preserve">
-    <value>Все</value>
-  </data>
-  <data name="BadgeModelFilter_Blacklisted" xml:space="preserve">
+  <data name="BadgeProperty_Blacklisted" xml:space="preserve">
     <value>В чёрном списке</value>
   </data>
-  <data name="BadgeModelFilter_HasTrial" xml:space="preserve">
+  <data name="BadgeProperty_Enqueued" xml:space="preserve">
+    <value>В очереди</value>
+  </data>
+  <data name="BadgeProperty_HasTrial" xml:space="preserve">
     <value>Пробный период</value>
   </data>
-  <data name="BadgeModelFilter_NotEnqueued" xml:space="preserve">
-    <value>Не в очереди</value>
-  </data>
-  <data name="BadgeModelFilter_Running" xml:space="preserve">
+  <data name="BadgeProperty_Running" xml:space="preserve">
     <value>Запущенные</value>
   </data>
   <data name="BadgesHeader" xml:space="preserve">
@@ -200,6 +197,15 @@
   </data>
   <data name="EnqueueTop" xml:space="preserve">
     <value>Все в начало очереди</value>
+  </data>
+  <data name="FilterState_Any" xml:space="preserve">
+    <value>Любое</value>
+  </data>
+  <data name="FilterState_No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="FilterState_Yes" xml:space="preserve">
+    <value>Да</value>
   </data>
   <data name="Game" xml:space="preserve">
     <value>Игра</value>
@@ -298,7 +304,7 @@
     <value>Найти по названию</value>
   </data>
   <data name="ToolShow" xml:space="preserve">
-    <value>Просмотр</value>
+    <value>Фильтры</value>
   </data>
   <data name="TotalCards" xml:space="preserve">
     <value>Карточек осталось</value>

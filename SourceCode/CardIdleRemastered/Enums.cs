@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace CardIdleRemastered
 {
-    public enum BadgeModelFilter
+    public enum BadgeProperty
     {
-        All,
         Running,
         HasTrial,
-        NotEnqueued,
+        Enqueued,
         Blacklisted
     }
 
@@ -20,5 +19,12 @@ namespace CardIdleRemastered
         OneByOne,
         TrialFirst,
         TrialLast,
+    }
+
+    public enum FilterState
+    {
+        Any,
+        Yes,
+        No
     }
 }

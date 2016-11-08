@@ -91,6 +91,7 @@
     <Compile Include="AccountUpdater.cs" />
     <Compile Include="AppBrush.cs" />
     <Compile Include="BadgeModel.cs" />
+    <Compile Include="ViewModels\SelectionItemVm.cs" />
     <Compile Include="Views\BadgesWindow.xaml.cs">
       <DependentUpon>BadgesWindow.xaml</DependentUpon>
     </Compile>

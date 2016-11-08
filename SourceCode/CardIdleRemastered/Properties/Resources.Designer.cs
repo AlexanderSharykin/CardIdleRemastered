@@ -98,47 +98,38 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All.
+        ///   Looks up a localized string similar to In Black List.
         /// </summary>
-        public static string BadgeModelFilter_All {
+        public static string BadgeProperty_Blacklisted {
             get {
-                return ResourceManager.GetString("BadgeModelFilter_All", resourceCulture);
+                return ResourceManager.GetString("BadgeProperty_Blacklisted", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to In Black List.
+        ///   Looks up a localized string similar to Enqueued.
         /// </summary>
-        public static string BadgeModelFilter_Blacklisted {
+        public static string BadgeProperty_Enqueued {
             get {
-                return ResourceManager.GetString("BadgeModelFilter_Blacklisted", resourceCulture);
+                return ResourceManager.GetString("BadgeProperty_Enqueued", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Has Trial Period.
         /// </summary>
-        public static string BadgeModelFilter_HasTrial {
+        public static string BadgeProperty_HasTrial {
             get {
-                return ResourceManager.GetString("BadgeModelFilter_HasTrial", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Not Enqueued.
-        /// </summary>
-        public static string BadgeModelFilter_NotEnqueued {
-            get {
-                return ResourceManager.GetString("BadgeModelFilter_NotEnqueued", resourceCulture);
+                return ResourceManager.GetString("BadgeProperty_HasTrial", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Running.
         /// </summary>
-        public static string BadgeModelFilter_Running {
+        public static string BadgeProperty_Running {
             get {
-                return ResourceManager.GetString("BadgeModelFilter_Running", resourceCulture);
+                return ResourceManager.GetString("BadgeProperty_Running", resourceCulture);
             }
         }
         
@@ -611,7 +602,7 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Show.
+        ///   Looks up a localized string similar to Filters.
         /// </summary>
         public static string ToolShow {
             get {

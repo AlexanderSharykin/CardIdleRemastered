@@ -360,14 +360,71 @@
                              VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,5,0"/>
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                            <Label Content="{x:Static res:Resources.ToolShow}" Foreground="White"/>
-                            <ComboBox 
-                                  MinWidth="100"
-                                  VerticalContentAlignment="Center"
-                                  ItemsSource="{Binding Path=BadgeFilters}" 
-                                  SelectedItem="{Binding Path=Filter, Converter={StaticResource enumTranslator}}" 
-                                  />
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Stretch">                            
+                            <ToggleButton Content="{x:Static res:Resources.ToolShow}" Name="SearchButton" 
+                                          HorizontalAlignment="Left" Padding="5,0"/>
+                            
+                            <!--filter options-->
+                            <Popup IsOpen="{Binding Path=IsChecked, ElementName=SearchButton}" 
+                                   PopupAnimation="Slide" StaysOpen="False"
+                                   PlacementTarget="{Binding ElementName=SearchButton}">
+                                
+                                <Border BorderBrush="DimGray" BorderThickness="1">
+                                    <ItemsControl 
+                                              Background="White"
+                                              Grid.IsSharedSizeScope="True"
+                                              ItemsSource="{Binding Path=BadgePropertiesFilters}"
+                                              Name="LstFilters">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="Headers" />
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Text="{Binding Path=Key, Converter={StaticResource enumTranslator}}" Margin="5"/>
+
+                                                    <ListBox Grid.Column="1" BorderThickness="0"
+                                                             ItemsSource="{Binding Path=DataContext.FilterStates, ElementName=LstFilters}"
+                                                             SelectedItem="{Binding Path=Value, Converter={StaticResource enumTranslator}}">
+                                                        <!--apply simplified ListBoxItem style to hide selection-->
+                                                        <ListBox.ItemContainerStyle>
+                                                            <Style TargetType="ListBoxItem">
+                                                                <Setter Property="Template">
+                                                                    <Setter.Value>
+                                                                        <ControlTemplate TargetType="ListBoxItem">
+                                                                            <Border Background="Transparent" SnapsToDevicePixels="true">
+                                                                                <ContentPresenter />
+                                                                            </Border>
+                                                                        </ControlTemplate>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                        </ListBox.ItemContainerStyle>
+
+                                                        <ListBox.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <StackPanel Orientation="Horizontal"/>
+                                                            </ItemsPanelTemplate>
+                                                        </ListBox.ItemsPanel>
+
+                                                        <ListBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid>
+                                                                <RadioButton IsChecked="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, TargetNullValue=false}"
+                                                                     Margin="5,0" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                                                     Content="{Binding .}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ListBox.ItemTemplate>
+                                                    </ListBox>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                            </Popup>
 
                         </StackPanel>
 
@@ -461,7 +518,7 @@
                                 Binding="{Binding Path=HoursPlayed}" 
                                 IsReadOnly="True" 
                                 CanUserSort="False"
-                                Width="*"
+                                Width="*"                                
                                 ElementStyle="{StaticResource {x:Type TextBlock}}"/>
                             <DataGridTextColumn 
                                 Header="{x:Static res:Resources.Cards}"                                                 
@@ -510,7 +567,7 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal" Grid.Column="0">
                             <Label Content="{x:Static res:Resources.ToolIdleMode}" Foreground="White"/>
-                            <ComboBox 
+                            <ComboBox
                                   MinWidth="100"
                                   VerticalContentAlignment="Center"
                                   ItemsSource="{Binding Path=Idler.IdleModes}" 
@@ -521,7 +578,7 @@
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="{x:Static res:Resources.CfgIdleProcessCount}" Foreground="White" VerticalAlignment="Center"/>
                             <xctk:ByteUpDown MinWidth="60" Margin="5,0"
-                                             Minimum="1"
+                                             Minimum="1" Maximum="30"
                                              Value="{Binding Path=Idler.MaxIdleInstanceCount}">
                                 <xctk:ByteUpDown.Style>
                                     <Style TargetType="xctk:ByteUpDown">

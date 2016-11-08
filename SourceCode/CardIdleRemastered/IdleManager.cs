@@ -145,6 +145,8 @@ namespace CardIdleRemastered
             {
                 if (_badgeBuffer.Count == _badgeBuffer.Capacity)
                     break;
+                if (false == IsActive)
+                    break;
                 await AddGame(badge, true);
             }
         }
@@ -205,6 +207,10 @@ namespace CardIdleRemastered
         {
             if (IsActive == false)
                 return;
+
+            IsActive = false;
+            _tmCounter.Stop();
+
             for (int i = _badgeBuffer.Count-1; i >= 0; i--)
             {
                 var badge = _badgeBuffer[i].Badge;
@@ -212,8 +218,7 @@ namespace CardIdleRemastered
                 badge.CardIdleProcess.Stop();
             }
             
-            IsActive = false;
-            _tmCounter.Stop();
+
         }
 
         private class BadgeWrapper

@@ -74,7 +74,7 @@
     <Setting Name="IdleMode" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="BadgeFilter" Type="System.Int32" Scope="User">
+    <Setting Name="BadgeFilter" Type="System.String" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="MaxIdleProcessCount" Type="System.Byte" Scope="User">

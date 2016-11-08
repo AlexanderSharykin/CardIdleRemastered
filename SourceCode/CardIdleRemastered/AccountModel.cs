@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using CardIdleRemastered.Commands;
 using CardIdleRemastered.Properties;
+using CardIdleRemastered.ViewModels;
 
 namespace CardIdleRemastered
 {
@@ -39,7 +40,8 @@ namespace CardIdleRemastered
 
         private string _gameTitle;
         private readonly ICollectionView _badges;
-        private BadgeModelFilter _filter;
+        private IList<SelectionItemVm<FilterState>> _badgePropertiesFilters;
+
         #endregion
 
         public AccountModel()
@@ -75,15 +77,35 @@ namespace CardIdleRemastered
 
             SettingsCmd = new BaseCommand(o=>SettingsDialog());
             #endregion
-
-            _filter = BadgeModelFilter.All;
+            
             _badges = CollectionViewSource.GetDefaultView(AllBadges);
             var quick = (ICollectionViewLiveShaping)_badges;
             quick.LiveFilteringProperties.Add("IsBlacklisted");
             quick.LiveFilteringProperties.Add("HasTrial");
             quick.LiveFilteringProperties.Add("CardIdleActive");
             quick.LiveFilteringProperties.Add("IsInQueue");
-            quick.IsLiveFiltering = true;            
+            quick.IsLiveFiltering = true;
+
+
+            _badgePropertiesFilters = Enum.GetValues(typeof (BadgeProperty))
+                .OfType<BadgeProperty>()
+                .Select(p => new SelectionItemVm<FilterState>
+                             {
+                                 Key = p,
+                                 Value = FilterState.Any
+                             })
+                .ToList();
+
+            foreach (var item in _badgePropertiesFilters)
+            {
+                item.PropertyChanged += (sender, e) =>
+                {
+                    if (e.PropertyName != "Value")
+                        return;
+
+                    SetFilter();
+                };
+            }
         }
 
         #region Account Properties
@@ -292,10 +314,27 @@ namespace CardIdleRemastered
                 AvatarUrl = Settings.Default.SteamAvatarUrl;
                 CustomBackgroundUrl = Settings.Default.CustomBackgroundUrl;
                 BackgroundUrl = Settings.Default.SteamBackgroundUrl;
+                
+                string filtersList = Settings.Default.BadgeFilter;
+                if (false == String.IsNullOrWhiteSpace(filtersList))
+                {
+                    // parsing filter list
+                    string[] parts = filtersList.Split(';');
+                    foreach (string property in parts)
+                    {
+                        string[] keyValue = property.Split(':');
+                        if (keyValue.Length < 2)
+                            continue;
+                        FilterState value = (FilterState)int.Parse(keyValue[1]);
 
-                Filter = (BadgeModelFilter)Settings.Default.BadgeFilter;
-                if (Filter == BadgeModelFilter.Running)
-                    Filter = BadgeModelFilter.All;
+                        if (value != FilterState.Any)
+                        {
+                            BadgeProperty key = (BadgeProperty)Enum.Parse(typeof(BadgeProperty), keyValue[0]);
+                            var filter = BadgePropertiesFilters.First(f => key.Equals(f.Key));
+                            filter.Value = value;
+                        }
+                    }
+                }
 
                 Idler.Mode = (IdleMode)Settings.Default.IdleMode;                
 
@@ -322,13 +361,16 @@ namespace CardIdleRemastered
                 await InitProfile();            
 
             // reload games list
-            var games = Settings.Default.Games.Cast<string>().ToList();
-            int idx = 0;
-            foreach (var id in games)
+            if (Settings.Default.Games != null)
             {
-                var game = await new SteamParser().GetGameInfo(id);
-                Games.Insert(idx, game);
-                idx++;
+                var games = Settings.Default.Games.Cast<string>().ToList();
+                int idx = 0;
+                foreach (var id in games)
+                {
+                    var game = await new SteamParser().GetGameInfo(id);
+                    Games.Insert(idx, game);
+                    idx++;
+                }
             }
         }
 
@@ -412,7 +454,7 @@ namespace CardIdleRemastered
             BackgroundUrl =
             CustomBackgroundUrl = null;
             Settings.Default.IdleMode = 0;
-            Settings.Default.BadgeFilter = 0;
+            Settings.Default.BadgeFilter = string.Empty;
             
             AllBadges.Clear();
             IdleQueueBadges.Clear();
@@ -770,49 +812,54 @@ namespace CardIdleRemastered
         {
             bool save = false;
 
-            if (e.PropertyName == "UserName")
+            var account = sender as AccountModel;
+
+            if (account != null)
             {
-                Settings.Default.SteamUserName = (sender as AccountModel).UserName ?? string.Empty;
+                if (e.PropertyName == "UserName")
+                {
+                    Settings.Default.SteamUserName = account.UserName ?? string.Empty;
+                    save = true;
+                }
+
+                else if (e.PropertyName == "Level")
+                {
+                    Settings.Default.SteamLevel = account.Level;
+                    save = true;
+                }
+
+                else if (e.PropertyName == "BackgroundUrl")
+                {
+                    Settings.Default.SteamBackgroundUrl = account.BackgroundUrl ?? string.Empty;
+                    save = true;
+                }
+
+                else if (e.PropertyName == "AvatarUrl")
+                {
+                    Settings.Default.SteamAvatarUrl = account.AvatarUrl ?? string.Empty;
+                    save = true;
+                }
+
+                else if (e.PropertyName == "CustomBackgroundUrl")
+                {
+                    Settings.Default.CustomBackgroundUrl = account.CustomBackgroundUrl ?? string.Empty;
+                    save = true;
+                }
+
+                else if (e.PropertyName == "Filter")
+                {
+                    Settings.Default.BadgeFilter = String.Join(";", account.BadgePropertiesFilters.Select(f => String.Format("{0}:{1}", f.Key, (int) f.Value)));
+                    save = true;
+                }
+            }
+
+            else if (e.PropertyName == "Mode")
+            {
+                Settings.Default.IdleMode = (int) (sender as IdleManager).Mode;
                 save = true;
             }
 
-            if (e.PropertyName == "Level")
-            {
-                Settings.Default.SteamLevel = (sender as AccountModel).Level;
-                save = true;
-            }
-
-            if (e.PropertyName == "BackgroundUrl")
-            {
-                Settings.Default.SteamBackgroundUrl = (sender as AccountModel).BackgroundUrl ?? string.Empty;
-                save = true;
-            }
-
-            if (e.PropertyName == "AvatarUrl")
-            {
-                Settings.Default.SteamAvatarUrl = (sender as AccountModel).AvatarUrl ?? string.Empty;
-                save = true;
-            }
-
-            if (e.PropertyName == "CustomBackgroundUrl")
-            {
-                Settings.Default.CustomBackgroundUrl = (sender as AccountModel).CustomBackgroundUrl ?? string.Empty;
-                save = true;
-            }
-
-            if (e.PropertyName == "Filter")
-            {
-                Settings.Default.BadgeFilter = (int)(sender as AccountModel).Filter;
-                save = true;
-            }
-
-            if (e.PropertyName == "Mode")
-            {
-                Settings.Default.IdleMode = (int)(sender as IdleManager).Mode;
-                save = true;
-            }
-
-            if (e.PropertyName == "MaxIdleInstanceCount")
+            else if (e.PropertyName == "MaxIdleInstanceCount")
             {
                 Settings.Default.MaxIdleProcessCount = (sender as IdleManager).MaxIdleInstanceCount;
                 save = true;
@@ -842,25 +889,29 @@ namespace CardIdleRemastered
             }
         }
 
-        public IEnumerable<string> BadgeFilters
+        public IEnumerable<string> BadgeProperties
         {
             get
             {
-                return Enum.GetValues(typeof(BadgeModelFilter))
-                    .Cast<BadgeModelFilter>()
+                return Enum.GetValues(typeof(BadgeProperty))
+                    .Cast<BadgeProperty>()
                     .Select(e => EnumLocalizationConverter.GetLocalValue(e));
             }
         }
 
-        public BadgeModelFilter Filter
+        public IEnumerable<string> FilterStates
         {
-            get { return _filter; }
-            set
+            get
             {
-                _filter = value;
-                OnPropertyChanged();
-                SetFilter();
+                return Enum.GetValues(typeof(FilterState))
+                    .Cast<FilterState>()
+                    .Select(e => EnumLocalizationConverter.GetLocalValue(e));
             }
+        }
+
+        public IList<SelectionItemVm<FilterState>> BadgePropertiesFilters
+        {
+            get { return _badgePropertiesFilters; }            
         }
 
         /// <summary>
@@ -868,25 +919,49 @@ namespace CardIdleRemastered
         /// </summary>
         private void SetFilter()
         {
-            switch (_filter)
-            {
-                case BadgeModelFilter.All:
-                    _badges.Filter = TitleSearch;
-                    break;
-                case BadgeModelFilter.HasTrial:
-                    _badges.Filter = IsTrialGame;
-                    break;
-                case BadgeModelFilter.Running:
-                    _badges.Filter = IsRunningGame;
-                    break;
-                case BadgeModelFilter.NotEnqueued:
-                    _badges.Filter = NotEnqueuedGame;
-                    break;
-                case BadgeModelFilter.Blacklisted:
-                    _badges.Filter = IsBlacklistedGame;
-                    break;
-            }
+            var titleSearch = TitleSearchFunc();
+            var propertySearch = PropertySearchFunc();
+
+            if (titleSearch == null || propertySearch == null)
+                _badges.Filter = titleSearch ?? propertySearch;
+            else
+                _badges.Filter = o => titleSearch(o) && propertySearch(o);
+            
+            OnPropertyChanged("Filter");
             UpdateTotalValues();
+        }
+
+        private Predicate<object> TitleSearchFunc()
+        {
+            if (String.IsNullOrWhiteSpace(GameTitle))
+                return null;
+            return o => ((BadgeModel)o).Title.ToLower().Contains(GameTitle.ToLower());
+        }
+
+        private Predicate<object> PropertySearchFunc()
+        {
+            Predicate<object> predicate = null;
+
+            var filtered = BadgePropertiesFilters.Where(x => x.Value != FilterState.Any).ToList();
+
+            foreach (var f in filtered)
+            {
+                FilterState fs = f.Value;
+                BadgeProperty key = (BadgeProperty) f.Key;
+
+                bool yes = fs == FilterState.Yes;
+                Predicate<object> p = o => ((BadgeModel) o).CheckProperty(key) == yes;
+
+                if (predicate == null)
+                    predicate = p;
+                else
+                {
+                    Predicate<object> z = predicate;
+                    predicate = (object o) => z(o) && p(o);
+                }
+            }
+
+            return predicate;
         }
 
         /// <summary>
@@ -898,30 +973,6 @@ namespace CardIdleRemastered
             TotalCards = Badges.Cast<BadgeModel>().Sum(b => b.RemainingCard);
         }
 
-        private bool TitleSearch(object o)
-        {
-            return string.IsNullOrWhiteSpace(GameTitle) || ((BadgeModel)o).Title.ToLower().Contains(GameTitle);
-        }
-
-        private bool IsTrialGame(object o)
-        {
-            return ((BadgeModel)o).HasTrial && TitleSearch(o);
-        }
-
-        private bool IsRunningGame(object o)
-        {
-            return ((BadgeModel)o).CardIdleActive && TitleSearch(o);
-        }
-
-        private bool NotEnqueuedGame(object o)
-        {
-            return ((BadgeModel)o).IsInQueue == false && TitleSearch(o);
-        }
-
-        private bool IsBlacklistedGame(object o)
-        {
-            return ((BadgeModel)o).IsBlacklisted && TitleSearch(o);
-        }
         #endregion
 
         public void Dispose()

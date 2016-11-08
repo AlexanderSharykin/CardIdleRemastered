@@ -77,8 +77,7 @@ namespace CardIdleRemastered
             // Delete Steam cookie data from the browser control
             InternetSetCookie("http://steamcommunity.com", "sessionid", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
             InternetSetCookie("http://steamcommunity.com", "steamLogin", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
-            InternetSetCookie("http://steamcommunity.com", "steamRememberLogin",
-                ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
+            InternetSetCookie("http://steamcommunity.com", "steamRememberLogin", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
 
             // When the form is loaded, navigate to the Steam login page using the web browser control
             wbAuth.Navigate("https://steamcommunity.com/login/home/?goto=my/profile", "_self", null,

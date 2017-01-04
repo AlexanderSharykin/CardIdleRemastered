@@ -16,22 +16,24 @@ namespace CardIdleRemastered
             Encoding = Encoding.UTF8;
         }
 
+        public static ISettingsStorage Storage { get; set; }
+
         private CookieContainer GenerateCookies()
         {
             var cookies = new CookieContainer();
             var target = new Uri("http://steamcommunity.com");
-            cookies.Add(new Cookie("sessionid", Settings.Default.sessionid) { Domain = target.Host });
-            cookies.Add(new Cookie("steamLogin", Settings.Default.steamLogin) { Domain = target.Host });
-            cookies.Add(new Cookie("steamparental", Settings.Default.steamparental) { Domain = target.Host });
-            cookies.Add(new Cookie("steamRememberLogin", Settings.Default.steamRememberLogin) { Domain = target.Host });
-            cookies.Add(new Cookie(GetSteamMachineAuthCookieName(), Settings.Default.steamMachineAuth) { Domain = target.Host });
+            cookies.Add(new Cookie("sessionid", Storage.SessionId ?? string.Empty) { Domain = target.Host });
+            cookies.Add(new Cookie("steamLogin", Storage.SteamLogin ?? string.Empty) { Domain = target.Host });
+            cookies.Add(new Cookie("steamparental", Storage.SteamParental ?? string.Empty) { Domain = target.Host });
+            cookies.Add(new Cookie("steamRememberLogin", Storage.SteamRememberLogin ?? string.Empty) { Domain = target.Host });
+            cookies.Add(new Cookie(GetSteamMachineAuthCookieName(), Storage.MachineAuth ?? string.Empty) { Domain = target.Host });
             return cookies;
         }
 
         private static string GetSteamMachineAuthCookieName()
         {
-            if (Settings.Default.steamLogin != null && Settings.Default.steamLogin.Length > 17)
-                return string.Format("steamMachineAuth{0}", Settings.Default.steamLogin.Substring(0, 17));
+            if (Storage.SteamLogin != null && Storage.SteamLogin.Length > 17)
+                return string.Format("steamMachineAuth{0}", Storage.SteamLogin.Substring(0, 17));
             return "steamMachineAuth";
         }
 
@@ -59,12 +61,12 @@ namespace CardIdleRemastered
                 var login = cookies["steamLogin"];
                 if (login != null && login.Value == "deleted")
                 {
-                    Settings.Default.sessionid = string.Empty;
-                    Settings.Default.steamLogin = string.Empty;
-                    Settings.Default.steamparental = string.Empty;
-                    Settings.Default.steamMachineAuth = string.Empty;
-                    Settings.Default.steamRememberLogin = string.Empty;
-                    Settings.Default.Save();
+                    Storage.SessionId = string.Empty;
+                    Storage.SteamLogin = string.Empty;
+                    Storage.SteamParental = string.Empty;
+                    Storage.MachineAuth = string.Empty;
+                    Storage.SteamRememberLogin = string.Empty;
+                    Storage.Save();
                 }
             }
 
@@ -78,7 +80,7 @@ namespace CardIdleRemastered
             try
             {
                 // If user is NOT authenticated (cookie got deleted in GetWebResponse()), return empty result
-                if (String.IsNullOrEmpty(Settings.Default.sessionid))
+                if (String.IsNullOrEmpty(Storage.SessionId))
                 {
                     return string.Empty;
                 }

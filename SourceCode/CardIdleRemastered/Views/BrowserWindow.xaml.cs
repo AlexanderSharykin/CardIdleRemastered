@@ -34,6 +34,8 @@ namespace CardIdleRemastered
             SetIeMode();
         }
 
+        public ISettingsStorage Storage { get; set; }
+
         private void SetIeMode()
         {
             if (_browserEmulation)
@@ -48,8 +50,8 @@ namespace CardIdleRemastered
                 RegistryKey key =
                     Registry.CurrentUser.OpenSubKey(
                         @"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
-                String programName = Path.GetFileName(Environment.GetCommandLineArgs()[0]);
-                key.SetValue(programName, (int) 10001, RegistryValueKind.DWord);
+                
+                key.SetValue(App.AppSystemName, (int) 10001, RegistryValueKind.DWord);
             }
             catch (Exception ex)
             {
@@ -185,7 +187,7 @@ namespace CardIdleRemastered
                 foreach (Cookie cookie in cookies)
                 {
                     if (cookie.Name.StartsWith("steamMachineAuth"))
-                        Settings.Default.steamMachineAuth = cookie.Value;
+                        Storage.MachineAuth = cookie.Value;
                 }
             }
             // If the page it just finished loading isn't the login page
@@ -222,37 +224,40 @@ namespace CardIdleRemastered
                     // Save the "sessionid" cookie
                     if (cookie.Name == "sessionid")
                     {
-                        Settings.Default.sessionid = cookie.Value;
+                        Storage.SessionId = cookie.Value;
                     }
 
                     // Save the "steamLogin" cookie and construct and save the user's profile link
                     else if (cookie.Name == "steamLogin")
                     {
                         string login = cookie.Value;
-                        Settings.Default.steamLogin = login;
+                        Storage.SteamLogin = login;
 
                         var steamId = WebUtility.UrlDecode(login);
                         var index = steamId.IndexOf('|');
                         if (index >= 0)
                             steamId = steamId.Remove(index);                        
-                        Settings.Default.myProfileURL = "http://steamcommunity.com/profiles/" + steamId;
+                        Storage.SteamProfileUrl = "http://steamcommunity.com/profiles/" + steamId;
                     }
 
                     // Save the "steamparental" cookie"
                     else if (cookie.Name == "steamparental")
                     {
-                        Settings.Default.steamparental = cookie.Value;
+                        Storage.SteamParental = cookie.Value;
                     }
 
                     else if (cookie.Name == "steamRememberLogin")
                     {
-                        Settings.Default.steamRememberLogin = cookie.Value;
+                        Storage.SteamRememberLogin = cookie.Value;
                     }
                 }
 
-                // Save all of the data to the program settings file, and close this form
-                Settings.Default.Save();
-                Close();
+                // Save all of the data to the program settings file, and close this form                
+                if (false == String.IsNullOrWhiteSpace(Storage.SteamLogin))
+                {
+                    Storage.Save();
+                    Close();
+                }
             }
         }
     }

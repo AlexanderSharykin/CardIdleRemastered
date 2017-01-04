@@ -5,15 +5,13 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using CardIdleRemastered.Annotations;
 
 namespace CardIdleRemastered
 {
     public abstract class ObservableModel: INotifyPropertyChanged
     {        
         public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
+        
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             var handler = PropertyChanged;

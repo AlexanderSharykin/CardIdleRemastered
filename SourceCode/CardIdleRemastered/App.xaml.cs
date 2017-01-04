@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Xml.Linq;
 using CardIdleRemastered.Properties;
 using Microsoft.Win32;
 
@@ -22,7 +23,7 @@ namespace CardIdleRemastered
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
-    {
+    {        
         private AccountModel _account;
 
         private void LaunchCardIdle(object sender, StartupEventArgs e)
@@ -38,9 +39,22 @@ namespace CardIdleRemastered
 
             Logger.Info(String.Format("{0} {1}bit", Environment.OSVersion, Environment.Is64BitOperatingSystem ? 64 : 32));
 
-            LoadVisuals();
+            string localDatafolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string appFolder = Path.Combine(localDatafolder, Path.GetFileNameWithoutExtension(AppSystemName));
+            if (Directory.Exists(appFolder) == false)
+                Directory.CreateDirectory(appFolder);
+            
+            var storage = new SettingsStorage();
+            storage.FileName = Path.Combine(appFolder, "Settings.txt");
+            storage.Init();
+            
+            CookieClient.Storage = storage;           
 
             _account = new AccountModel();
+            _account.Storage = storage;
+
+            LoadVisuals();
+
             var w = new BadgesWindow { DataContext = _account};                        
             w.Show();
 
@@ -69,15 +83,29 @@ namespace CardIdleRemastered
             get { return Current as App; }
         }
 
+        private static string _appSystemName;
+
+        public static string AppSystemName
+        {
+            get
+            {
+                if (_appSystemName == null)
+                    _appSystemName = Path.GetFileName(Environment.GetCommandLineArgs()[0]);
+                return _appSystemName;
+            }
+        }
+
         private void LoadVisuals()
         {
+            var storage = _account.Storage;
+
             AppVisualSettings.DefaultVisualSettings.GetBrushes();
 
-            if (Settings.Default.AppBrushes == null)
+            if (storage.AppBrushes == null)
                 return;
 
-            var vis = new AppVisualSettings();            
-            foreach (var str in Settings.Default.AppBrushes)
+            var vis = new AppVisualSettings();
+            foreach (var str in storage.AppBrushes)
             {
                 var a = str.Split(';');
                 vis.AppBrushes.Add(new AppBrush(a[0], (Color)ColorConverter.ConvertFromString(a[1])));
@@ -87,15 +115,16 @@ namespace CardIdleRemastered
 
         public void SaveSettings(AppVisualSettings vis)
         {
-            Settings.Default.CustomBackgroundUrl = vis.BackgroundUrl;
+            var storage = _account.Storage;
+            storage.CustomBackgroundUrl = vis.BackgroundUrl;
 
-            Settings.Default.AppBrushes.Clear();
+            storage.AppBrushes.Clear();
             foreach (var b in vis.AppBrushes)
             {
-                Settings.Default.AppBrushes.Add(String.Format("{0};{1}", b.Name, b.BrushColor));
+                storage.AppBrushes.Add(String.Format("{0};{1}", b.Name, b.BrushColor));
             }
 
-            Settings.Default.Save();
+            storage.Save();
         }
 
         private void StopCardIdle(object sender, ExitEventArgs e)

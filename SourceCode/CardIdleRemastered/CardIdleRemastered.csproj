@@ -91,6 +91,8 @@
     <Compile Include="AccountUpdater.cs" />
     <Compile Include="AppBrush.cs" />
     <Compile Include="BadgeModel.cs" />
+    <Compile Include="ISettingsStorage.cs" />
+    <Compile Include="SettingsStorage.cs" />
     <Compile Include="ViewModels\SelectionItemVm.cs" />
     <Compile Include="Views\BadgesWindow.xaml.cs">
       <DependentUpon>BadgesWindow.xaml</DependentUpon>
@@ -109,7 +111,6 @@
     <Compile Include="IdleProcess.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="ObservableModel.cs" />
-    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\Resources.ru-Ru.Designer.cs">
       <DependentUpon>Resources.ru-Ru.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -155,11 +156,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <EmbeddedResource Include="Properties\Resources.ru-Ru.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.ru-Ru.Designer.cs</LastGenOutput>
@@ -169,10 +165,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

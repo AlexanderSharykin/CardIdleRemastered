@@ -108,6 +108,8 @@ namespace CardIdleRemastered
             }
         }
 
+        public ISettingsStorage Storage { get; set; }
+
         #region Account Properties
         public string UserName
         {
@@ -305,17 +307,17 @@ namespace CardIdleRemastered
         /// </summary>
         public async void LoadAccount()
         {
-            if (String.IsNullOrWhiteSpace(Settings.Default.myProfileURL) == false)
+            if (String.IsNullOrWhiteSpace(Storage.SteamProfileUrl) == false)
             {
                 // restore account data from Settings
-                UserName = Settings.Default.SteamUserName;
-                Level = Settings.Default.SteamLevel;
+                UserName = Storage.SteamUserName;
+                Level = Storage.SteamLevel;
 
-                AvatarUrl = Settings.Default.SteamAvatarUrl;
-                CustomBackgroundUrl = Settings.Default.CustomBackgroundUrl;
-                BackgroundUrl = Settings.Default.SteamBackgroundUrl;
+                AvatarUrl = Storage.SteamAvatarUrl;
+                CustomBackgroundUrl = Storage.CustomBackgroundUrl;
+                BackgroundUrl = Storage.SteamBackgroundUrl;
                 
-                string filtersList = Settings.Default.BadgeFilter;
+                string filtersList = Storage.BadgeFilter;
                 if (false == String.IsNullOrWhiteSpace(filtersList))
                 {
                     // parsing filter list
@@ -336,12 +338,12 @@ namespace CardIdleRemastered
                     }
                 }
 
-                Idler.Mode = (IdleMode)Settings.Default.IdleMode;                
+                Idler.Mode = (IdleMode)Storage.IdleMode;                
 
-                if (Settings.Default.MaxIdleProcessCount > 0)
-                    Idler.MaxIdleInstanceCount = Settings.Default.MaxIdleProcessCount;
+                if (Storage.MaxIdleProcessCount > 0)
+                    Idler.MaxIdleInstanceCount = Storage.MaxIdleProcessCount;
                 
-                IgnoreClient = Settings.Default.ignoreclient;
+                IgnoreClient = Storage.IgnoreClient;
             }
 
             PropertyChanged += SaveConfiguration;
@@ -349,10 +351,10 @@ namespace CardIdleRemastered
 
             IdleQueueBadges.CollectionChanged += (sender, args) =>
             {
-                Settings.Default.IdleQueue.Clear();
+                Storage.IdleQueue.Clear();
                 foreach (var b in IdleQueueBadges)
-                    Settings.Default.IdleQueue.Add(b.AppId);
-                Settings.Default.Save();
+                    Storage.IdleQueue.Add(b.AppId);
+                Storage.Save();
             };
 
             IsAuthorized = await CheckAuth();
@@ -361,29 +363,26 @@ namespace CardIdleRemastered
                 await InitProfile();            
 
             // reload games list
-            if (Settings.Default.Games != null)
+            var games = Storage.Games.Cast<string>().ToList();
+            int idx = 0;
+            foreach (var id in games)
             {
-                var games = Settings.Default.Games.Cast<string>().ToList();
-                int idx = 0;
-                foreach (var id in games)
-                {
-                    var game = await new SteamParser().GetGameInfo(id);
-                    Games.Insert(idx, game);
-                    idx++;
-                }
-            }
+                var game = await new SteamParser().GetGameInfo(id);
+                Games.Insert(idx, game);
+                idx++;
+            }            
         }
 
         private async Task<bool> CheckAuth()
         {
-            bool registered = !String.IsNullOrWhiteSpace(Settings.Default.sessionid) &&
-                              !String.IsNullOrWhiteSpace(Settings.Default.steamLogin) &&
-                              !String.IsNullOrWhiteSpace(Settings.Default.myProfileURL);
+            bool registered = !String.IsNullOrWhiteSpace(Storage.SessionId) &&
+                              !String.IsNullOrWhiteSpace(Storage.SteamLogin) &&
+                              !String.IsNullOrWhiteSpace(Storage.SteamProfileUrl);
                               
             if (registered)
             {
                 Logger.Info("Session test");
-                registered = await new SteamParser().IsLogined(Settings.Default.myProfileURL);
+                registered = await new SteamParser().IsLogined(Storage.SteamProfileUrl);
             }
 
             if (registered)            
@@ -396,7 +395,7 @@ namespace CardIdleRemastered
 
         private async Task InitProfile()
         {
-            ProfileUrl = Settings.Default.myProfileURL;
+            ProfileUrl = Storage.SteamProfileUrl;
 
             _updater.Start();
 
@@ -404,14 +403,14 @@ namespace CardIdleRemastered
             await _updater.Sync();
 
             // restore queue
-            var queue = Settings.Default.IdleQueue.Cast<string>()
+            var queue = Storage.IdleQueue.Cast<string>()
                 .Join(AllBadges, s => s, b => b.AppId, (s, badge) => badge)
                 .ToList();
             foreach (var badge in queue)
                 EnqueueBadgeLowCmd.Execute(badge);
 
             // restore blacklist
-            var blacklist = Settings.Default.blacklist.Cast<string>()
+            var blacklist = Storage.Blacklist.Cast<string>()
                 .Join(AllBadges, s => s, b => b.AppId, (s, badge) => badge)
                 .ToList();
             foreach (var badge in blacklist)
@@ -425,7 +424,9 @@ namespace CardIdleRemastered
 
         private async void Login()
         {
-            new BrowserWindow().ShowDialog();
+            var w = new BrowserWindow();
+            w.Storage = Storage;
+            w.ShowDialog();
             IsAuthorized = await CheckAuth();
             if (IsAuthorized)
                 await InitProfile();
@@ -444,22 +445,22 @@ namespace CardIdleRemastered
             IsAuthorized = false;
 
             // Clear the account settings
-            Settings.Default.sessionid = string.Empty;
-            Settings.Default.steamLogin = string.Empty;            
-            Settings.Default.steamparental = string.Empty;
+            Storage.SessionId = string.Empty;
+            Storage.SteamLogin = string.Empty;            
+            Storage.SteamParental = string.Empty;
             UserName = 
             ProfileUrl =
             Level = 
             AvatarUrl = 
             BackgroundUrl =
             CustomBackgroundUrl = null;
-            Settings.Default.IdleMode = 0;
-            Settings.Default.BadgeFilter = string.Empty;
+            Storage.IdleMode = 0;
+            Storage.BadgeFilter = string.Empty;
             
             AllBadges.Clear();
             IdleQueueBadges.Clear();
 
-            Settings.Default.Save();
+            Storage.Save();
             Logger.Info("See you later");            
         }
         #endregion
@@ -700,8 +701,8 @@ namespace CardIdleRemastered
             {
                 if (Games.Any(g => g.AppId == SelectedGame.AppId))
                     return;
-                Settings.Default.Games.Add(SelectedGame.AppId);
-                Settings.Default.Save();
+                Storage.Games.Add(SelectedGame.AppId);
+                Storage.Save();
                 SelectedGame.PropertyChanged += BadgeIdleStatusChanged;
                 Games.Insert(Games.Count - 1, SelectedGame);
             }
@@ -716,8 +717,8 @@ namespace CardIdleRemastered
             var game = o as BadgeModel;
             if (game == null)
                 return;
-            Settings.Default.Games.Remove(game.AppId);
-            Settings.Default.Save();
+            Storage.Games.Remove(game.AppId);
+            Storage.Save();
             game.CardIdleProcess.Stop();
             game.PropertyChanged -= BadgeIdleStatusChanged;
             Games.Remove(game);
@@ -776,10 +777,10 @@ namespace CardIdleRemastered
 
             badge.IsBlacklisted = !badge.IsBlacklisted;
             if (badge.IsBlacklisted)
-                Settings.Default.blacklist.Add(badge.AppId);
+                Storage.Blacklist.Add(badge.AppId);
             else
-                Settings.Default.blacklist.Remove(badge.AppId);
-            Settings.Default.Save();
+                Storage.Blacklist.Remove(badge.AppId);
+            Storage.Save();
         }
         #endregion
 
@@ -818,55 +819,55 @@ namespace CardIdleRemastered
             {
                 if (e.PropertyName == "UserName")
                 {
-                    Settings.Default.SteamUserName = account.UserName ?? string.Empty;
+                    Storage.SteamUserName = account.UserName ?? string.Empty;
                     save = true;
                 }
 
                 else if (e.PropertyName == "Level")
                 {
-                    Settings.Default.SteamLevel = account.Level;
+                    Storage.SteamLevel = account.Level;
                     save = true;
                 }
 
                 else if (e.PropertyName == "BackgroundUrl")
                 {
-                    Settings.Default.SteamBackgroundUrl = account.BackgroundUrl ?? string.Empty;
+                    Storage.SteamBackgroundUrl = account.BackgroundUrl ?? string.Empty;
                     save = true;
                 }
 
                 else if (e.PropertyName == "AvatarUrl")
                 {
-                    Settings.Default.SteamAvatarUrl = account.AvatarUrl ?? string.Empty;
+                    Storage.SteamAvatarUrl = account.AvatarUrl ?? string.Empty;
                     save = true;
                 }
 
                 else if (e.PropertyName == "CustomBackgroundUrl")
                 {
-                    Settings.Default.CustomBackgroundUrl = account.CustomBackgroundUrl ?? string.Empty;
+                    Storage.CustomBackgroundUrl = account.CustomBackgroundUrl ?? string.Empty;
                     save = true;
                 }
 
                 else if (e.PropertyName == "Filter")
                 {
-                    Settings.Default.BadgeFilter = String.Join(";", account.BadgePropertiesFilters.Select(f => String.Format("{0}:{1}", f.Key, (int) f.Value)));
+                    Storage.BadgeFilter = String.Join(";", account.BadgePropertiesFilters.Select(f => String.Format("{0}:{1}", f.Key, (int) f.Value)));
                     save = true;
                 }
             }
 
             else if (e.PropertyName == "Mode")
             {
-                Settings.Default.IdleMode = (int) (sender as IdleManager).Mode;
+                Storage.IdleMode = (int) (sender as IdleManager).Mode;
                 save = true;
             }
 
             else if (e.PropertyName == "MaxIdleInstanceCount")
             {
-                Settings.Default.MaxIdleProcessCount = (sender as IdleManager).MaxIdleInstanceCount;
+                Storage.MaxIdleProcessCount = (sender as IdleManager).MaxIdleInstanceCount;
                 save = true;
             }
 
             if (save)
-                Settings.Default.Save();
+                Storage.Save();
         }
 
         #endregion

@@ -104,58 +104,42 @@ namespace CardIdleRemastered
 
         public async Task<IEnumerable<BadgeModel>> LoadBadgesAsync(string profileLink)
         {
-            profileLink = profileLink + "/badges";
-            var pages = new List<string> { "?p=1" };
             var document = new HtmlDocument();
             var badges = new List<BadgeModel>();
+            int pagesCount = 1;
+
             try
-            {
-                // Load Page 1 and check how many pages there are
-                var pageUrl = string.Format("{0}/?p={1}", profileLink, 1);
-                var response = await DownloadStringWithAuth(pageUrl);
-
-                // Response should not be empty. User should be unauthorised.
-                if (string.IsNullOrEmpty(response))
-                    return badges;
-
-                document.LoadHtml(response);
-
-                // If user is authenticated, check page count. If user is not authenticated, pages are different.
-                var pageNodes = document.DocumentNode.SelectNodes("//a[@class=\"pagelink\"]");
-                if (pageNodes != null)
+            {                
+                // loading pages with user badges
+                for (var p = 1; p <= pagesCount; p++)
                 {
-                    pages.AddRange(pageNodes.Select(p => p.Attributes["href"].Value).Distinct());
-                    pages = pages.Distinct().ToList();
-                }
-
-                string lastpage = pages.Last().Replace("?p=", "");
-                int pagesCount = Convert.ToInt32(lastpage);
-
-                // Get all badges from current page
-                ProcessBadgesOnPage(badges, document);
-
-                // Load other pages
-                for (var i = 2; i <= pagesCount; i++)
-                {
-
-                    // Load Page 2+
-                    pageUrl = string.Format("{0}/?p={1}", profileLink, i);
-                    response = await DownloadStringWithAuth(pageUrl);
-                    // Response should not be empty. User should be unauthorised.
+                    var pageUrl = string.Format("{0}/badges/?p={1}", profileLink, p);
+                    var response = await DownloadStringWithAuth(pageUrl);
+                    
                     if (string.IsNullOrEmpty(response))
                         return badges;
 
                     document.LoadHtml(response);
 
-                    // Get all badges from current page
+                    if (p == 1)
+                    {
+                        // get pages count from navigation tab after first request
+                        // possible formats depend on badge count, e.g. < 1 2 3 4 5 > or < 1 2 3 ... 15 >
+                        var pageNodes = document.DocumentNode.SelectNodes("//a[@class=\"pagelink\"]");
+                        if (pageNodes != null)
+                            pagesCount = pageNodes
+                                .Select(a => a.Attributes["href"].Value)
+                                .Select(s => int.Parse(s.Replace("?p=", "")))
+                                .Max();
+                    }
+                    
+                    // add all badges from page to list
                     ProcessBadgesOnPage(badges, document);
-                }
-
-                
+                }                
             }
             catch (Exception ex)
             {
-                Logger.Exception(ex, "LoadBadgesAsync");                
+                Logger.Exception(ex, "LoadBadgesAsync");
                 return Enumerable.Empty<BadgeModel>();
             }
 

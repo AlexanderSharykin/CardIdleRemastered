@@ -1,23 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
-using CardIdleRemastered.Properties;
 using Microsoft.Win32;
-using Path = System.IO.Path;
 
 namespace CardIdleRemastered
 {
@@ -36,20 +23,20 @@ namespace CardIdleRemastered
 
         public ISettingsStorage Storage { get; set; }
 
+        /// <summary>
+        /// Set the Browser emulation version for embedded browser control (registry key) to use newest IE version
+        /// </summary>
         private void SetIeMode()
         {
             if (_browserEmulation)
                 return;
-
-            // Set the Browser emulation version for embedded browser control
+            
             try
             {
-                RegistryKey ie_root =
-                    Registry.CurrentUser.CreateSubKey(
-                        @"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION");
-                RegistryKey key =
-                    Registry.CurrentUser.OpenSubKey(
-                        @"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
+                RegistryKey ie_root = Registry.CurrentUser
+                    .CreateSubKey(@"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION");
+                RegistryKey key = Registry.CurrentUser
+                    .OpenSubKey(@"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
                 
                 key.SetValue(App.AppSystemName, (int) 10001, RegistryValueKind.DWord);
             }
@@ -63,7 +50,7 @@ namespace CardIdleRemastered
             }
         }
 
-        public int SecondsWaiting = 30;
+        #region Dll Imports
 
         [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool InternetSetOption(int hInternet, int dwOption, string lpBuffer, int dwBufferLength);
@@ -71,7 +58,14 @@ namespace CardIdleRemastered
         [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool InternetSetCookie(string lpszUrlName, string lpszCookieName, string lpszCookieData);
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        // Imports the InternetGetCookieEx function from wininet.dll which allows the application to access the cookie data from the web browser control
+        // Reference: http://stackoverflow.com/questions/3382498/is-it-possible-to-transfer-authentication-from-webbrowser-to-webrequest
+        [DllImport("wininet.dll", SetLastError = true)]
+        public static extern bool InternetGetCookieEx(string url, string cookieName, StringBuilder cookieData, ref int size, int dwFlags, IntPtr lpReserved);
+
+        #endregion
+
+        private void BrowserWindowLoaded(object sender, RoutedEventArgs e)
         {
             // Remove any existing session state data
             InternetSetOption(0, 42, null, 0);
@@ -86,43 +80,37 @@ namespace CardIdleRemastered
                 "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko");
         }
 
-        // Imports the InternetGetCookieEx function from wininet.dll which allows the application to access the cookie data from the web browser control
-        // Reference: http://stackoverflow.com/questions/3382498/is-it-possible-to-transfer-authentication-from-webbrowser-to-webrequest
-        [DllImport("wininet.dll", SetLastError = true)]
-        public static extern bool InternetGetCookieEx(
-            string url,
-            string cookieName,
-            StringBuilder cookieData,
-            ref int size,
-            int dwFlags,
-            IntPtr lpReserved);
-
         // Assigns the hex value for the DLL flag that allows Idle Master to be able to access cookie data marked as "HTTP Only"
-        private const int InternetCookieHttponly = 0x2000;
+        private const int InternetCookieHttpOnly = 0x2000;
 
-        // This function returns cookie data based on a uniform resource identifier
+        /// <summary>
+        /// Returns cookie data based on Uri
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
         public static CookieContainer GetUriCookieContainer(Uri uri)
         {
             // First, create a null cookie container
             CookieContainer cookies = null;
 
-            // Determine the size of the cookie
-            var datasize = 8192*16;
+            // Determine cookie size
+            int datasize = 8192*16;
+
             var cookieData = new StringBuilder(datasize);
 
             // Call InternetGetCookieEx from wininet.dll
-            if (
-                !InternetGetCookieEx(uri.ToString(), null, cookieData, ref datasize, InternetCookieHttponly, IntPtr.Zero))
+            if (false == InternetGetCookieEx(uri.ToString(), null, cookieData, ref datasize, InternetCookieHttpOnly, IntPtr.Zero))
             {
                 if (datasize < 0)
                     return null;
+
                 // Allocate stringbuilder large enough to hold the cookie
                 cookieData = new StringBuilder(datasize);
-                if (!InternetGetCookieEx(
+                if (false == InternetGetCookieEx(
                     uri.ToString(),
                     null, cookieData,
                     ref datasize,
-                    InternetCookieHttponly,
+                    InternetCookieHttpOnly,
                     IntPtr.Zero))
                     return null;
             }
@@ -138,23 +126,7 @@ namespace CardIdleRemastered
             return cookies;
         }
 
-        // This code executes each time the web browser control is in the process of navigating
-        private void wbAuth_Navigating(object sender, NavigatingCancelEventArgs e)
-        {
-            // Get the url that's being navigated to
-            var url = e.Uri.AbsoluteUri;
-
-            // Check to see if the page it's navigating to isn't the Steam login page or related calls
-            if (url != "https://steamcommunity.com/login/home/?goto=my/profile" &&
-                url != "https://store.steampowered.com/login/transfer" &&
-                url != "https://store.steampowered.com//login/transfer" && url.StartsWith("javascript:") == false &&
-                url.StartsWith("about:") == false)
-            {
-                //e.Cancel = true;
-            }
-        }
-
-        private void wbAuth_Navigated(object sender, NavigationEventArgs e)
+        private void BrowserNavigated(object sender, NavigationEventArgs e)
         {
             // Find the page header, and remove it.  This gives the login form a more streamlined look.
             dynamic htmldoc = wbAuth.Document;
@@ -167,23 +139,23 @@ namespace CardIdleRemastered
                 }
                 catch (Exception)
                 {
-
+                    
                 }
-
             }
 
             // Get the URL of the page that just finished loading
             var src = wbAuth.Source;
             var url = wbAuth.Source.AbsoluteUri;
 
+            Logger.Info("Navigated to " + url);
+
             // If the page it just finished loading is the login page
             if (url == "https://steamcommunity.com/login/home/?goto=my/profile" ||
                 url == "https://store.steampowered.com/login/transfer" ||
                 url == "https://store.steampowered.com//login/transfer")
             {
-                // Get a list of cookies from the current page
-                CookieContainer container = GetUriCookieContainer(src);
-                var cookies = container.GetCookies(src);
+                // Get a list of cookies from the current page                
+                var cookies = GetUriCookieContainer(src).GetCookies(src);
                 foreach (Cookie cookie in cookies)
                 {
                     if (cookie.Name.StartsWith("steamMachineAuth"))
@@ -201,10 +173,7 @@ namespace CardIdleRemastered
                     {
                         if (parentalNotice.OuterHtml != "")
                         {
-                            // Steam family options enabled
-                            //wbAuth.Show();
-                            Width = 1000;
-                            Height = 350;
+                            // Steam family options enabled                            
                             return;
                         }
                     }
@@ -215,48 +184,55 @@ namespace CardIdleRemastered
                 }
 
                 // Get a list of cookies from the current page
-                var container = GetUriCookieContainer(src);
-                var cookies = container.GetCookies(src);
-
-                // Go through the cookie data so that we can extract the cookies we are looking for
-                foreach (Cookie cookie in cookies)
-                {
-                    // Save the "sessionid" cookie
-                    if (cookie.Name == "sessionid")
-                    {
-                        Storage.SessionId = cookie.Value;
-                    }
-
-                    // Save the "steamLogin" cookie and construct and save the user's profile link
-                    else if (cookie.Name == "steamLogin")
-                    {
-                        string login = cookie.Value;
-                        Storage.SteamLogin = login;
-
-                        var steamId = WebUtility.UrlDecode(login);
-                        var index = steamId.IndexOf('|');
-                        if (index >= 0)
-                            steamId = steamId.Remove(index);                        
-                        Storage.SteamProfileUrl = "http://steamcommunity.com/profiles/" + steamId;
-                    }
-
-                    // Save the "steamparental" cookie"
-                    else if (cookie.Name == "steamparental")
-                    {
-                        Storage.SteamParental = cookie.Value;
-                    }
-
-                    else if (cookie.Name == "steamRememberLogin")
-                    {
-                        Storage.SteamRememberLogin = cookie.Value;
-                    }
-                }
+                var cookies = GetUriCookieContainer(src).GetCookies(src);
+                
+                GetSessionCookies(cookies);
 
                 // Save all of the data to the program settings file, and close this form                
                 if (false == String.IsNullOrWhiteSpace(Storage.SteamLogin))
                 {
                     Storage.Save();
                     Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Extract session auth cookies
+        /// </summary>
+        /// <param name="cookies"></param>
+        private void GetSessionCookies(CookieCollection cookies)
+        {
+            foreach (Cookie cookie in cookies)
+            {
+                // Save the "sessionid" cookie
+                if (cookie.Name == "sessionid")
+                {
+                    Storage.SessionId = cookie.Value;
+                }
+
+                // Save the "steamLogin" cookie and construct and save the user's profile link
+                else if (cookie.Name == "steamLogin")
+                {
+                    string login = cookie.Value;
+                    Storage.SteamLogin = login;
+
+                    var steamId = WebUtility.UrlDecode(login);
+                    var index = steamId.IndexOf('|');
+                    if (index >= 0)
+                        steamId = steamId.Remove(index);
+                    Storage.SteamProfileUrl = "http://steamcommunity.com/profiles/" + steamId;
+                }
+
+                // Save the "steamparental" cookie"
+                else if (cookie.Name == "steamparental")
+                {
+                    Storage.SteamParental = cookie.Value;
+                }
+
+                else if (cookie.Name == "steamRememberLogin")
+                {
+                    Storage.SteamRememberLogin = cookie.Value;
                 }
             }
         }

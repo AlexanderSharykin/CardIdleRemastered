@@ -5,20 +5,10 @@
         Title="{x:Static res:Resources.SteamLogin}" 
         Height="Auto" Width="Auto" 
         WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded">
+        Loaded="BrowserWindowLoaded">
     <Grid>
         <WebBrowser Name="wbAuth"  
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                    Navigated="wbAuth_Navigated" Navigating="wbAuth_Navigating"
-                    />
-
-        <!--<Button Width="120" Height="50" >
-            <StackPanel Orientation="Horizontal">
-                <Image Source="../Resources/Avatar.png" />
-                <TextBlock Text="Click Here" 
-                   VerticalAlignment="Center" 
-                   HorizontalAlignment="Center" />
-            </StackPanel>
-        </Button>-->
+                    Navigated="BrowserNavigated"/>
     </Grid>
 </Window>

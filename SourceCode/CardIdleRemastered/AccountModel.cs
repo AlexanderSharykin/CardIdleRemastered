@@ -60,6 +60,7 @@ namespace CardIdleRemastered
             StartBadgeIdleCmd = new BaseCommand(StartBadgeIdle, CanStartBadgeIdle);
             StopBadgeIdleCmd = new BaseCommand(StopBadgeIdle, CanStopBadgeIdle);
             BlacklistBadgeCmd = new BaseCommand(BlacklistBadge);
+            ForceSyncCmd = new BaseCommand(ForceSync);
 
             EnqueueAllCmd = new BaseCommand(EnqueueAll);
             DequeueAllCmd = new BaseCommand(_ => DequeueAll());
@@ -113,7 +114,7 @@ namespace CardIdleRemastered
         #region Account Properties
         public string UserName
         {
-            get { return _userName ?? "Card Idle"; }
+            get { return String.IsNullOrWhiteSpace(_userName) ? "Card Idle" : _userName; }
             set
             {
                 _userName = value;
@@ -176,7 +177,7 @@ namespace CardIdleRemastered
 
         public string AvatarUrl
         {
-            get { return _avatarUrl ?? "../Resources/Avatar.png"; }
+            get { return String.IsNullOrWhiteSpace(_avatarUrl) ? "../Resources/Avatar.png" : _avatarUrl; }
             set
             {
                 _avatarUrl = value;
@@ -212,7 +213,7 @@ namespace CardIdleRemastered
 
         public string Level
         {
-            get { return _level ?? "0"; }
+            get { return String.IsNullOrWhiteSpace(_level) ? "0" : _level; }
             set
             {
                 _level = value;
@@ -400,7 +401,7 @@ namespace CardIdleRemastered
             _updater.Start();
 
             // load badges and new profile settings
-            await _updater.Sync();
+            await _updater.Sync(false);
 
             // restore queue
             var queue = Storage.IdleQueue.Cast<string>()
@@ -483,6 +484,13 @@ namespace CardIdleRemastered
                 if (badge.CardIdleActive)
                     badge.CardIdleProcess.Stop();
             }            
+        }
+
+        public ICommand ForceSyncCmd { get; private set; }
+
+        private void ForceSync(object o)
+        {
+            _updater.Sync(true);
         }
 
         public ICommand StartBadgeIdleCmd { get; private set; }

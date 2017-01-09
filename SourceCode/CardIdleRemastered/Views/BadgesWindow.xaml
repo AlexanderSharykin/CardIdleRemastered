@@ -236,6 +236,9 @@
                      Visibility="{Binding IsAuthorized, Converter={StaticResource BoolToVisible}}"
                      IsSelected="{Binding IsAuthorized, Mode=OneWay}"
                      Header="{x:Static res:Resources.BadgesHeader}">
+                <TabItem.InputBindings>
+                    <KeyBinding Key="F5" Command="{Binding Path=ForceSyncCmd}"/>
+                </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -735,7 +738,7 @@
 
             <TabItem FontSize="18" Header="{x:Static res:Resources.AboutHeader}">
                 <Grid Background="{StaticResource DarkTheme}" Opacity="0.8">
-                    <Grid  MaxHeight="320" Margin="20">
+                    <Grid MaxHeight="400" Margin="20">
                         <Grid.Resources>
                             <Style TargetType="StackPanel">
                                 <Setter Property="Orientation" Value="Horizontal"/>
@@ -754,12 +757,17 @@
                                 <Setter Property="Foreground" Value="Lime"/>
                                 <Setter Property="TextDecorations" Value="Underline"/>
                                 <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="ToolTip" Value="Click to visit web page"/>
                             </Style>
                         </Grid.Resources>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="3*"/>
                             <RowDefinition Height="3*"/>
                             <RowDefinition Height="3*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="2*"/>
@@ -790,6 +798,24 @@
                             <TextBlock Name="lblIM" Text="https://github.com/jshackles/idle_master" Style="{StaticResource ResourceKey=Link}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding Gesture="LeftClick" Command="{StaticResource ResourceKey=redirect}" CommandParameter="{Binding ElementName=lblIM, Path=Text}"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="8">
+                            <Label Content="Notifications about new releases in my Twitter" Style="{StaticResource ResourceKey=Message}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="9">
+                            <TextBlock Name="lblTwitter"  Text="https://twitter.com/Alex_Sharykin" Style="{StaticResource ResourceKey=Link}">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding Gesture="LeftClick" Command="{StaticResource ResourceKey=redirect}" CommandParameter="{Binding ElementName=lblTwitter, Path=Text}"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Grid.Row="10">
+                            <TextBlock Name="lblHashtag" Text="https://twitter.com/hashtag/CardIdleRemastered" Style="{StaticResource ResourceKey=Link}">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding Gesture="LeftClick" Command="{StaticResource ResourceKey=redirect}" CommandParameter="{Binding ElementName=lblHashtag, Path=Text}"/>
                                 </TextBlock.InputBindings>
                             </TextBlock>
                         </StackPanel>

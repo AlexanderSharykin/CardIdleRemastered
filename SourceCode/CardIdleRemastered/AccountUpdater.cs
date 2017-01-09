@@ -72,16 +72,29 @@ namespace CardIdleRemastered
         }
 
         private async void SyncBanges(object sender, EventArgs eventArgs)
-        {            
-            _counter = 0;
-            await Sync();            
+        {                        
+            await Sync(true);            
         }
 
-        public async Task Sync()
+        private bool _syncRunning;
+        public async Task Sync(bool resetCounter)
         {
-            var tBadges = LoadBadgesAsync();
-            var tProfile = LoadProfileAsync();
-            await Task.WhenAll(tBadges, tProfile);
+            if (_syncRunning)
+                return;
+
+            if (resetCounter)
+                _counter = 0;
+            try
+            {
+                _syncRunning = true;
+                var tBadges = LoadBadgesAsync();
+                var tProfile = LoadProfileAsync();
+                await Task.WhenAll(tBadges, tProfile);
+            }
+            finally
+            {
+                _syncRunning = false;
+            }
         }
 
         private async Task LoadProfileAsync()

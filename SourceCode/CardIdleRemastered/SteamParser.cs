@@ -143,6 +143,9 @@ namespace CardIdleRemastered
                 return Enumerable.Empty<BadgeModel>();
             }
 
+            foreach (var badge in badges)            
+                badge.ProfileUrl = profileLink;
+            
             return badges;
         }
 
@@ -175,7 +178,19 @@ namespace CardIdleRemastered
                 var cardNode = badge.SelectSingleNode(".//span[@class=\"progress_info_bold\"]");
                 var cards = cardNode == null ? string.Empty : Regex.Match(cardNode.InnerText, @"[0-9]+").Value;
 
-                badges.Add(new BadgeModel(appid, name, cards, hours));
+                var progressNode = badge.SelectSingleNode(".//div[@class=\"badge_progress_info\"]");
+
+                int current = 0, total = 0;
+                if (progressNode != null)
+                {
+                    Match m = Regex.Match(progressNode.InnerText, @"([0-9]+)\s.+\s([0-9]+)");
+                    string gCurrent = m.Groups[1].Value;
+                    string gTotal = m.Groups[2].Value;
+                    int.TryParse(gCurrent, out current);
+                    int.TryParse(gTotal, out total);
+                }
+
+                badges.Add(new BadgeModel(appid, name, cards, hours, current, total));
             }
         }
     }

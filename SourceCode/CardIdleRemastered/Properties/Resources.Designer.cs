@@ -98,6 +98,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Progress.
+        /// </summary>
+        public static string BadgeProgress {
+            get {
+                return ResourceManager.GetString("BadgeProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to In Black List.
         /// </summary>
         public static string BadgeProperty_Blacklisted {
@@ -202,6 +211,15 @@ namespace CardIdleRemastered.Properties {
         public static string CfgIdleProcessCount {
             get {
                 return ResourceManager.GetString("CfgIdleProcessCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Switch Interval.
+        /// </summary>
+        public static string CfgSwitchInterval {
+            get {
+                return ResourceManager.GetString("CfgSwitchInterval", resourceCulture);
             }
         }
         
@@ -368,11 +386,29 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All.
+        /// </summary>
+        public static string IdleMode_All {
+            get {
+                return ResourceManager.GetString("IdleMode_All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to One By One.
         /// </summary>
         public static string IdleMode_OneByOne {
             get {
                 return ResourceManager.GetString("IdleMode_OneByOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Periodic Switch.
+        /// </summary>
+        public static string IdleMode_PeriodicSwitch {
+            get {
+                return ResourceManager.GetString("IdleMode_PeriodicSwitch", resourceCulture);
             }
         }
         
@@ -418,6 +454,15 @@ namespace CardIdleRemastered.Properties {
         public static string Logout {
             get {
                 return ResourceManager.GetString("Logout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to min.
+        /// </summary>
+        public static string Minutes {
+            get {
+                return ResourceManager.GetString("Minutes", resourceCulture);
             }
         }
         
@@ -508,6 +553,15 @@ namespace CardIdleRemastered.Properties {
         public static string Reset {
             get {
                 return ResourceManager.GetString("Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to sec.
+        /// </summary>
+        public static string Seconds {
+            get {
+                return ResourceManager.GetString("Seconds", resourceCulture);
             }
         }
         

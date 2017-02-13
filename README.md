@@ -9,6 +9,9 @@ It offers rich UI and flexible idle management.
 
 Requirements
 -------
+Steam account with non-F2P games with cards
+
+Minimal understanding of Steam cards, game badges abd card drops 
 
 OS Windows 7 and higher
 
@@ -63,7 +66,11 @@ Click Dequeue button to remove a game from the queue if necessary
 
 Select Idle mode. Default mode is "One by One" which means that Card Idle runs one game idle process at a time and starts the next game only when all cards received. 
 
-Other two modes ("Trial First" and "Trial Last") were introduces for games which have 2 hour delay before cards begin to drop. Card Idle will run such "trial" games together, stop those what reached 2 hour and pick next from the queue. Default number of processes is 16, max number is 255. When there is no more trial games Card Idle switches to "One by One" mode.
+Two "Trial" modes ("Trial First" and "Trial Last") were introduces for games which have 2 hour delay before cards begin to drop. Card Idle will run such "trial" games together, stop those what reached 2 hour and pick next from the queue. Default number of processes is 16, max number is 255. When there is no more trial games Card Idle switches to "One by One" mode.
+
+Due to changes in Steam card drop system it became possible to get 1 card drop with a simple method: 1. launch a game from library 2. wait some time 3. quit the game. "Periodic Switch" mode automates the process. Card Idle starts the 1st game from the queue, waits for a short interval, stops the game, waits a bit for Steam to react (and possibly drop a card), starts the 2nd game from the queue, waits, stops it, etc, repeat for all games in the queue.
+
+If "All" mode is selected, Card Idle will start all games from the idle queue.
 
 Launch automatic idle: click **[Start]** button
 

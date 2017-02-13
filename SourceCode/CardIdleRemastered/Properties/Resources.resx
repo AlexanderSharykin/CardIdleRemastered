@@ -130,6 +130,9 @@
   <data name="Avatar" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Avatar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="BadgeProgress" xml:space="preserve">
+    <value>Progress</value>
+  </data>
   <data name="BadgeProperty_Blacklisted" xml:space="preserve">
     <value>In Black List</value>
   </data>
@@ -165,6 +168,9 @@
   </data>
   <data name="CfgIdleProcessCount" xml:space="preserve">
     <value>Max Idle Process Count</value>
+  </data>
+  <data name="CfgSwitchInterval" xml:space="preserve">
+    <value>Switch Interval</value>
   </data>
   <data name="DequeueAll" xml:space="preserve">
     <value>Dequeue Selected</value>
@@ -220,8 +226,14 @@
   <data name="Idle" xml:space="preserve">
     <value>Idle</value>
   </data>
+  <data name="IdleMode_All" xml:space="preserve">
+    <value>All</value>
+  </data>
   <data name="IdleMode_OneByOne" xml:space="preserve">
     <value>One By One</value>
+  </data>
+  <data name="IdleMode_PeriodicSwitch" xml:space="preserve">
+    <value>Periodic Switch</value>
   </data>
   <data name="IdleMode_TrialFirst" xml:space="preserve">
     <value>Trial First</value>
@@ -237,6 +249,9 @@
   </data>
   <data name="Logout" xml:space="preserve">
     <value>(logout)</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>min</value>
   </data>
   <data name="NextSync" xml:space="preserve">
     <value>Sync</value>
@@ -267,6 +282,9 @@
   </data>
   <data name="Reset" xml:space="preserve">
     <value>Reset</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>sec</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>

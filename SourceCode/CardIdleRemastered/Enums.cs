@@ -19,6 +19,8 @@ namespace CardIdleRemastered
         OneByOne,
         TrialFirst,
         TrialLast,
+        PeriodicSwitch,
+        All
     }
 
     public enum FilterState

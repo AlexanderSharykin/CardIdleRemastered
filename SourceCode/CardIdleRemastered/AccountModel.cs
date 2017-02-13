@@ -343,6 +343,9 @@ namespace CardIdleRemastered
 
                 if (Storage.MaxIdleProcessCount > 0)
                     Idler.MaxIdleInstanceCount = Storage.MaxIdleProcessCount;
+                Idler.SwitchMinutes = Storage.SwitchMinutes;
+                if (Storage.SwitchSeconds > 0)
+                    Idler.SwitchSeconds = Storage.SwitchSeconds;
                 
                 IgnoreClient = Storage.IgnoreClient;
             }
@@ -871,6 +874,16 @@ namespace CardIdleRemastered
             else if (e.PropertyName == "MaxIdleInstanceCount")
             {
                 Storage.MaxIdleProcessCount = (sender as IdleManager).MaxIdleInstanceCount;
+                save = true;
+            }
+            else if (e.PropertyName == "SwitchMinutes")
+            {
+                Storage.SwitchMinutes = (sender as IdleManager).SwitchMinutes;
+                save = true;
+            }
+            else if (e.PropertyName == "SwitchSeconds")
+            {
+                Storage.SwitchSeconds = (sender as IdleManager).SwitchSeconds;
                 save = true;
             }
 

@@ -28,6 +28,8 @@ namespace CardIdleRemastered
         int IdleMode { get; set; }
         string BadgeFilter { get; set; }
         byte MaxIdleProcessCount { get; set; }
+        byte SwitchMinutes { get; set; }
+        byte SwitchSeconds { get; set; }        
 
         StringCollection IdleQueue { get; }
 

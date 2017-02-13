@@ -19,16 +19,30 @@ namespace CardIdleRemastered
         private bool _isBlacklisted;
         private bool _isInQueue;
 
+        private int _cardsCurrent;
+        private string _badgeProgress;
+        private int _cardsTotal;
+
         public BadgeModel()
         {
         }
 
         public BadgeModel(string id, string title, string card, string hours)
+            :this(id, title, card, hours, 0, 0)
+        {            
+        }
+
+        public BadgeModel(string id, string title, string card, string hours, int cardsCurrent, int cardsTotal)
         {
             AppId = id;
             Title = title;
             UpdateStats(card, hours);
+
+            CardsTotal = cardsTotal;
+            CardsCurrent = cardsCurrent;
         }
+
+        public string ProfileUrl { get; set; }
 
         public string Title { get; set; }
         
@@ -37,6 +51,11 @@ namespace CardIdleRemastered
         public string StorePageUrl
         {
             get { return "http://store.steampowered.com/app/" + AppId; }
+        }
+
+        public string BadgeUrl
+        {
+            get { return String.Format("{0}/gamecards/", ProfileUrl) + AppId; }
         }
 
         public string ImageUrl
@@ -53,6 +72,47 @@ namespace CardIdleRemastered
                 OnPropertyChanged();
                 if (CardIdleActive && _remainingCard == 0)
                     CardIdleProcess.Stop();
+            }
+        }
+
+        public int CardsCurrent
+        {
+            get { return _cardsCurrent; }
+            set
+            {
+                _cardsCurrent = value;
+                OnPropertyChanged();
+
+                UpdateProgress();                                
+            }
+        }
+
+        public int CardsTotal
+        {
+            get { return _cardsTotal; }
+            set
+            {
+                _cardsTotal = value;
+                UpdateProgress();
+            }
+        }
+
+        private void UpdateProgress()
+        {
+            if (CardsTotal > 0 && CardsCurrent >= 0)
+            {
+                BadgeProgress = new string((char)9733, CardsCurrent) +
+                                new string((char)9734, CardsTotal - CardsCurrent);
+            }
+        }
+
+        public string BadgeProgress
+        {
+            get { return _badgeProgress; }
+            private set
+            {
+                _badgeProgress = value;
+                OnPropertyChanged();
             }
         }
 

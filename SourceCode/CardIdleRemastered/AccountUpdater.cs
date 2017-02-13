@@ -103,7 +103,7 @@ namespace CardIdleRemastered
             _account.BackgroundUrl = profile["BackgroundUrl"];
             _account.AvatarUrl = profile["AvatarUrl"];            
             _account.UserName = profile["UserName"];            
-            _account.Level = profile["Level"];            
+            _account.Level = profile["Level"];
         }
 
         private async Task LoadBadgesAsync()

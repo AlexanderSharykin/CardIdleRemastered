@@ -126,6 +126,9 @@
   <data name="Apply" xml:space="preserve">
     <value>Применить</value>
   </data>
+  <data name="BadgeProgress" xml:space="preserve">
+    <value>Прогресс</value>
+  </data>
   <data name="BadgeProperty_Blacklisted" xml:space="preserve">
     <value>В чёрном списке</value>
   </data>
@@ -161,6 +164,9 @@
   </data>
   <data name="CfgIdleProcessCount" xml:space="preserve">
     <value>Запускать процессов не более</value>
+  </data>
+  <data name="CfgSwitchInterval" xml:space="preserve">
+    <value>Интервал переключения</value>
   </data>
   <data name="DequeueAll" xml:space="preserve">
     <value>Убрать все из очереди</value>
@@ -225,8 +231,14 @@
   <data name="Idle" xml:space="preserve">
     <value>Процесс</value>
   </data>
+  <data name="IdleMode_All" xml:space="preserve">
+    <value>Все сразу</value>
+  </data>
   <data name="IdleMode_OneByOne" xml:space="preserve">
     <value>Поодиночке</value>
+  </data>
+  <data name="IdleMode_PeriodicSwitch" xml:space="preserve">
+    <value>Переключения</value>
   </data>
   <data name="IdleMode_TrialFirst" xml:space="preserve">
     <value>С пробным периодом - в начало</value>
@@ -242,6 +254,9 @@
   </data>
   <data name="Logout" xml:space="preserve">
     <value>(выйти)</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>мин</value>
   </data>
   <data name="NextSync" xml:space="preserve">
     <value>Синхронизация</value>
@@ -272,6 +287,9 @@
   </data>
   <data name="Reset" xml:space="preserve">
     <value>Сбросить</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>сек</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>

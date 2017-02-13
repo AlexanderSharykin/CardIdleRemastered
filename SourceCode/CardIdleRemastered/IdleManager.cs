@@ -10,12 +10,15 @@ namespace CardIdleRemastered
     public class IdleManager: ObservableModel
     {
         public static readonly byte DefaultIdleInstanceCount = 16;
+        public static readonly byte DefaultSwitchSeconds = 10;
 
         private AccountModel _account;
 
         private bool _isActive;
         private IdleMode _mode;        
         private byte _maxIdleInstanceCount;
+        private byte _switchMinutes;
+        private byte _switchSeconds;
 
         private Random _rand = new Random();
         
@@ -27,6 +30,7 @@ namespace CardIdleRemastered
         {
             _account = acc;
             _maxIdleInstanceCount = DefaultIdleInstanceCount;
+            _switchSeconds = DefaultSwitchSeconds;
         }
 
         public bool IsActive
@@ -69,6 +73,26 @@ namespace CardIdleRemastered
             }
         }
 
+        public byte SwitchMinutes
+        {
+            get { return _switchMinutes; }
+            set
+            {
+                _switchMinutes = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public byte SwitchSeconds
+        {
+            get { return _switchSeconds; }
+            set
+            {
+                _switchSeconds = value;
+                OnPropertyChanged();
+            }
+        }
+
         public async void Start()
         {
             if (IsActive)
@@ -78,6 +102,7 @@ namespace CardIdleRemastered
 
             _currentMode = Mode;
             _badgeBuffer = new List<BadgeWrapper>(Math.Max((int)MaxIdleInstanceCount, 1));
+
             _tmCounter = new DispatcherTimer();
             _tmCounter.Tick += UpdateGameTimeCounter;
             _tmCounter.Interval = new TimeSpan(0, 1, 0);
@@ -88,43 +113,73 @@ namespace CardIdleRemastered
 
         private async Task Proceed()
         {
-            var trial = _account.IdleQueueBadges.Where(b => b.HoursPlayed < 2).ToArray();
-
-            if (_badgeBuffer.Count == 0)
+            if (_currentMode == IdleMode.All)
             {
-                if (_currentMode == IdleMode.OneByOne)
-                {
-                    var next = _account.IdleQueueBadges.FirstOrDefault(b=>b.RemainingCard > 0);
-                    if (next != null)
-                        await AddGame(next);
-                }
-                else
-                {
-                    var next = _account.IdleQueueBadges.FirstOrDefault(b => b.HoursPlayed >= 2.0 && b.RemainingCard > 0);
-                    
-                    if (_mode == IdleMode.TrialFirst && trial.Length > 0 || next == null)                    
-                        await AddTrialGames(trial);
+                foreach (BadgeModel badge in _account.IdleQueueBadges)
+                    await AddGame(badge);
+            }
+            else if (_currentMode == IdleMode.PeriodicSwitch)
+            {
+                int idx = 0;
+                int sec = Math.Max(SwitchMinutes * 60 + SwitchSeconds, DefaultSwitchSeconds);
+                var ts = TimeSpan.FromSeconds(sec);
 
-                    if (_badgeBuffer.Count == 0 && next != null)
-                        await AddGame(next);
+                while (idx < _account.IdleQueueBadges.Count && IsActive)
+                {                    
+                    var badge = _account.IdleQueueBadges[idx];
+
+                    badge.CardIdleProcess.Start();
+                    
+                    await Task.Delay(ts);
+                    
+                    badge.CardIdleProcess.Stop();
+                    
+                    await Task.Delay(4000);
+                    idx++;
                 }
             }
             else
             {
-                await AddTrialGames(trial);
+                var trial = _account.IdleQueueBadges.Where(b => b.HoursPlayed < 2).ToArray();
+
+                if (_badgeBuffer.Count == 0)
+                {
+                    if (_currentMode == IdleMode.OneByOne)
+                    {
+                        var next = _account.IdleQueueBadges.FirstOrDefault(b => b.RemainingCard > 0);
+                        if (next != null)
+                            await AddGame(next);
+                    }
+                    else
+                    {
+                        var next =
+                            _account.IdleQueueBadges.FirstOrDefault(b => b.HoursPlayed >= 2.0 && b.RemainingCard > 0);
+
+                        if (_mode == IdleMode.TrialFirst && trial.Length > 0 || next == null)
+                            await AddTrialGames(trial);
+
+                        if (_badgeBuffer.Count == 0 && next != null)
+                            await AddGame(next);
+                    }
+                }
+                else
+                {
+                    await AddTrialGames(trial);
+                }
             }
 
             if (_badgeBuffer.Count == 0)
             {
                 IsActive = false;
-                _tmCounter.Stop();                
+                _tmCounter.Stop();
             }            
         }
 
         private async Task AddGame(BadgeModel next, bool trial = false)
         {
-            if (_badgeBuffer.Any(w=>w.Badge == next) || _badgeBuffer.Count == _badgeBuffer.Capacity)
+            if (false == IsActive || _badgeBuffer.Any(w => w.Badge == next) || _badgeBuffer.Count == _badgeBuffer.Capacity)
                 return;
+
             _badgeBuffer.Add(new BadgeWrapper{Badge = next, IsTrial = trial, Hours = next.HoursPlayed});            
             next.IdleStopped += BadgeIdleProcessStopped;
 
@@ -216,9 +271,7 @@ namespace CardIdleRemastered
                 var badge = _badgeBuffer[i].Badge;
                 RemoveGame(badge);
                 badge.CardIdleProcess.Stop();
-            }
-            
-
+            }           
         }
 
         private class BadgeWrapper

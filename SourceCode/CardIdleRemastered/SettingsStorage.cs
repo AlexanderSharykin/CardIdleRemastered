@@ -28,6 +28,8 @@ namespace CardIdleRemastered
         public int IdleMode { get; set; }
         public string BadgeFilter { get; set; }
         public byte MaxIdleProcessCount { get; set; }
+        public byte SwitchMinutes { get; set; }
+        public byte SwitchSeconds { get; set; }
 
         public StringCollection IdleQueue { get; private set; }
 
@@ -86,6 +88,8 @@ namespace CardIdleRemastered
                     BadgeFilter = (string)xml.Element("BadgeFilter");
                     IdleMode = ReadInt(xml.Element("IdleMode"));
                     MaxIdleProcessCount = ReadByte(xml.Element("MaxIdleProcessCount"));
+                    SwitchMinutes = ReadByte(xml.Element("SwitchMinutes"));
+                    SwitchSeconds = ReadByte(xml.Element("SwitchSeconds"));
 
                     IdleQueue.AddRange(GetStringList(xml.Element("IdleQueue")));
                     Blacklist.AddRange(GetStringList(xml.Element("Blacklist")));
@@ -146,6 +150,8 @@ namespace CardIdleRemastered
                 new XElement("BadgeFilter", BadgeFilter),
                 new XElement("IdleMode", IdleMode),
                 new XElement("MaxIdleProcessCount", MaxIdleProcessCount),
+                new XElement("SwitchMinutes", SwitchMinutes),
+                new XElement("SwitchSeconds", SwitchSeconds),
                 new XElement("IdleQueue", String.Join(",", IdleQueue.Cast<string>())),
                 new XElement("Blacklist", String.Join(",", Blacklist.Cast<string>())),
                 new XElement("Games", String.Join(",", Games.Cast<string>())),

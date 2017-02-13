@@ -287,6 +287,37 @@
                             <DataGridTextColumn Header="{x:Static res:Resources.Cards}" Binding="{Binding Path=RemainingCard}" IsReadOnly="True" 
                                     Width="*"
                                     ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.BadgeProgress}" IsReadOnly="True" 
+                                    Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="Transparent"
+                                                Cursor="Hand" Padding="4"
+                                                BorderBrush="{DynamicResource DynGridHeaders}" BorderThickness="1"
+                                                VerticalAlignment="Center">                                            
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Path=BadgeProgress}" 
+                                                           Foreground="Black"
+                                                           TextWrapping="Wrap" TextAlignment="Center"/>
+                                                <TextBlock TextAlignment="Center" Margin="0,2" Foreground="Black">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="{}{0} / {1} ">
+                                                            <Binding Path="CardsCurrent"/>
+                                                            <Binding Path="CardsTotal"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            
+                                            <Border.InputBindings>
+                                                <MouseBinding Gesture="MiddleClick" 
+                                                              Command="{StaticResource redirect}" 
+                                                              CommandParameter="{Binding Path=BadgeUrl}" />
+                                            </Border.InputBindings>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="{x:Static res:Resources.Idle}" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -561,14 +592,19 @@
                     </DataGrid>
 
 
-                    <Grid Grid.Row="1" Margin="0,21,0,15">
+                    <Grid Grid.Row="1" Margin="0,15,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
                             <Label Content="{x:Static res:Resources.ToolIdleMode}" Foreground="White"/>
                             <ComboBox
                                   MinWidth="100"
@@ -577,32 +613,35 @@
                                   SelectedItem="{Binding Path=Idler.Mode, Converter={StaticResource enumTranslator}}" >
                             </ComboBox>
                         </StackPanel>
-                        
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="{x:Static res:Resources.CfgIdleProcessCount}" Foreground="White" VerticalAlignment="Center"/>
-                            <xctk:ByteUpDown MinWidth="60" Margin="5,0"
-                                             Minimum="1" Maximum="30"
-                                             Value="{Binding Path=Idler.MaxIdleInstanceCount}">
-                                <xctk:ByteUpDown.Style>
-                                    <Style TargetType="xctk:ByteUpDown">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Path=Idler.IsActive}" Value="True">
-                                                <Setter Property="IsEnabled" Value="False"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </xctk:ByteUpDown.Style>
-                            </xctk:ByteUpDown>
-                        </StackPanel>
+
+                        <ToggleButton Name="ButCfg" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" Padding="8,5">
+                            <ToggleButton.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{x:Static res:Resources.Settings}"/>
+                                    <Border Margin="10,0,0,0">
+                                        <TextBlock>
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="&#9660;"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=IsChecked, ElementName=ButCfg}" Value="True">
+                                                            <Setter Property="Text" Value="&#9650;"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </StackPanel>
+                            </ToggleButton.Content>
+                        </ToggleButton>
 
                         <Button Content="{x:Static res:Resources.Start}"
-                                Command ="{Binding IdleCmd}" CommandParameter="1"
-                                
-                                Grid.Column="2"
+                                Command ="{Binding IdleCmd}" CommandParameter="1"                                
+                                Grid.Row="0" Grid.Column="2"
                                 HorizontalAlignment="Right"
-                                Margin="0,0,10,0"
-                                Padding="10,4,10,4" 
-                             
+                                Margin="0,0,10,0" Padding="10,4,10,4" 
+                                
                                 FontSize="18"
                                 BorderThickness="2" 
                                 Background="{DynamicResource DynIdleButtons}"
@@ -610,18 +649,70 @@
                                 VerticalContentAlignment="Center"/>
 
                         <Button Content="{x:Static res:Resources.Stop}"     
-                                Command ="{Binding IdleCmd}" CommandParameter="0"
-                                
-                                Grid.Column="3" 
+                                Command ="{Binding IdleCmd}" CommandParameter="0"                                
+                                Grid.Row="0" Grid.Column="3" 
                                 HorizontalAlignment="Left"
-                                Margin="10,0,0,0"
-                                Padding="10,4,10,4" 
+                                Margin="10,0,0,0" Padding="10,4,10,4" 
                                 
                                 FontSize="18"
                                 BorderThickness="2" 
                                 Background="{DynamicResource DynIdleButtons}"                             
                                 HorizontalContentAlignment="Center" 
                                 VerticalContentAlignment="Center"/>
+
+                        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="0,10,0,0" 
+                              Visibility="{Binding ElementName=ButCfg, Path=IsChecked, Converter={StaticResource BoolToVisible}}">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Idler.IsActive}" Value="True">
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            
+                            <Grid.Resources>
+                                <Style TargetType="Label">
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </Grid.Resources>
+                            
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="5"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                                                        
+                            <Label Content="{x:Static res:Resources.CfgIdleProcessCount}"/>
+
+                            <xctk:ByteUpDown  Grid.Row="0" Grid.Column="2" 
+                                              MinWidth="60" HorizontalAlignment="Left"
+                                              Minimum="1" Maximum="30" 
+                                              Value="{Binding Path=Idler.MaxIdleInstanceCount}"/>
+
+                            <Label Content="{x:Static res:Resources.CfgSwitchInterval}" 
+                                   Grid.Row="2" Grid.Column="0"/>
+
+                            <StackPanel Grid.Row="2" Grid.Column="2" 
+                                        Orientation="Horizontal" HorizontalAlignment="Left">
+                                <xctk:ByteUpDown MinWidth="60" 
+                                                 Minimum="0" Maximum="240" 
+                                                 Value="{Binding Path=Idler.SwitchMinutes}"/>
+                                <Label Content="{x:Static res:Resources.Minutes}"/>
+                                
+                                <xctk:ByteUpDown MinWidth="60" 
+                                                 Minimum="1" Maximum="60" 
+                                                 Value="{Binding Path=Idler.SwitchSeconds}"/>
+                                <Label Content="{x:Static res:Resources.Seconds}"/>
+                            </StackPanel>
+                        </Grid>
                     </Grid>
                 </Grid>
             </TabItem>

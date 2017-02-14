@@ -11,13 +11,15 @@ Requirements
 -------
 Steam account with non-F2P games with cards
 
-Minimal understanding of Steam cards, game badges abd card drops 
+Minimal understanding of Steam cards, game badges and card drops [Steam FAQ](https://steamcommunity.com/tradingcards/faq)
 
 OS Windows 7 and higher
 
 .Net Framework 4.5
 
 You should be logged into your Steam account via Steam client to start idling.
+
+---
 
 Card Idle works in a Single, Multi (Automatic) or Time Idle mode.
 

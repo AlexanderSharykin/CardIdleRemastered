@@ -169,7 +169,7 @@ namespace CardIdleRemastered
                 try
                 {
                     dynamic parentalNotice = htmldoc.GetElementById("parental_notice");
-                    if (parentalNotice != null)
+                    if (parentalNotice != DBNull.Value && parentalNotice != null)
                     {
                         if (parentalNotice.OuterHtml != "")
                         {
@@ -188,11 +188,13 @@ namespace CardIdleRemastered
                 
                 GetSessionCookies(cookies);
 
-                // Save all of the data to the program settings file, and close this form                
+                // Save all of the data to the program settings file, and close this form
                 if (false == String.IsNullOrWhiteSpace(Storage.SteamLogin))
                 {
                     Storage.Save();
-                    Close();
+                    if (url.StartsWith(@"http://steamcommunity.com/id/") ||
+                        url.StartsWith(@"https://steamcommunity.com/id/"))
+                        Close();
                 }
             }
         }

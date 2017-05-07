@@ -59,6 +59,7 @@ namespace CardIdleRemastered
             w.Show();
 
             _account.InitSteamTimer();
+            _account.CheckLatestRelease();
             _account.LoadAccount();
         }
 

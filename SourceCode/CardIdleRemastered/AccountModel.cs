@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -41,6 +42,9 @@ namespace CardIdleRemastered
         private string _gameTitle;
         private readonly ICollectionView _badges;
         private IList<SelectionItemVm<FilterState>> _badgePropertiesFilters;
+        
+        private ReleaseInfo _newestRelease;
+        private bool _canUpdateApp;
 
         #endregion
 
@@ -302,6 +306,40 @@ namespace CardIdleRemastered
         }
 
         #region Initialization
+
+        public ReleaseInfo NewestRelease
+        {
+            get { return _newestRelease; }
+            set
+            {
+                _newestRelease = value;
+                OnPropertyChanged();                
+            }
+        }
+
+        public bool CanUpdateApp
+        {
+            get { return _canUpdateApp; }
+            set
+            {
+                _canUpdateApp = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public async void CheckLatestRelease()
+        {
+            NewestRelease = await new SteamParser().GetLatestCardIdlerRelease();
+
+            // compare current version number with latest release version
+            var a = Assembly.GetExecutingAssembly().GetName().Version;
+            var num = new int[] { a.Major, a.Minor, a.Build, a.Revision};
+            int delta = Enumerable.Range(0, num.Length)
+                .Select(i => num[i] - NewestRelease.Version[i])
+                .SkipWhile(d => d == 0)
+                .FirstOrDefault();
+            CanUpdateApp = delta < 0;
+        }
 
         /// <summary>
         /// Load account when application starts

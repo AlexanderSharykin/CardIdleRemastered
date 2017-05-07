@@ -90,6 +90,13 @@
             <Setter Property="Margin" Value="0,5,15,0"/>
             <Setter Property="TextAlignment" Value="Center"/>
         </Style>
+
+        <Style x:Key="Link" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Lime"/>
+            <Setter Property="TextDecorations" Value="Underline"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="ToolTip" Value="Click to visit web page"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -140,7 +147,7 @@
                   HorizontalAlignment="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>                    
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -224,6 +231,28 @@
                            FontSize="14" Foreground="White"/>
 
                 </Border>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Margin="20"
+                        Background="Transparent"
+                        Visibility="{Binding Path=CanUpdateApp, Converter={StaticResource BoolToVisible}}"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                <StackPanel.InputBindings>
+                    <MouseBinding Gesture="LeftClick" Command="{StaticResource ResourceKey=redirect}" 
+                                  CommandParameter="https://github.com/AlexanderSharykin/CardIdleRemastered/releases"/>
+                </StackPanel.InputBindings>
+                <TextBlock Text="{x:Static res:Resources.NewRelease}" 
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource Link}"/>
+                <TextBlock Text="{Binding Path=NewestRelease.Title, TargetNullValue=?}" 
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource Link}"/>
+                <TextBlock Text="{Binding Path=NewestRelease.Date, TargetNullValue=?}"
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource Link}"/>
+                <TextBlock Text="{x:Static res:Resources.DownloadRelease}" 
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource Link}"/>
             </StackPanel>
         </Grid>
 
@@ -843,12 +872,6 @@
                             </Style>
                             <Style x:Key="Message" TargetType="Label">
                                 <Setter Property="Foreground" Value="White"/>
-                            </Style>
-                            <Style x:Key="Link" TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="Lime"/>
-                                <Setter Property="TextDecorations" Value="Underline"/>
-                                <Setter Property="Cursor" Value="Hand"/>
-                                <Setter Property="ToolTip" Value="Click to visit web page"/>
                             </Style>
                         </Grid.Resources>
                         <Grid.RowDefinitions>

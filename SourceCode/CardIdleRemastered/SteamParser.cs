@@ -193,5 +193,27 @@ namespace CardIdleRemastered
                 badges.Add(new BadgeModel(appid, name, cards, hours, current, total));
             }
         }
-    }
+
+        public async Task<ReleaseInfo> GetLatestCardIdlerRelease()
+        {
+            ReleaseInfo release = null;
+            var response = await DownloadString("https://github.com/AlexanderSharykin/CardIdleRemastered/releases");
+            var doc = new HtmlDocument();
+            doc.LoadHtml(response);
+
+            // profile background
+            HtmlNode html = null;
+            var nodes = doc.DocumentNode.SelectNodes("//div[@class='release-header']");
+            if (nodes != null)
+                html = nodes.FirstOrDefault();
+            if (html != null)
+            {
+                release = new ReleaseInfo();
+                release.Title = html.SelectSingleNode("//h1[@class='release-title']").InnerText.Trim();
+                release.Date = html.SelectSingleNode("//relative-time").InnerText;
+            }
+
+            return release;
+        }
+    }    
 }

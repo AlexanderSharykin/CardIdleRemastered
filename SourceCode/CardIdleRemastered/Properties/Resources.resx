@@ -178,6 +178,9 @@
   <data name="DequeueHeader" xml:space="preserve">
     <value>Dequeue</value>
   </data>
+  <data name="DownloadRelease" xml:space="preserve">
+    <value>Download from GitHub</value>
+  </data>
   <data name="DynGridHeaders" xml:space="preserve">
     <value>Grid Headers</value>
   </data>
@@ -252,6 +255,9 @@
   </data>
   <data name="Minutes" xml:space="preserve">
     <value>min</value>
+  </data>
+  <data name="NewRelease" xml:space="preserve">
+    <value>New release available</value>
   </data>
   <data name="NextSync" xml:space="preserve">
     <value>Sync</value>

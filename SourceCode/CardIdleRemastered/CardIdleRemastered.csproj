@@ -92,6 +92,7 @@
     <Compile Include="AppBrush.cs" />
     <Compile Include="BadgeModel.cs" />
     <Compile Include="ISettingsStorage.cs" />
+    <Compile Include="ReleaseInfo.cs" />
     <Compile Include="SettingsStorage.cs" />
     <Compile Include="ViewModels\SelectionItemVm.cs" />
     <Compile Include="Views\BadgesWindow.xaml.cs">

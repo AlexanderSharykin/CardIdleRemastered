@@ -5,6 +5,12 @@ Card Idle Remastered is a WPF remake of Idle Master, developed by jshackles (htt
 
 It offers rich UI and flexible idle management.
 
+Card Idle Remastered was designed to browse all games with card drops and to idle one selected game as simple as possible (in a single click).
+
+It helps to get remaining card drops in games you own without wasting disk space and CPU and RAM resources.
+
+I publish notifications about new Card Idle releases in Twitter [#CardIdleRemastered](https://twitter.com/hashtag/CardIdleRemastered?src=hash). Additionally Card Idle Remastered performs auto-check for new releases at startup.
+
 ![](https://github.com/AlexanderSharykin/CardIdleRemastered/blob/master/Card_Idle_Main_Page.png)
 
 Requirements

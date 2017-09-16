@@ -71,12 +71,40 @@
                 <Trigger Property="IsSelected" Value="true">
                     <Setter Property="Foreground" Value="White"/>
                 </Trigger>
-                <DataTrigger Binding="{Binding Path=CardIdleProcess.IsRunning}" Value="true">
+                <DataTrigger Binding="{Binding Path=(loc:BadgeModel.CardIdleProcess).IsRunning}" Value="true">
                     <Setter Property="Background" Value="{DynamicResource DynRunningGame}"/>
                     <Setter Property="Foreground" Value="Black"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <DataTemplate x:Key="GameImgCell" DataType="{x:Type loc:BadgeModel}">
+            <Grid Width="230" ToolTip="{Binding Path=Title}" Background="Transparent" Cursor="Hand">
+                <!-- http://stackoverflow.com/questions/3885007/wpf-image-command-binding -->
+                <!-- http://stackoverflow.com/a/31905177/1506454 -->
+                <Grid.InputBindings>
+                    <MouseBinding Gesture="MiddleClick" 
+                                  Command="{StaticResource redirect}" 
+                                  CommandParameter="{Binding Path=StorePageUrl}" />
+                </Grid.InputBindings>
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <Image Source="{Binding Path=ImageUrl}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Height="110" Stretch="Fill"/>
+
+                <Border Grid.Row="1" Background="{DynamicResource DynGridHeaders}">
+                    <TextBlock Text="{Binding Path=Title}" 
+                               TextWrapping="Wrap"
+                               Foreground="Black"
+                               HorizontalAlignment="Center"/>
+                </Border>
+            </Grid>
+        </DataTemplate>
 
         <Style x:Key="propName" TargetType="Label">
             <Setter Property="FontSize" Value="16"/>
@@ -115,7 +143,7 @@
             <ColumnDefinition Width="25*"/>
         </Grid.ColumnDefinitions>
 
-        <Grid Name="gHeader" Grid.Row="0" Grid.Column="1" 
+        <Grid Grid.Row="0" Grid.Column="1" 
               VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="-10,0,-10,-10"
               Background="#324252">
             <Grid.ColumnDefinitions>
@@ -126,7 +154,7 @@
             
             <Border Margin="25" Name="AvatarBorder"
                     HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Image Name="picAvatar" Source="{Binding Path=AvatarUrl}" 
+                <Image Source="{Binding Path=AvatarUrl}" 
                        MinWidth="10" MinHeight="10" 
                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                        Stretch="UniformToFill"/>
@@ -154,7 +182,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
-                <Label Name="lblUserName" Content="{Binding Path=UserName}"  
+                <Label Content="{Binding Path=UserName}"  
                        VerticalAlignment="Top"
                        FontSize="24" Foreground="White"/>
                 <StackPanel Grid.Row="0" Grid.Column="1">
@@ -222,12 +250,12 @@
             </Grid>
 
             <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,25,0,0">
-                <Label Name="lblLevel" Content="{x:Static res:Resources.SteamLevel}" HorizontalAlignment="Center" 
+                <Label Content="{x:Static res:Resources.SteamLevel}" HorizontalAlignment="Center" 
                        FontSize="24" Foreground="White"/>
                 <Border BorderBrush="{DynamicResource DynLevelBorder}" BorderThickness="2" CornerRadius="18" 
                         HorizontalAlignment="Center"
                         MinWidth="36" MinHeight="36">
-                    <Label Name="txtLevel" Content="{Binding Path=Level}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <Label Content="{Binding Path=Level}" HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontSize="14" Foreground="White"/>
 
                 </Border>
@@ -290,26 +318,9 @@
                         </DataGrid.Resources>
 
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="{x:Static res:Resources.Game}" Width="Auto">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Image Source="{Binding Path=ImageUrl}" 
-                                               ToolTip="{Binding Path=Title}" 
-                                               Cursor="Hand" 
-                                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                               Width="230" Height="110" Stretch="Fill">
-
-                                            <!-- http://stackoverflow.com/questions/3885007/wpf-image-command-binding -->
-                                            <!-- http://stackoverflow.com/a/31905177/1506454 -->
-                                            <Image.InputBindings>
-                                                <MouseBinding Gesture="MiddleClick" 
-                                                              Command="{StaticResource redirect}" 
-                                                              CommandParameter="{Binding Path=StorePageUrl}" />
-                                            </Image.InputBindings>
-                                        </Image>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.Game}" 
+                                                    CellTemplate="{StaticResource GameImgCell}"
+                                                    Width="Auto"/>
                             <DataGridTextColumn Header="{x:Static res:Resources.Hours}" Binding="{Binding Path=HoursPlayed}" IsReadOnly="True" 
                                     Width="*"
                                     ElementStyle="{StaticResource {x:Type TextBlock}}"/>
@@ -319,7 +330,7 @@
                             <DataGridTemplateColumn Header="{x:Static res:Resources.BadgeProgress}" IsReadOnly="True" 
                                     Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate DataType="{x:Type loc:BadgeModel}">
                                         <Border Background="Transparent"
                                                 Cursor="Hand" Padding="4"
                                                 BorderBrush="{DynamicResource DynGridHeaders}" BorderThickness="1"
@@ -349,7 +360,7 @@
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="{x:Static res:Resources.Idle}" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate DataType="{x:Type loc:BadgeModel}">
                                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                                             <Button Command="{Binding Path=DataContext.StartBadgeIdleCmd, ElementName=grdBadges}" 
                                                     CommandParameter="{Binding Path=.}"
@@ -375,7 +386,7 @@
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="{x:Static res:Resources.QueueHeader}" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate DataType="{x:Type loc:BadgeModel}">
                                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                                             <Button Content="&#9650;"
                                                     ToolTip="{x:Static res:Resources.EnqueueFirst}"
@@ -393,7 +404,7 @@
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="{x:Static res:Resources.Blacklist}" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate DataType="{x:Type loc:BadgeModel}">
                                         <Button Command="{Binding Path=DataContext.BlacklistBadgeCmd, ElementName=grdBadges}" 
                                                 CommandParameter="{Binding Path=.}"
                                                 Content="&#10761;">
@@ -541,12 +552,12 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <DataGrid Name ="grdQueue"
+                    <DataGrid Name="grdQueue"
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                    
                               ItemsSource="{Binding Path=IdleQueueBadges}" AutoGenerateColumns="False" 
                               CanUserAddRows="False" CanUserDeleteRows="False" 
                               ColumnHeaderHeight="36" Opacity="0.8" GridLinesVisibility="Horizontal" 
-                              FontWeight="Medium" FontSize="14" SelectionMode="Single" 
+                              FontWeight="Medium" FontSize="14" SelectionMode="Single"
                               LoadingRow="SetLoadingRowNumber">
 
                         <DataGrid.Resources>
@@ -557,25 +568,9 @@
                         </DataGrid.Resources>
 
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="{x:Static res:Resources.Game}" Width="Auto">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Image Source="{Binding Path=ImageUrl}" ToolTip="{Binding Path=Title}"  
-                                               Cursor="Hand" 
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"
-                                               Width="230" Height="110" Stretch="Fill">
-
-                                            <!-- http://stackoverflow.com/questions/3885007/wpf-image-command-binding -->
-                                            <!-- http://stackoverflow.com/a/31905177/1506454 -->
-                                            <Image.InputBindings>
-                                                <MouseBinding Gesture="MiddleClick" 
-                                                              Command="{StaticResource redirect}" 
-                                                              CommandParameter="{Binding Path=StorePageUrl}" />
-                                            </Image.InputBindings>
-                                        </Image>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="{x:Static res:Resources.Game}" 
+                                                    CellTemplate="{StaticResource GameImgCell}"
+                                                    Width="Auto"/>
                             <DataGridTextColumn 
                                 Header="{x:Static res:Resources.Hours}" 
                                 Binding="{Binding Path=HoursPlayed}" 
@@ -813,7 +808,7 @@
                                     <Border Background="Gray"/>
 
                                     <TextBlock Text="+" FontSize="32" FontWeight="Bold" Foreground="White" 
-                                               Margin="0"
+                                               Grid.Row="0"  Margin="0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
 
@@ -920,7 +915,7 @@
                             <Label Content="Notifications about new releases in my Twitter" Style="{StaticResource ResourceKey=Message}"/>
                         </StackPanel>
                         <StackPanel Grid.Row="9">
-                            <TextBlock Name="lblTwitter"  Text="https://twitter.com/Alex_Sharykin" Style="{StaticResource ResourceKey=Link}">
+                            <TextBlock Name="lblTwitter" Text="https://twitter.com/Alex_Sharykin" Style="{StaticResource ResourceKey=Link}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding Gesture="LeftClick" Command="{StaticResource ResourceKey=redirect}" CommandParameter="{Binding ElementName=lblTwitter, Path=Text}"/>
                                 </TextBlock.InputBindings>

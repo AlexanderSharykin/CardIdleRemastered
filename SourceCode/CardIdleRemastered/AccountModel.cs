@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -391,13 +393,7 @@ namespace CardIdleRemastered
             PropertyChanged += SaveConfiguration;
             Idler.PropertyChanged += SaveConfiguration;
 
-            IdleQueueBadges.CollectionChanged += (sender, args) =>
-            {
-                Storage.IdleQueue.Clear();
-                foreach (var b in IdleQueueBadges)
-                    Storage.IdleQueue.Add(b.AppId);
-                Storage.Save();
-            };
+            IdleQueueBadges.CollectionChanged += IdleQueueItemsChanged;
 
             IsAuthorized = await CheckAuth();
 
@@ -445,7 +441,7 @@ namespace CardIdleRemastered
             await _updater.Sync(false);
 
             // restore queue
-            var queue = Storage.IdleQueue.Cast<string>()
+            var queue = Storage.IdleQueue.Cast<string>().Distinct()
                 .Join(AllBadges, s => s, b => b.AppId, (s, badge) => badge)
                 .ToList();
             foreach (var badge in queue)
@@ -598,6 +594,18 @@ namespace CardIdleRemastered
         #endregion
 
         #region Queue
+
+        /// <summary>
+        /// Saves queued games when Queue changes
+        /// </summary>
+        private void IdleQueueItemsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            Storage.IdleQueue.Clear();
+            foreach (var b in IdleQueueBadges)
+                Storage.IdleQueue.Add(b.AppId);
+            Storage.Save();
+        }
+
 
         public ICommand EnqueueAllCmd { get; private set; }
 
@@ -940,7 +948,7 @@ namespace CardIdleRemastered
             get { return _gameTitle; }
             set
             {
-                value = value.Trim().ToLower();
+                value = value.Trim();
                 if (_gameTitle == value)
                     return;
                 _gameTitle = value;
@@ -995,7 +1003,10 @@ namespace CardIdleRemastered
         {
             if (String.IsNullOrWhiteSpace(GameTitle))
                 return null;
-            return o => ((BadgeModel)o).Title.ToLower().Contains(GameTitle.ToLower());
+
+            // https://stackoverflow.com/questions/444798/case-insensitive-containsstring
+            // https://stackoverflow.com/a/15464440/1506454
+            return o => CultureInfo.InvariantCulture.CompareInfo.IndexOf(((BadgeModel)o).Title, GameTitle, CompareOptions.IgnoreCase) >= 0;            
         }
 
         private Predicate<object> PropertySearchFunc()

@@ -123,6 +123,9 @@
   <data name="AddGame" xml:space="preserve">
     <value>Add game to time idle list</value>
   </data>
+  <data name="AllowSync" xml:space="preserve">
+    <value>Allow Sync</value>
+  </data>
   <data name="Apply" xml:space="preserve">
     <value>Apply</value>
   </data>
@@ -151,26 +154,38 @@
   <data name="Blacklist" xml:space="preserve">
     <value>Black List</value>
   </data>
+  <data name="Bookmark" xml:space="preserve">
+    <value>Bookmark</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
   <data name="Cards" xml:space="preserve">
     <value>Cards</value>
   </data>
-  <data name="CfgColor" xml:space="preserve">
-    <value>Color</value>
-  </data>
   <data name="CfgCustomBackground" xml:space="preserve">
     <value>Background Url</value>
-  </data>
-  <data name="CfgElement" xml:space="preserve">
-    <value>Element</value>
   </data>
   <data name="CfgIdleProcessCount" xml:space="preserve">
     <value>Max Idle Process Count</value>
   </data>
+  <data name="CfgOperationsHeader" xml:space="preserve">
+    <value>Operations</value>
+  </data>
+  <data name="CfgPalette" xml:space="preserve">
+    <value>Palette</value>
+  </data>
+  <data name="CfgPeriodicSwitchRepeatCount" xml:space="preserve">
+    <value>Periodic Switch Repeat Count</value>
+  </data>
+  <data name="CfgShowInTaskBar" xml:space="preserve">
+    <value>Show Icon in TaskBar</value>
+  </data>
   <data name="CfgSwitchInterval" xml:space="preserve">
     <value>Switch Interval</value>
+  </data>
+  <data name="CfgVisualSettings" xml:space="preserve">
+    <value>Visual Settings</value>
   </data>
   <data name="DequeueAll" xml:space="preserve">
     <value>Dequeue Selected</value>
@@ -247,6 +262,9 @@
   <data name="LevelBorder" xml:space="preserve">
     <value>Level Border</value>
   </data>
+  <data name="Levels" xml:space="preserve">
+    <value>Levels</value>
+  </data>
   <data name="Login" xml:space="preserve">
     <value>(login)</value>
   </data>
@@ -294,6 +312,18 @@
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="ShowcaseProperty_Bookmarked" xml:space="preserve">
+    <value>Bookmarked</value>
+  </data>
+  <data name="ShowcaseProperty_Collected" xml:space="preserve">
+    <value>Collected</value>
+  </data>
+  <data name="ShowcaseProperty_Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="Showcases" xml:space="preserve">
+    <value>Showcases</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Start</value>

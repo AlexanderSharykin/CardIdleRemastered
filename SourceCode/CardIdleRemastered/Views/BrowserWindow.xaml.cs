@@ -30,15 +30,15 @@ namespace CardIdleRemastered
         {
             if (_browserEmulation)
                 return;
-            
+
             try
             {
                 RegistryKey ie_root = Registry.CurrentUser
                     .CreateSubKey(@"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION");
                 RegistryKey key = Registry.CurrentUser
                     .OpenSubKey(@"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
-                
-                key.SetValue(App.AppSystemName, (int) 10001, RegistryValueKind.DWord);
+
+                key.SetValue(App.AppSystemName, (int)10001, RegistryValueKind.DWord);
             }
             catch (Exception ex)
             {
@@ -71,9 +71,10 @@ namespace CardIdleRemastered
             InternetSetOption(0, 42, null, 0);
 
             // Delete Steam cookie data from the browser control
-            InternetSetCookie("http://steamcommunity.com", "sessionid", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
-            InternetSetCookie("http://steamcommunity.com", "steamLogin", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
-            InternetSetCookie("http://steamcommunity.com", "steamRememberLogin", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
+            InternetSetCookie("https://steamcommunity.com", "sessionid", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
+            InternetSetCookie("https://steamcommunity.com", "steamLogin", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
+            InternetSetCookie("https://steamcommunity.com", "steamLoginSecure", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
+            InternetSetCookie("https://steamcommunity.com", "steamRememberLogin", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
 
             // When the form is loaded, navigate to the Steam login page using the web browser control
             wbAuth.Navigate("https://steamcommunity.com/login/home/?goto=my/profile", "_self", null,
@@ -94,7 +95,7 @@ namespace CardIdleRemastered
             CookieContainer cookies = null;
 
             // Determine cookie size
-            int datasize = 8192*16;
+            int datasize = 8192 * 16;
 
             var cookieData = new StringBuilder(datasize);
 
@@ -139,7 +140,7 @@ namespace CardIdleRemastered
                 }
                 catch (Exception)
                 {
-                    
+
                 }
             }
 
@@ -185,7 +186,7 @@ namespace CardIdleRemastered
 
                 // Get a list of cookies from the current page
                 var cookies = GetUriCookieContainer(src).GetCookies(src);
-                
+
                 GetSessionCookies(cookies);
 
                 // Save all of the data to the program settings file, and close this form
@@ -207,7 +208,6 @@ namespace CardIdleRemastered
         {
             foreach (Cookie cookie in cookies)
             {
-                // Save the "sessionid" cookie
                 if (cookie.Name == "sessionid")
                 {
                     Storage.SessionId = cookie.Value;
@@ -223,15 +223,16 @@ namespace CardIdleRemastered
                     var index = steamId.IndexOf('|');
                     if (index >= 0)
                         steamId = steamId.Remove(index);
-                    Storage.SteamProfileUrl = "http://steamcommunity.com/profiles/" + steamId;
+                    Storage.SteamProfileUrl = "https://steamcommunity.com/profiles/" + steamId;
                 }
-
-                // Save the "steamparental" cookie"
+                else if (cookie.Name == "steamLoginSecure")
+                {
+                    Storage.SteamLoginSecure = cookie.Value;
+                }
                 else if (cookie.Name == "steamparental")
                 {
                     Storage.SteamParental = cookie.Value;
                 }
-
                 else if (cookie.Name == "steamRememberLogin")
                 {
                     Storage.SteamRememberLogin = cookie.Value;

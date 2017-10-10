@@ -7,7 +7,7 @@ using System.Windows.Threading;
 
 namespace CardIdleRemastered
 {
-    public class IdleManager: ObservableModel
+    public class IdleManager : ObservableModel
     {
         public static readonly byte DefaultIdleInstanceCount = 16;
         public static readonly byte DefaultSwitchSeconds = 10;
@@ -15,15 +15,16 @@ namespace CardIdleRemastered
         private AccountModel _account;
 
         private bool _isActive;
-        private IdleMode _mode;        
+        private IdleMode _mode;
+        private byte _periodicSwitchRepeatCount = 1;
         private byte _maxIdleInstanceCount;
         private byte _switchMinutes;
         private byte _switchSeconds;
 
         private Random _rand = new Random();
-        
+
         private IdleMode _currentMode;
-        private List<BadgeWrapper> _badgeBuffer;
+        private List<BadgeIdlingWrapper> _badgeBuffer;
         private DispatcherTimer _tmCounter;
 
         public IdleManager(AccountModel acc)
@@ -38,7 +39,7 @@ namespace CardIdleRemastered
             get { return _isActive; }
             private set
             {
-                _isActive = value; 
+                _isActive = value;
                 OnPropertyChanged();
             }
         }
@@ -48,7 +49,7 @@ namespace CardIdleRemastered
             get { return _mode; }
             set
             {
-                _mode = value; 
+                _mode = value;
                 OnPropertyChanged();
             }
         }
@@ -69,6 +70,16 @@ namespace CardIdleRemastered
             set
             {
                 _maxIdleInstanceCount = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public byte PeriodicSwitchRepeatCount
+        {
+            get { return _periodicSwitchRepeatCount; }
+            set
+            {
+                _periodicSwitchRepeatCount = value;
                 OnPropertyChanged();
             }
         }
@@ -101,7 +112,7 @@ namespace CardIdleRemastered
             IsActive = true;
 
             _currentMode = Mode;
-            _badgeBuffer = new List<BadgeWrapper>(Math.Max((int)MaxIdleInstanceCount, 1));
+            _badgeBuffer = new List<BadgeIdlingWrapper>(Math.Max((int)MaxIdleInstanceCount, 1));
 
             _tmCounter = new DispatcherTimer();
             _tmCounter.Tick += UpdateGameTimeCounter;
@@ -120,23 +131,31 @@ namespace CardIdleRemastered
             }
             else if (_currentMode == IdleMode.PeriodicSwitch)
             {
-                int idx = 0;
+                var repeats = 0;
+                var repeatCount = Math.Max(PeriodicSwitchRepeatCount, (byte)1);
+
                 int sec = Math.Max(SwitchMinutes * 60 + SwitchSeconds, DefaultSwitchSeconds);
                 var ts = TimeSpan.FromSeconds(sec);
 
-                while (idx < _account.IdleQueueBadges.Count && IsActive)
-                {                    
-                    var badge = _account.IdleQueueBadges[idx];
+                do
+                {
+                    repeats++;
+                    int idx = 0;
+                    while (idx < _account.IdleQueueBadges.Count && IsActive)
+                    {
+                        var badge = _account.IdleQueueBadges[idx];
 
-                    badge.CardIdleProcess.Start();
-                    
-                    await Task.Delay(ts);
-                    
-                    badge.CardIdleProcess.Stop();
-                    
-                    await Task.Delay(4000);
-                    idx++;
+                        badge.CardIdleProcess.Start();
+
+                        await Task.Delay(ts);
+
+                        badge.CardIdleProcess.Stop();
+
+                        await Task.Delay(4000);
+                        idx++;
+                    }
                 }
+                while (IsActive && (_account.IdleQueueBadges.Count > 0) && (repeats < repeatCount));
             }
             else
             {
@@ -172,7 +191,7 @@ namespace CardIdleRemastered
             {
                 IsActive = false;
                 _tmCounter.Stop();
-            }            
+            }
         }
 
         private async Task AddGame(BadgeModel next, bool trial = false)
@@ -180,13 +199,13 @@ namespace CardIdleRemastered
             if (false == IsActive || _badgeBuffer.Any(w => w.Badge == next) || _badgeBuffer.Count == _badgeBuffer.Capacity)
                 return;
 
-            _badgeBuffer.Add(new BadgeWrapper{Badge = next, IsTrial = trial, Hours = next.HoursPlayed});            
+            _badgeBuffer.Add(new BadgeIdlingWrapper { Badge = next, IsTrial = trial, Hours = next.HoursPlayed });
             next.IdleStopped += BadgeIdleProcessStopped;
 
-            next.CardIdleProcess.Start();            
+            next.CardIdleProcess.Start();
             if (trial)
                 next.PropertyChanged += BadgeHoursChanged;
-            next.PropertyChanged += BadgeQueueStateChanged;            
+            next.PropertyChanged += BadgeQueueStateChanged;
 
             // Make a short but random amount of time pass before starting next game
             var wait = _rand.Next(40, 80);
@@ -213,8 +232,8 @@ namespace CardIdleRemastered
             var trials = _badgeBuffer.Where(x => x.IsTrial).ToList();
             foreach (var item in trials)
             {
-                item.Minutes++;                
-                var hours = item.Hours + item.Minutes/60.0;
+                item.Minutes++;
+                var hours = item.Hours + item.Minutes / 60.0;
                 if (hours >= 2.0)
                 {
                     item.Badge.HoursPlayed = hours;
@@ -225,7 +244,7 @@ namespace CardIdleRemastered
 
         private void BadgeHoursChanged(object sender, PropertyChangedEventArgs e)
         {
-            var badge = (BadgeModel) sender;
+            var badge = (BadgeModel)sender;
             if (e.PropertyName == "HoursPlayed")
             {
                 // Steam delay for trial games is 2 hours (refund condition)
@@ -252,10 +271,10 @@ namespace CardIdleRemastered
 
         private void RemoveGame(BadgeModel badge)
         {
-            _badgeBuffer.RemoveAll(b=>b.Badge == badge);
-            badge.IdleStopped -= BadgeIdleProcessStopped;            
+            _badgeBuffer.RemoveAll(b => b.Badge == badge);
+            badge.IdleStopped -= BadgeIdleProcessStopped;
             badge.PropertyChanged -= BadgeHoursChanged;
-            badge.PropertyChanged -= BadgeQueueStateChanged;               
+            badge.PropertyChanged -= BadgeQueueStateChanged;
         }
 
         public void Stop()
@@ -266,20 +285,12 @@ namespace CardIdleRemastered
             IsActive = false;
             _tmCounter.Stop();
 
-            for (int i = _badgeBuffer.Count-1; i >= 0; i--)
+            for (int i = _badgeBuffer.Count - 1; i >= 0; i--)
             {
                 var badge = _badgeBuffer[i].Badge;
                 RemoveGame(badge);
                 badge.CardIdleProcess.Stop();
-            }           
-        }
-
-        private class BadgeWrapper
-        {
-            public BadgeModel Badge { get; set; }
-            public double Hours { get; set; }
-            public int Minutes { get; set; }
-            public bool IsTrial { get; set; }
+            }
         }
     }
 }

@@ -123,6 +123,9 @@
   <data name="AddGame" xml:space="preserve">
     <value>Добавить игру в список</value>
   </data>
+  <data name="AllowSync" xml:space="preserve">
+    <value>Разрешить загрузку</value>
+  </data>
   <data name="Apply" xml:space="preserve">
     <value>Применить</value>
   </data>
@@ -147,26 +150,38 @@
   <data name="Blacklist" xml:space="preserve">
     <value>Бан</value>
   </data>
+  <data name="Bookmark" xml:space="preserve">
+    <value>В закладки</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Отменить</value>
   </data>
   <data name="Cards" xml:space="preserve">
     <value>Карточки</value>
   </data>
-  <data name="CfgColor" xml:space="preserve">
-    <value>Цвет</value>
-  </data>
   <data name="CfgCustomBackground" xml:space="preserve">
     <value>Фон профиля</value>
-  </data>
-  <data name="CfgElement" xml:space="preserve">
-    <value>Элемент</value>
   </data>
   <data name="CfgIdleProcessCount" xml:space="preserve">
     <value>Запускать процессов не более</value>
   </data>
+  <data name="CfgOperationsHeader" xml:space="preserve">
+    <value>Рабочие параметры</value>
+  </data>
+  <data name="CfgPalette" xml:space="preserve">
+    <value>Цветовая схема</value>
+  </data>
+  <data name="CfgPeriodicSwitchRepeatCount" xml:space="preserve">
+    <value>Повторять переключения (раз)</value>
+  </data>
+  <data name="CfgShowInTaskBar" xml:space="preserve">
+    <value>Отображать в панели задач</value>
+  </data>
   <data name="CfgSwitchInterval" xml:space="preserve">
     <value>Интервал переключения</value>
+  </data>
+  <data name="CfgVisualSettings" xml:space="preserve">
+    <value>Внешний вид</value>
   </data>
   <data name="DequeueAll" xml:space="preserve">
     <value>Убрать все из очереди</value>
@@ -252,6 +267,9 @@
   <data name="LevelBorder" xml:space="preserve">
     <value>Рамка уровня</value>
   </data>
+  <data name="Levels" xml:space="preserve">
+    <value>Уровни</value>
+  </data>
   <data name="Login" xml:space="preserve">
     <value>(войти)</value>
   </data>
@@ -299,6 +317,18 @@
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>
+  </data>
+  <data name="ShowcaseProperty_Bookmarked" xml:space="preserve">
+    <value>В закладках</value>
+  </data>
+  <data name="ShowcaseProperty_Collected" xml:space="preserve">
+    <value>Подготовленные</value>
+  </data>
+  <data name="ShowcaseProperty_Completed" xml:space="preserve">
+    <value>Собранные</value>
+  </data>
+  <data name="Showcases" xml:space="preserve">
+    <value>Витрины</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Старт</value>

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CardIdleRemastered.ViewModels
 {
-    public class SelectionItemVm : ObservableModel
+    public abstract class SelectionItemVm : ObservableModel
     {
         private bool _isSelected;
 
@@ -21,6 +21,8 @@ namespace CardIdleRemastered.ViewModels
         }
 
         public object Key { get; set; }
+
+        public abstract object Item { get; set; }
     }
 
     public class SelectionItemVm<T> : SelectionItemVm
@@ -35,6 +37,12 @@ namespace CardIdleRemastered.ViewModels
                 _value = value;
                 OnPropertyChanged();
             }
+        }
+
+        public override object Item
+        {
+            get { return Value; }
+            set { Value = (T)value; }
         }
     }
 }

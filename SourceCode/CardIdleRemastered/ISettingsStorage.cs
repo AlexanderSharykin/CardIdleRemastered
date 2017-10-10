@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Specialized;
 
 namespace CardIdleRemastered
 {
@@ -12,8 +6,9 @@ namespace CardIdleRemastered
     {
         string SessionId { get; set; }
         string SteamLogin { get; set; }
+        string SteamLoginSecure { get; set; }
         string SteamProfileUrl { get; set; }
-        string SteamParental { get; set; }        
+        string SteamParental { get; set; }
         string SteamRememberLogin { get; set; }
         string MachineAuth { get; set; }
 
@@ -22,18 +17,27 @@ namespace CardIdleRemastered
         string SteamAvatarUrl { get; set; }
         string SteamBackgroundUrl { get; set; }
         string SteamUserName { get; set; }
-        string SteamLevel { get; set; }        
+        string SteamLevel { get; set; }
         string CustomBackgroundUrl { get; set; }
+        string SteamBadgeUrl { get; set; }
+        string SteamBadgeTitle { get; set; }
 
         int IdleMode { get; set; }
         string BadgeFilter { get; set; }
+        string ShowcaseFilter { get; set; }
         byte MaxIdleProcessCount { get; set; }
+        byte PeriodicSwitchRepeatCount { get; set; }
         byte SwitchMinutes { get; set; }
-        byte SwitchSeconds { get; set; }        
+        byte SwitchSeconds { get; set; }
+
+        bool AllowShowcaseSync { get; set; }
+        bool ShowInTaskbar { get; set; }
 
         StringCollection IdleQueue { get; }
 
         StringCollection Blacklist { get; }
+
+        StringCollection ShowcaseBookmarks { get; }
 
         StringCollection Games { get; }
 

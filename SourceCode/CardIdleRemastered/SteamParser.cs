@@ -29,8 +29,8 @@ namespace CardIdleRemastered
                 return false;
             var document = new HtmlDocument();
             document.LoadHtml(response);
-            return document.DocumentNode.SelectSingleNode("//a[@class=\"global_action_link\"]") == null;
-        }  
+            return document.DocumentNode.SelectSingleNode("//div[@class=\"responsive_menu_user_area\"]") != null;
+        }
 
         public async Task<BadgeModel> GetGameInfo(int id)
         {

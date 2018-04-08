@@ -67,6 +67,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -89,11 +90,20 @@
     </ApplicationDefinition>
     <Compile Include="AccountModel.cs" />
     <Compile Include="AccountUpdater.cs" />
-    <Compile Include="AppBrush.cs" />
-    <Compile Include="BadgeModel.cs" />
+    <Compile Include="Info\ProfileInfo.cs" />
+    <Compile Include="ViewModels\PaletteItemsCollection.cs" />
+    <Compile Include="ViewModels\PaletteItemVm.cs" />
+    <Compile Include="Badges\BadgeIdentity.cs" />
+    <Compile Include="Badges\BadgeIdlingWrapper.cs" />
+    <Compile Include="Badges\BadgeLevelData.cs" />
+    <Compile Include="Badges\BadgeModel.cs" />
+    <Compile Include="Badges\BadgeShowcase.cs" />
+    <Compile Include="FileStorage.cs" />
     <Compile Include="ISettingsStorage.cs" />
-    <Compile Include="ReleaseInfo.cs" />
+    <Compile Include="Info\ReleaseInfo.cs" />
     <Compile Include="SettingsStorage.cs" />
+    <Compile Include="ShowcaseManager.cs" />
+    <Compile Include="ViewModels\FilterStatesCollection.cs" />
     <Compile Include="ViewModels\SelectionItemVm.cs" />
     <Compile Include="Views\BadgesWindow.xaml.cs">
       <DependentUpon>BadgesWindow.xaml</DependentUpon>
@@ -105,6 +115,9 @@
     </Compile>
     <Compile Include="Converters\EnumLocalizationConverter.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Views\CardIdlePage.xaml.cs">
+      <DependentUpon>CardIdlePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\GameSelectionWindow.xaml.cs">
       <DependentUpon>GameSelectionWindow.xaml</DependentUpon>
     </Compile>
@@ -117,12 +130,17 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Views\SettingsWindow.xaml.cs">
-      <DependentUpon>SettingsWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="AppVisualSettings.cs" />
+    <Compile Include="Views\SearchPopup.cs" />
     <Compile Include="Converters\TranslationConverter.cs" />
     <Compile Include="SteamParser.cs" />
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\SharedResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\BadgesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -139,11 +157,11 @@
       <DependentUpon>BrowserWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\GameSelectionWindow.xaml">
+    <Page Include="Views\CardIdlePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SettingsWindow.xaml">
+    <Page Include="Views\GameSelectionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -164,6 +182,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
     <AppDesigner Include="Properties\" />
@@ -189,7 +208,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="CardIdle.ico" />
+    <Resource Include="CardIdle.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\steam-idle\steam-idle.csproj">
@@ -200,6 +221,7 @@
   <ItemGroup>
     <Resource Include="Resources\Avatar.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

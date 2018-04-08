@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CardIdleRemastered.Commands
@@ -13,11 +9,12 @@ namespace CardIdleRemastered.Commands
         private readonly Func<object, bool> _canExec;
 
         protected BaseCommand()
-        { }
+        {
+        }
 
         public BaseCommand(Action<object> exec, Func<object, bool> canExec = null)
         {
-            if (exec == null) 
+            if (exec == null)
                 throw new ArgumentNullException("exec");
             _exec = exec;
             _canExec = canExec;
@@ -33,7 +30,6 @@ namespace CardIdleRemastered.Commands
             return _canExec == null || _canExec(parameter);
         }
 
-        
         public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }

@@ -79,6 +79,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow Sync.
+        /// </summary>
+        public static string AllowSync {
+            get {
+                return ResourceManager.GetString("AllowSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apply.
         /// </summary>
         public static string Apply {
@@ -161,6 +170,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bookmark.
+        /// </summary>
+        public static string Bookmark {
+            get {
+                return ResourceManager.GetString("Bookmark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string Cancel {
@@ -179,29 +197,11 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Color.
-        /// </summary>
-        public static string CfgColor {
-            get {
-                return ResourceManager.GetString("CfgColor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Background Url.
         /// </summary>
         public static string CfgCustomBackground {
             get {
                 return ResourceManager.GetString("CfgCustomBackground", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Element.
-        /// </summary>
-        public static string CfgElement {
-            get {
-                return ResourceManager.GetString("CfgElement", resourceCulture);
             }
         }
         
@@ -215,11 +215,56 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Operations.
+        /// </summary>
+        public static string CfgOperationsHeader {
+            get {
+                return ResourceManager.GetString("CfgOperationsHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Palette.
+        /// </summary>
+        public static string CfgPalette {
+            get {
+                return ResourceManager.GetString("CfgPalette", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Periodic Switch Repeat Count.
+        /// </summary>
+        public static string CfgPeriodicSwitchRepeatCount {
+            get {
+                return ResourceManager.GetString("CfgPeriodicSwitchRepeatCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Icon in TaskBar.
+        /// </summary>
+        public static string CfgShowInTaskBar {
+            get {
+                return ResourceManager.GetString("CfgShowInTaskBar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Switch Interval.
         /// </summary>
         public static string CfgSwitchInterval {
             get {
                 return ResourceManager.GetString("CfgSwitchInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visual Settings.
+        /// </summary>
+        public static string CfgVisualSettings {
+            get {
+                return ResourceManager.GetString("CfgVisualSettings", resourceCulture);
             }
         }
         
@@ -449,6 +494,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Levels.
+        /// </summary>
+        public static string Levels {
+            get {
+                return ResourceManager.GetString("Levels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (login).
         /// </summary>
         public static string Login {
@@ -589,6 +643,42 @@ namespace CardIdleRemastered.Properties {
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bookmarked.
+        /// </summary>
+        public static string ShowcaseProperty_Bookmarked {
+            get {
+                return ResourceManager.GetString("ShowcaseProperty_Bookmarked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collected.
+        /// </summary>
+        public static string ShowcaseProperty_Collected {
+            get {
+                return ResourceManager.GetString("ShowcaseProperty_Collected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completed.
+        /// </summary>
+        public static string ShowcaseProperty_Completed {
+            get {
+                return ResourceManager.GetString("ShowcaseProperty_Completed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Showcases.
+        /// </summary>
+        public static string Showcases {
+            get {
+                return ResourceManager.GetString("Showcases", resourceCulture);
             }
         }
         

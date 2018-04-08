@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 
 namespace CardIdleRemastered
 {
-    public class SettingsStorage: ISettingsStorage
+    public class SettingsStorage : FileStorage, ISettingsStorage
     {
         public string SessionId { get; set; }
         public string SteamLogin { get; set; }
+        public string SteamLoginSecure { get; set; }
         public string SteamProfileUrl { get; set; }
         public string SteamParental { get; set; }
         public string SteamRememberLogin { get; set; }
         public string MachineAuth { get; set; }
-        
+
         public bool IgnoreClient { get; set; }
 
         public string SteamAvatarUrl { get; set; }
@@ -24,30 +24,38 @@ namespace CardIdleRemastered
         public string SteamUserName { get; set; }
         public string SteamLevel { get; set; }
         public string CustomBackgroundUrl { get; set; }
+        public string SteamBadgeUrl { get; set; }
+        public string SteamBadgeTitle { get; set; }
 
         public int IdleMode { get; set; }
         public string BadgeFilter { get; set; }
+        public string ShowcaseFilter { get; set; }
         public byte MaxIdleProcessCount { get; set; }
+        public byte PeriodicSwitchRepeatCount { get; set; }
         public byte SwitchMinutes { get; set; }
         public byte SwitchSeconds { get; set; }
+
+        public bool AllowShowcaseSync { get; set; }
+        public bool ShowInTaskbar { get; set; }
 
         public StringCollection IdleQueue { get; private set; }
 
         public StringCollection Blacklist { get; private set; }
 
+        public StringCollection ShowcaseBookmarks { get; private set; }
+
         public StringCollection Games { get; private set; }
 
         public StringCollection AppBrushes { get; private set; }
 
-        public string FileName { get; set; }
-
         public void Init()
         {
             Blacklist = new StringCollection();
+            ShowcaseBookmarks = new StringCollection();
             AppBrushes = new StringCollection();
             IdleQueue = new StringCollection();
             Games = new StringCollection();
-            
+
             ReadXml();
         }
 
@@ -58,20 +66,18 @@ namespace CardIdleRemastered
 
         private void ReadXml()
         {
-            if (File.Exists(FileName) == false)
-            {
-                Logger.Info(FileName + Environment.NewLine + "Settings storage file not found.");
-                File.Create(FileName);                
+            var content = ReadContent();
+            if (String.IsNullOrWhiteSpace(content))
                 return;
-            }
 
             try
             {
-                var xml = XDocument.Load(new StreamReader(FileName, Encoding.UTF8)).Root;
+                var xml = XDocument.Parse(content).Root;
                 if (xml != null)
                 {
                     SessionId = (string)xml.Element("SessionId");
                     SteamLogin = (string)xml.Element("SteamLogin");
+                    SteamLoginSecure = (string)xml.Element("SteamLoginSecure");
                     SteamProfileUrl = (string)xml.Element("SteamProfileUrl");
                     SteamParental = (string)xml.Element("SteamParental");
                     SteamRememberLogin = (string)xml.Element("SteamRememberLogin");
@@ -84,24 +90,32 @@ namespace CardIdleRemastered
                     SteamUserName = (string)xml.Element("SteamUserName");
                     SteamLevel = (string)xml.Element("SteamLevel");
                     CustomBackgroundUrl = (string)xml.Element("CustomBackgroundUrl");
+                    SteamBadgeTitle = (string)xml.Element("SteamBadgeTitle");
+                    SteamBadgeUrl = (string)xml.Element("SteamBadgeUrl");
 
                     BadgeFilter = (string)xml.Element("BadgeFilter");
+                    ShowcaseFilter = (string)xml.Element("ShowcaseFilter");
                     IdleMode = ReadInt(xml.Element("IdleMode"));
                     MaxIdleProcessCount = ReadByte(xml.Element("MaxIdleProcessCount"));
+                    PeriodicSwitchRepeatCount = ReadByte(xml.Element("PeriodicSwitchRepeatCount"));
                     SwitchMinutes = ReadByte(xml.Element("SwitchMinutes"));
                     SwitchSeconds = ReadByte(xml.Element("SwitchSeconds"));
 
+                    AllowShowcaseSync = ReadBool(xml.Element("AllowShowcaseSync"));
+                    ShowInTaskbar = ReadBool(xml.Element("ShowInTaskbar"), true);
+
                     IdleQueue.AddRange(GetStringList(xml.Element("IdleQueue")));
                     Blacklist.AddRange(GetStringList(xml.Element("Blacklist")));
+                    ShowcaseBookmarks.AddRange(GetStringList(xml.Element("ShowcaseBookmarks")));
                     Games.AddRange(GetStringList(xml.Element("Games")));
                     AppBrushes.AddRange(GetStringList(xml.Element("AppBrushes")));
                 }
 
-                Logger.Info(String.Format("Settings storage initialized" + Environment.NewLine +FileName));
+                Logger.Info("Settings storage initialized");
             }
             catch (Exception ex)
             {
-                Logger.Exception(ex, FileName);                
+                Logger.Exception(ex, "Settings storage");
             }
         }
 
@@ -111,10 +125,10 @@ namespace CardIdleRemastered
             return i ?? 0;
         }
 
-        private bool ReadBool(XElement xe)
+        private bool ReadBool(XElement xe, bool missingValue = false)
         {
             bool? b = (bool?)xe;
-            return b ?? false;
+            return b ?? missingValue;
         }
 
         private byte ReadByte(XElement xe)
@@ -129,7 +143,7 @@ namespace CardIdleRemastered
         {
             if (xe == null)
                 return new string[0];
-            return xe.Value.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            return xe.Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         private void WriteXml()
@@ -137,6 +151,7 @@ namespace CardIdleRemastered
             var xe = new XElement("Settings",
                 new XElement("SessionId", SessionId),
                 new XElement("SteamLogin", SteamLogin),
+                new XElement("SteamLoginSecure", SteamLoginSecure),
                 new XElement("SteamProfileUrl", SteamProfileUrl),
                 new XElement("SteamParental", SteamParental),
                 new XElement("SteamRememberLogin", SteamRememberLogin),
@@ -147,18 +162,25 @@ namespace CardIdleRemastered
                 new XElement("SteamUserName", SteamUserName),
                 new XElement("SteamLevel", SteamLevel),
                 new XElement("CustomBackgroundUrl", CustomBackgroundUrl),
+                new XElement("SteamBadgeUrl", SteamBadgeUrl),
+                new XElement("SteamBadgeTitle", SteamBadgeTitle),
                 new XElement("BadgeFilter", BadgeFilter),
+                new XElement("ShowcaseFilter", ShowcaseFilter),
                 new XElement("IdleMode", IdleMode),
                 new XElement("MaxIdleProcessCount", MaxIdleProcessCount),
+                new XElement("PeriodicSwitchRepeatCount", PeriodicSwitchRepeatCount),
                 new XElement("SwitchMinutes", SwitchMinutes),
                 new XElement("SwitchSeconds", SwitchSeconds),
+                new XElement("AllowShowcaseSync", AllowShowcaseSync),
+                new XElement("ShowInTaskbar", ShowInTaskbar),
                 new XElement("IdleQueue", String.Join(",", IdleQueue.Cast<string>())),
                 new XElement("Blacklist", String.Join(",", Blacklist.Cast<string>())),
+                new XElement("ShowcaseBookmarks", String.Join(",", ShowcaseBookmarks.Cast<string>())),
                 new XElement("Games", String.Join(",", Games.Cast<string>())),
                 new XElement("AppBrushes", String.Join(",", AppBrushes.Cast<string>()))
                 );
 
-            File.WriteAllText(FileName, xe.ToString(), Encoding.UTF8);
+            WriteContent(xe.ToString());
         }
     }
 }

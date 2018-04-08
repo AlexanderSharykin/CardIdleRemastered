@@ -1,21 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
-using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using System.Xml.Linq;
-using CardIdleRemastered.Properties;
-using Microsoft.Win32;
 
 namespace CardIdleRemastered
 {
@@ -23,7 +11,7 @@ namespace CardIdleRemastered
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
-    {        
+    {
         private AccountModel _account;
 
         private void LaunchCardIdle(object sender, StartupEventArgs e)
@@ -43,23 +31,33 @@ namespace CardIdleRemastered
             string appFolder = Path.Combine(localDatafolder, Path.GetFileNameWithoutExtension(AppSystemName));
             if (Directory.Exists(appFolder) == false)
                 Directory.CreateDirectory(appFolder);
-            
+
             var storage = new SettingsStorage();
             storage.FileName = Path.Combine(appFolder, "Settings.txt");
             storage.Init();
-            
-            CookieClient.Storage = storage;           
+
+            CookieClient.Storage = storage;
 
             _account = new AccountModel();
             _account.Storage = storage;
+            _account.ShowcaseStorage = new FileStorage("ShowcaseDb.txt");
 
-            LoadVisuals();
+            Palette = PaletteItemsCollection.Create();
+            if (storage.AppBrushes != null)
+                Palette.Deserialize(storage.AppBrushes.OfType<string>());
+            Palette.SetNotifier(() =>
+            {
+                storage.AppBrushes.Clear();
+                storage.AppBrushes.AddRange(Palette.Serialize().ToArray());
+                storage.Save();
+            });
 
-            var w = new BadgesWindow { DataContext = _account};                        
+            var w = new BadgesWindow { DataContext = _account };
             w.Show();
 
             _account.InitSteamTimer();
             _account.CheckLatestRelease();
+            _account.LoadCardIdleProfile();
             _account.LoadAccount();
         }
 
@@ -70,7 +68,7 @@ namespace CardIdleRemastered
 
         private void LogUnhandledDomainException(object sender, UnhandledExceptionEventArgs arg)
         {
-            Logger.Exception(arg.ExceptionObject as Exception, "AppDomain.CurrentDomain.UnhandledException", String.Format("IsTerminating = {0}", arg.IsTerminating));           
+            Logger.Exception(arg.ExceptionObject as Exception, "AppDomain.CurrentDomain.UnhandledException", String.Format("IsTerminating = {0}", arg.IsTerminating));
         }
 
         private void LogUnhandledDispatcherException(object sender, DispatcherUnhandledExceptionEventArgs arg)
@@ -96,37 +94,7 @@ namespace CardIdleRemastered
             }
         }
 
-        private void LoadVisuals()
-        {
-            var storage = _account.Storage;
-
-            AppVisualSettings.DefaultVisualSettings.GetBrushes();
-
-            if (storage.AppBrushes == null)
-                return;
-
-            var vis = new AppVisualSettings();
-            foreach (var str in storage.AppBrushes)
-            {
-                var a = str.Split(';');
-                vis.AppBrushes.Add(new AppBrush(a[0], (Color)ColorConverter.ConvertFromString(a[1])));
-            }
-            vis.ResetBrushes();
-        }
-
-        public void SaveSettings(AppVisualSettings vis)
-        {
-            var storage = _account.Storage;
-            storage.CustomBackgroundUrl = vis.BackgroundUrl;
-
-            storage.AppBrushes.Clear();
-            foreach (var b in vis.AppBrushes)
-            {
-                storage.AppBrushes.Add(String.Format("{0};{1}", b.Name, b.BrushColor));
-            }
-
-            storage.Save();
-        }
+        public PaletteItemsCollection Palette { get; set; }
 
         private void StopCardIdle(object sender, ExitEventArgs e)
         {

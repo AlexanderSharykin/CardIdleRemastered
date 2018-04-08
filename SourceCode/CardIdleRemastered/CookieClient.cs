@@ -2,7 +2,6 @@
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using CardIdleRemastered.Properties;
 
 namespace CardIdleRemastered
 {
@@ -21,9 +20,10 @@ namespace CardIdleRemastered
         private CookieContainer GenerateCookies()
         {
             var cookies = new CookieContainer();
-            var target = new Uri("http://steamcommunity.com");
+            var target = new Uri("https://steamcommunity.com");
             cookies.Add(new Cookie("sessionid", Storage.SessionId ?? string.Empty) { Domain = target.Host });
             cookies.Add(new Cookie("steamLogin", Storage.SteamLogin ?? string.Empty) { Domain = target.Host });
+            cookies.Add(new Cookie("steamLoginSecure", Storage.SteamLoginSecure ?? string.Empty) { Domain = target.Host });
             cookies.Add(new Cookie("steamparental", Storage.SteamParental ?? string.Empty) { Domain = target.Host });
             cookies.Add(new Cookie("steamRememberLogin", Storage.SteamRememberLogin ?? string.Empty) { Domain = target.Host });
             cookies.Add(new Cookie(GetSteamMachineAuthCookieName(), Storage.MachineAuth ?? string.Empty) { Domain = target.Host });

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -12,8 +11,8 @@ namespace CardIdleRemastered
     public class AccountUpdater
     {
         private AccountModel _account;
-        private DispatcherTimer _tmSync;       
-        private DispatcherTimer _tmCounter;        
+        private DispatcherTimer _tmSync;
+        private DispatcherTimer _tmCounter;
         private TimeSpan _interval;
         private int _counter;
 
@@ -30,8 +29,12 @@ namespace CardIdleRemastered
             _tmCounter.Interval = new TimeSpan(0, 0, 1);
         }
 
+        public IList<BadgeModel> CompleBadgeList { get; private set; }
+
+        public event Action BadgeListSync;
+
         public void Start()
-        {            
+        {
             if (false == _tmSync.IsEnabled)
                 _tmSync.Start();
 
@@ -39,17 +42,17 @@ namespace CardIdleRemastered
             {
                 _counter = 0;
                 _tmCounter.Start();
-            }            
+            }
         }
 
         public void Stop()
-        {            
-            _tmSync.Stop();            
+        {
+            _tmSync.Stop();
             _tmCounter.Stop();
         }
 
         private void UpdateSecondCounter(object sender, EventArgs eventArgs)
-        {            
+        {
             _counter++;
             int seconds = (int)Interval.TotalSeconds - _counter;
             if (seconds > 0)
@@ -72,8 +75,8 @@ namespace CardIdleRemastered
         }
 
         private async void SyncBanges(object sender, EventArgs eventArgs)
-        {                        
-            await Sync(true);            
+        {
+            await Sync(true);
         }
 
         private bool _syncRunning;
@@ -84,12 +87,19 @@ namespace CardIdleRemastered
 
             if (resetCounter)
                 _counter = 0;
+
+            Task<IEnumerable<BadgeModel>> tBadges = null;
             try
             {
                 _syncRunning = true;
-                var tBadges = LoadBadgesAsync();
+
+                tBadges = LoadBadgesAsync();
                 var tProfile = LoadProfileAsync();
                 await Task.WhenAll(tBadges, tProfile);
+
+                CompleBadgeList = tBadges.Result.ToList();
+                if (BadgeListSync != null)
+                    BadgeListSync();
             }
             finally
             {
@@ -100,13 +110,22 @@ namespace CardIdleRemastered
         private async Task LoadProfileAsync()
         {
             var profile = await new SteamParser().LoadProfileAsync(_account.ProfileUrl);
-            _account.BackgroundUrl = profile["BackgroundUrl"];
-            _account.AvatarUrl = profile["AvatarUrl"];            
-            _account.UserName = profile["UserName"];            
-            _account.Level = profile["Level"];
+            _account.BackgroundUrl = profile.BackgroundUrl;
+            _account.AvatarUrl = profile.AvatarUrl;
+            _account.UserName = profile.UserName;
+            _account.Level = profile.Level;
+
+            if (profile.BadgeUrl != null)
+            {
+                _account.FavoriteBadge = new BadgeLevelData
+                                         {
+                                             Name = profile.BadgeTitle,
+                                             PictureUrl = profile.BadgeUrl
+                                         };
+            }
         }
 
-        private async Task LoadBadgesAsync()
+        private async Task<IEnumerable<BadgeModel>> LoadBadgesAsync()
         {
             var badges = await new SteamParser().LoadBadgesAsync(_account.ProfileUrl);
 
@@ -121,6 +140,7 @@ namespace CardIdleRemastered
                     {
                         b.RemainingCard = badge.RemainingCard;
                         b.HoursPlayed = badge.HoursPlayed;
+                        b.CardsCurrent = badge.CardsCurrent;
                     }
                 }
                 else
@@ -131,6 +151,8 @@ namespace CardIdleRemastered
             }
 
             _account.UpdateTotalValues();
+
+            return badges;
         }
     }
 }

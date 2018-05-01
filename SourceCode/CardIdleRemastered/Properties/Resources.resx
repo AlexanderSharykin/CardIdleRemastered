@@ -337,11 +337,14 @@
   <data name="Stop" xml:space="preserve">
     <value>Stop</value>
   </data>
+  <data name="SyncBadges" xml:space="preserve">
+    <value>Reload badges</value>
+  </data>
   <data name="TimeIdleHeader" xml:space="preserve">
     <value>Time Idle</value>
   </data>
   <data name="Title" xml:space="preserve">
-    <value>Card Idle</value>
+    <value>Card Idle v{0}</value>
   </data>
   <data name="ToolIdleMode" xml:space="preserve">
     <value>Idle Mode</value>

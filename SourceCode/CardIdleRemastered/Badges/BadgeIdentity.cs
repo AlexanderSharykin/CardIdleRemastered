@@ -48,6 +48,11 @@ namespace CardIdleRemastered
             get { return "http://cdn.akamai.steamstatic.com/steam/apps/" + AppId + "/header_292x136.jpg"; }
         }
 
+        public virtual string NavigationUrl
+        {
+            get { return StorePageUrl; }
+        }
+
         public abstract bool CheckProperty(Enum property);
 
         public override string ToString()

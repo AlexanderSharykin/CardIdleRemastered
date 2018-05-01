@@ -719,6 +719,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reload badges.
+        /// </summary>
+        public static string SyncBadges {
+            get {
+                return ResourceManager.GetString("SyncBadges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Time Idle.
         /// </summary>
         public static string TimeIdleHeader {
@@ -728,7 +737,7 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Card Idle.
+        ///   Looks up a localized string similar to Card Idle v{0}.
         /// </summary>
         public static string Title {
             get {

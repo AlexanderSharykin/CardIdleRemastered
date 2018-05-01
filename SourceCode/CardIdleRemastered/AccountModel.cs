@@ -332,6 +332,17 @@ namespace CardIdleRemastered
 
         #region Initialization
 
+        private string _currentVersion = "1.0";
+        public string CurrentVersion
+        {
+            get { return _currentVersion; }
+            private set
+            {
+                _currentVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ReleaseInfo NewestRelease
         {
             get { return _newestRelease; }
@@ -354,9 +365,11 @@ namespace CardIdleRemastered
 
         public async void CheckLatestRelease()
         {
-            NewestRelease = await new SteamParser().GetLatestCardIdlerRelease();
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            CurrentVersion = version.Major + "." + version.Minor + "." + version.Build;
 
-            CanUpdateApp = NewestRelease.IsOlderThan(Assembly.GetExecutingAssembly().GetName().Version);
+            NewestRelease = await new SteamParser().GetLatestCardIdlerRelease();
+            CanUpdateApp = NewestRelease.IsOlderThan(version);
         }
 
 

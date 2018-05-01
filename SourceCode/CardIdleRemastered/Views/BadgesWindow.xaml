@@ -7,7 +7,8 @@
         xmlns:loc="clr-namespace:CardIdleRemastered"                
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:views="clr-namespace:CardIdleRemastered.Views"
-        Title="{x:Static res:Resources.Title}" Height="Auto" Width="Auto"         
+        Title="{Binding CurrentVersion, StringFormat={x:Static res:Resources.Title}}" 
+        Height="Auto" Width="Auto"         
         WindowStartupLocation="CenterScreen" 
         ShowInTaskbar="{Binding ShowInTaskbar}"
         Background="{DynamicResource DarkTheme}"
@@ -321,6 +322,7 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Button Content="&#9650;" 
@@ -344,6 +346,13 @@
                                     FontSize="18" 
                                     ToolTip="{x:Static res:Resources.DequeueAll}"
                                     Command="{Binding Path=DequeueAllCmd}"
+                                    Style="{StaticResource CmdButton}"
+                                    HorizontalAlignment="Center"/>
+                            <Button Grid.Column="3" Margin="5,0,0,0" 
+                                    Content="&#10227;" 
+                                    FontSize="18" 
+                                    ToolTip="{x:Static res:Resources.SyncBadges}"
+                                    Command="{Binding Path=ForceSyncCmd}"
                                     Style="{StaticResource CmdButton}"
                                     HorizontalAlignment="Center"/>
                         </Grid>

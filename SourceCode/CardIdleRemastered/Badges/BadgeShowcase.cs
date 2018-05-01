@@ -20,6 +20,11 @@ namespace CardIdleRemastered
         {
         }
 
+        public override string NavigationUrl
+        {
+            get { return "https://www.steamcardexchange.net/index.php?inventorygame-appid-" + AppId; }
+        }
+
         public ObservableCollection<BadgeLevelData> CommonBadges { get; private set; }
 
         public BadgeLevelData FoilBadge { get; set; }

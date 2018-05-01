@@ -114,8 +114,8 @@
             <!-- http://stackoverflow.com/a/31905177/1506454 -->
             <Grid.InputBindings>
                 <MouseBinding Gesture="MiddleClick" 
-                                  Command="{StaticResource Redirect}" 
-                                  CommandParameter="{Binding Path=StorePageUrl}" />
+                              Command="{StaticResource Redirect}" 
+                              CommandParameter="{Binding Path=NavigationUrl}" />
             </Grid.InputBindings>
 
             <Grid.RowDefinitions>

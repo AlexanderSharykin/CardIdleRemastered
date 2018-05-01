@@ -30,6 +30,14 @@ namespace CardIdleRemastered
             _ni.DoubleClick += ExpandWindow;
         }
 
+        protected override void OnStateChanged(EventArgs e)
+        {
+            if (WindowState == WindowState.Minimized && !Vm.ShowInTaskbar)
+                this.Hide();
+
+            base.OnStateChanged(e);
+        }
+
         private AccountModel _vm;
         private AccountModel Vm
         {
@@ -66,6 +74,7 @@ namespace CardIdleRemastered
         /// <see cref="https://stackoverflow.com/questions/10230579/easiest-way-to-have-a-program-minimize-itself-to-the-system-tray-using-net-4"/>
         private void ExpandWindow(object sender, EventArgs e)
         {
+            Show();
             WindowState = WindowState.Normal;
             Activate();
         }

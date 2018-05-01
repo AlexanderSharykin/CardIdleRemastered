@@ -56,6 +56,8 @@ namespace CardIdleRemastered
             IdleQueue = new StringCollection();
             Games = new StringCollection();
 
+            ShowInTaskbar = true;
+
             ReadXml();
         }
 

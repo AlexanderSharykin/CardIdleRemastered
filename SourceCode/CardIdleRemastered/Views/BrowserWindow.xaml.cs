@@ -13,6 +13,7 @@ namespace CardIdleRemastered
     /// </summary>
     public partial class BrowserWindow : Window
     {
+        private const string EmulationKey = @"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION";
         private static bool _browserEmulation;
 
         public BrowserWindow()
@@ -33,12 +34,13 @@ namespace CardIdleRemastered
 
             try
             {
-                RegistryKey ie_root = Registry.CurrentUser
-                    .CreateSubKey(@"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION");
-                RegistryKey key = Registry.CurrentUser
-                    .OpenSubKey(@"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
+                var ieVersion = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Internet Explorer").GetValue("Version").ToString();
+                Logger.Info("IE version " + ieVersion);
+                RegistryKey ie_root = Registry.CurrentUser.CreateSubKey(EmulationKey);
+                RegistryKey key = Registry.CurrentUser.OpenSubKey(EmulationKey, true);
 
-                key.SetValue(App.AppSystemName, (int)10001, RegistryValueKind.DWord);
+                var emulationVersion = ieVersion.StartsWith("9.11") ? 11000 : 10001;
+                key.SetValue(App.AppSystemName, emulationVersion, RegistryValueKind.DWord);
             }
             catch (Exception ex)
             {

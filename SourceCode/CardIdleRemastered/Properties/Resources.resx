@@ -169,6 +169,9 @@
   <data name="CfgIdleProcessCount" xml:space="preserve">
     <value>Max Idle Process Count</value>
   </data>
+  <data name="CfgIdleTrialPeriod" xml:space="preserve">
+    <value>Trial Period</value>
+  </data>
   <data name="CfgOperationsHeader" xml:space="preserve">
     <value>Operations</value>
   </data>

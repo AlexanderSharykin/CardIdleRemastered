@@ -27,6 +27,7 @@ namespace CardIdleRemastered
         string ShowcaseFilter { get; set; }
         byte MaxIdleProcessCount { get; set; }
         byte PeriodicSwitchRepeatCount { get; set; }
+        double TrialPeriod { get; set; }
         byte SwitchMinutes { get; set; }
         byte SwitchSeconds { get; set; }
 

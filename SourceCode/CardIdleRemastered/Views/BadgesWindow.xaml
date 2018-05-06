@@ -685,6 +685,8 @@
                                         <RowDefinition/>
                                         <RowDefinition Height="5"/>
                                         <RowDefinition/>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition/>
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
@@ -694,29 +696,37 @@
 
                                     <Label Content="{x:Static res:Resources.CfgIdleProcessCount}"/>
 
-                                    <xctk:ByteUpDown  Grid.Row="0" Grid.Column="2" 
-                                              MinWidth="60" HorizontalAlignment="Left"
-                                              Minimum="1" Maximum="30" 
-                                              Value="{Binding Path=Idler.MaxIdleInstanceCount}"/>
+                                    <xctk:ByteUpDown Grid.Row="0" Grid.Column="2" 
+                                                     MinWidth="60" HorizontalAlignment="Left"
+                                                     Minimum="1" Maximum="30" 
+                                                     Value="{Binding Path=Idler.MaxIdleInstanceCount}"/>
 
-                                    <Label Grid.Row="2" Content="{x:Static res:Resources.CfgPeriodicSwitchRepeatCount}"/>
+                                    <Label Grid.Row="2"  Content="{x:Static res:Resources.CfgIdleTrialPeriod}"/>
 
-                                    <xctk:ByteUpDown  Grid.Row="2" Grid.Column="2" 
-                                              MinWidth="60" HorizontalAlignment="Left"
-                                              Minimum="1" Maximum="30" 
-                                              Value="{Binding Path=Idler.PeriodicSwitchRepeatCount}"/>
+                                    <xctk:DoubleUpDown Grid.Row="2" Grid.Column="2" 
+                                                       FormatString="N1"
+                                                       MinWidth="60" HorizontalAlignment="Left"
+                                                       Minimum="0" Increment="0.5"
+                                                       Value="{Binding Path=Idler.TrialPeriod}" />
 
-                                    <Label Content="{x:Static res:Resources.CfgSwitchInterval}" Grid.Row="4" Grid.Column="0"/>
+                                    <Label Grid.Row="4" Content="{x:Static res:Resources.CfgPeriodicSwitchRepeatCount}"/>
 
-                                    <StackPanel Grid.Row="4" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <xctk:ByteUpDown  Grid.Row="4" Grid.Column="2" 
+                                                      MinWidth="60" HorizontalAlignment="Left"
+                                                      Minimum="1" Maximum="30" 
+                                                      Value="{Binding Path=Idler.PeriodicSwitchRepeatCount}"/>
+
+                                    <Label Content="{x:Static res:Resources.CfgSwitchInterval}" Grid.Row="6" Grid.Column="0"/>
+
+                                    <StackPanel Grid.Row="6" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Left">
                                         <xctk:ByteUpDown MinWidth="60" 
-                                                 Minimum="0" Maximum="240" 
-                                                 Value="{Binding Path=Idler.SwitchMinutes}"/>
+                                                         Minimum="0" Maximum="240" 
+                                                         Value="{Binding Path=Idler.SwitchMinutes}"/>
                                         <Label Content="{x:Static res:Resources.Minutes}"/>
 
                                         <xctk:ByteUpDown MinWidth="60" 
-                                                 Minimum="1" Maximum="60" 
-                                                 Value="{Binding Path=Idler.SwitchSeconds}"/>
+                                                         Minimum="1" Maximum="60" 
+                                                         Value="{Binding Path=Idler.SwitchSeconds}"/>
                                         <Label Content="{x:Static res:Resources.Seconds}"/>
                                     </StackPanel>
                                 </Grid>

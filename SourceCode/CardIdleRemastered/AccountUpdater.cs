@@ -151,6 +151,7 @@ namespace CardIdleRemastered
             }
 
             _account.UpdateTotalValues();
+            _account.UpdateTrialStatus();
 
             return badges;
         }

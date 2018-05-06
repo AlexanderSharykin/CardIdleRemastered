@@ -32,6 +32,7 @@ namespace CardIdleRemastered
         public string ShowcaseFilter { get; set; }
         public byte MaxIdleProcessCount { get; set; }
         public byte PeriodicSwitchRepeatCount { get; set; }
+        public double TrialPeriod { get; set; }
         public byte SwitchMinutes { get; set; }
         public byte SwitchSeconds { get; set; }
 
@@ -100,6 +101,7 @@ namespace CardIdleRemastered
                     IdleMode = ReadInt(xml.Element("IdleMode"));
                     MaxIdleProcessCount = ReadByte(xml.Element("MaxIdleProcessCount"));
                     PeriodicSwitchRepeatCount = ReadByte(xml.Element("PeriodicSwitchRepeatCount"));
+                    TrialPeriod = ReadDouble(xml.Element("TrialPeriod"));
                     SwitchMinutes = ReadByte(xml.Element("SwitchMinutes"));
                     SwitchSeconds = ReadByte(xml.Element("SwitchSeconds"));
 
@@ -119,6 +121,12 @@ namespace CardIdleRemastered
             {
                 Logger.Exception(ex, "Settings storage");
             }
+        }
+
+        private double ReadDouble(XElement xe)
+        {
+            double? i = (double?)xe;
+            return i ?? 0;
         }
 
         private int ReadInt(XElement xe)
@@ -171,6 +179,7 @@ namespace CardIdleRemastered
                 new XElement("IdleMode", IdleMode),
                 new XElement("MaxIdleProcessCount", MaxIdleProcessCount),
                 new XElement("PeriodicSwitchRepeatCount", PeriodicSwitchRepeatCount),
+                new XElement("TrialPeriod", TrialPeriod),
                 new XElement("SwitchMinutes", SwitchMinutes),
                 new XElement("SwitchSeconds", SwitchSeconds),
                 new XElement("AllowShowcaseSync", AllowShowcaseSync),

@@ -165,6 +165,9 @@
   <data name="CfgIdleProcessCount" xml:space="preserve">
     <value>Запускать процессов не более</value>
   </data>
+  <data name="CfgIdleTrialPeriod" xml:space="preserve">
+    <value>Пробный период</value>
+  </data>
   <data name="CfgOperationsHeader" xml:space="preserve">
     <value>Рабочие параметры</value>
   </data>

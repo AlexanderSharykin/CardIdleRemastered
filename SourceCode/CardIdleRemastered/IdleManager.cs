@@ -18,6 +18,7 @@ namespace CardIdleRemastered
         private IdleMode _mode;
         private byte _periodicSwitchRepeatCount = 1;
         private byte _maxIdleInstanceCount;
+        private double _trialPeriod;
         private byte _switchMinutes;
         private byte _switchSeconds;
 
@@ -84,6 +85,16 @@ namespace CardIdleRemastered
             }
         }
 
+        public double TrialPeriod
+        {
+            get { return _trialPeriod; }
+            set
+            {
+                _trialPeriod = Math.Round(value, 1);
+                OnPropertyChanged();
+            }
+        }
+
         public byte SwitchMinutes
         {
             get { return _switchMinutes; }
@@ -102,6 +113,11 @@ namespace CardIdleRemastered
                 _switchSeconds = value;
                 OnPropertyChanged();
             }
+        }
+
+        public bool IsTrial(BadgeModel badge)
+        {
+            return badge.HoursPlayed < TrialPeriod;
         }
 
         public async void Start()
@@ -159,7 +175,7 @@ namespace CardIdleRemastered
             }
             else
             {
-                var trial = _account.IdleQueueBadges.Where(b => b.HoursPlayed < 2).ToArray();
+                var trial = _account.IdleQueueBadges.Where(IsTrial).ToArray();
 
                 if (_badgeBuffer.Count == 0)
                 {
@@ -172,7 +188,7 @@ namespace CardIdleRemastered
                     else
                     {
                         var next =
-                            _account.IdleQueueBadges.FirstOrDefault(b => b.HoursPlayed >= 2.0 && b.RemainingCard > 0);
+                            _account.IdleQueueBadges.FirstOrDefault(b => IsTrial(b) == false && b.RemainingCard > 0);
 
                         if (_mode == IdleMode.TrialFirst && trial.Length > 0 || next == null)
                             await AddTrialGames(trial);
@@ -234,7 +250,7 @@ namespace CardIdleRemastered
             {
                 item.Minutes++;
                 var hours = item.Hours + item.Minutes / 60.0;
-                if (hours >= 2.0)
+                if (hours >= TrialPeriod)
                 {
                     item.Badge.HoursPlayed = hours;
                     //item.Badge.CardIdleProcess.Stop();                    
@@ -247,8 +263,8 @@ namespace CardIdleRemastered
             var badge = (BadgeModel)sender;
             if (e.PropertyName == "HoursPlayed")
             {
-                // Steam delay for trial games is 2 hours (refund condition)
-                if (badge.HoursPlayed >= 2.0)
+                // Steam has a delay in card drops for trial games (refund condition)
+                if (IsTrial(badge) == false)
                     badge.CardIdleProcess.Stop();
             }
         }

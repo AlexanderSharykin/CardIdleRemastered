@@ -421,6 +421,11 @@ namespace CardIdleRemastered
             if (Storage.PeriodicSwitchRepeatCount > 0)
                 Idler.PeriodicSwitchRepeatCount = Storage.PeriodicSwitchRepeatCount;
 
+            if (Storage.TrialPeriod > 0)
+                Idler.TrialPeriod = Storage.TrialPeriod;
+            else
+                Idler.TrialPeriod = 2;
+
             Idler.SwitchMinutes = Storage.SwitchMinutes;
             if (Storage.SwitchSeconds > 0)
                 Idler.SwitchSeconds = Storage.SwitchSeconds;
@@ -432,6 +437,7 @@ namespace CardIdleRemastered
 
             PropertyChanged += SaveConfiguration;
             Idler.PropertyChanged += SaveConfiguration;
+            Idler.PropertyChanged += TrialPeriodChanged;
 
             IdleQueueBadges.CollectionChanged += IdleQueueItemsChanged;
 
@@ -979,6 +985,11 @@ namespace CardIdleRemastered
                     Storage.PeriodicSwitchRepeatCount = idler.PeriodicSwitchRepeatCount;
                     save = true;
                 }
+                else if (e.PropertyName == "TrialPeriod")
+                {
+                    Storage.TrialPeriod = idler.TrialPeriod;
+                    save = true;
+                }
                 else if (e.PropertyName == "SwitchMinutes")
                 {
                     Storage.SwitchMinutes = idler.SwitchMinutes;
@@ -1082,6 +1093,20 @@ namespace CardIdleRemastered
         {
             TotalGames = Badges.Cast<BadgeModel>().Count();
             TotalCards = Badges.Cast<BadgeModel>().Sum(b => b.RemainingCard);
+        }
+
+        public void UpdateTrialStatus()
+        {
+            foreach (var badge in AllBadges)
+            {
+                badge.HasTrial = _idler.IsTrial(badge);
+            }
+        }
+
+        private void TrialPeriodChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "TrialPeriod")
+                UpdateTrialStatus();
         }
 
         #endregion

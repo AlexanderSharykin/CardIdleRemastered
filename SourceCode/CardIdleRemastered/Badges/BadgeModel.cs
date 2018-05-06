@@ -9,6 +9,7 @@ namespace CardIdleRemastered
         private double _hoursPlayed;
 
         private IdleProcess _idleProcess;
+        private bool _hasTrial;
         private bool _isBlacklisted;
         private bool _isInQueue;
 
@@ -106,13 +107,17 @@ namespace CardIdleRemastered
             {
                 _hoursPlayed = value;
                 OnPropertyChanged();
-                OnPropertyChanged("HasTrial");
             }
         }
 
         public bool HasTrial
         {
-            get { return !CardIdleActive && HoursPlayed < 2; }
+            get { return _hasTrial; }
+            set
+            {
+                _hasTrial = value;
+                OnPropertyChanged();
+            }
         }
 
         public bool IsBlacklisted

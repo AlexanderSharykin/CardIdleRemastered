@@ -215,6 +215,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Trial Period.
+        /// </summary>
+        public static string CfgIdleTrialPeriod {
+            get {
+                return ResourceManager.GetString("CfgIdleTrialPeriod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Operations.
         /// </summary>
         public static string CfgOperationsHeader {

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using CardIdleRemastered.Converters;
 using CardIdleRemastered.Commands;
 using CardIdleRemastered.ViewModels;
 
@@ -21,6 +22,7 @@ namespace CardIdleRemastered
     {
         #region Fields
         private readonly AccountUpdater _updater;
+        private readonly PricesUpdater _pricesUpdater;
         private readonly IdleManager _idler;
         private readonly ShowcaseManager _showcaseManager;
 
@@ -36,6 +38,7 @@ namespace CardIdleRemastered
 
         private bool _isAuthorized;
         private bool _showInTaskbar = true;
+        private bool _showBackground = true;
         private int _activeProcessCount;
         private int _totalCards;
         private int _totalGames;
@@ -59,7 +62,8 @@ namespace CardIdleRemastered
 
         public AccountModel()
         {
-            _updater = new AccountUpdater(this);
+            _pricesUpdater = new PricesUpdater();
+            _updater = new AccountUpdater(this, _pricesUpdater);
             _idler = new IdleManager(this);
             _showcaseManager = new ShowcaseManager();
             _updater.BadgeListSync += SyncShowcases;
@@ -165,6 +169,17 @@ namespace CardIdleRemastered
             }
         }
 
+        public bool ShowBackground
+        {
+            get { return _showBackground; }
+            set
+            {
+                _showBackground = value;
+                OnPropertyChanged();
+                OnPropertyChanged("BackgroundUrl");
+            }
+        }
+
         public IdleManager Idler
         {
             get { return _idler; }
@@ -206,6 +221,8 @@ namespace CardIdleRemastered
         {
             get
             {
+                if (false == ShowBackground)
+                    return null;
                 if (String.IsNullOrWhiteSpace(_customBackgroundUrl) == false)
                     return _customBackgroundUrl;
                 return _backgroundUrl;
@@ -292,24 +309,6 @@ namespace CardIdleRemastered
 
         #endregion
 
-        /// <summary>
-        /// Initialize timer to regularly check Steam client status
-        /// </summary>
-        public void InitSteamTimer()
-        {
-            _tmSteamStatus = new DispatcherTimer();
-            _tmSteamStatus.Interval = new TimeSpan(0, 0, 5);
-            bool steamRunning = false;
-            _tmSteamStatus.Tick += (sender, args) =>
-            {
-                bool connected = IsSteamRunning;
-                if (steamRunning != connected)
-                    OnPropertyChanged("IsSteamRunning");
-                steamRunning = connected;
-            };
-            _tmSteamStatus.Start();
-        }
-
         public void AddBadge(BadgeModel badge)
         {
             AllBadges.Add(badge);
@@ -388,6 +387,54 @@ namespace CardIdleRemastered
             CardIdleProfile = await new SteamParser().LoadCardIdleProfileAsync();
         }
 
+        public FileStorage PricesStorage
+        {
+            get { return _pricesUpdater.Storage; }
+            set { _pricesUpdater.Storage = value; }
+        }
+
+        public void Startup()
+        {
+            InitSteamTimer();
+            CheckLatestRelease();
+            LoadCardIdleProfile();
+            DownloadPricesCatalog();
+            LoadAccount();
+        }
+
+        /// <summary>
+        /// Initialize timer to regularly check Steam client status
+        /// </summary>
+        public void InitSteamTimer()
+        {
+            _tmSteamStatus = new DispatcherTimer();
+            _tmSteamStatus.Interval = new TimeSpan(0, 0, 5);
+            bool steamRunning = false;
+            _tmSteamStatus.Tick += (sender, args) =>
+            {
+                bool connected = IsSteamRunning;
+                if (steamRunning != connected)
+                    OnPropertyChanged("IsSteamRunning");
+                steamRunning = connected;
+            };
+            _tmSteamStatus.Start();
+        }
+
+        public async void DownloadPricesCatalog()
+        {
+            var dt = DateTime.Today;
+            int dayNum = dt.Year * 10000 + dt.Month * 100 + dt.Day;
+            if (dayNum > Storage.PricesCatalogDate)
+            {
+                bool success = await _pricesUpdater.DownloadCatalog();
+                if (success)
+                {
+                    Storage.PricesCatalogDate = dayNum;
+                    Storage.Save();
+                }
+            }
+        }
+
         /// <summary>
         /// Load account when application starts
         /// </summary>
@@ -400,7 +447,7 @@ namespace CardIdleRemastered
                 Level = Storage.SteamLevel;
 
                 AvatarUrl = Storage.SteamAvatarUrl;
-                CustomBackgroundUrl = Storage.CustomBackgroundUrl;
+
                 BackgroundUrl = Storage.SteamBackgroundUrl;
 
                 FavoriteBadge = new BadgeLevelData
@@ -410,6 +457,7 @@ namespace CardIdleRemastered
                                 };
             }
 
+            CustomBackgroundUrl = Storage.CustomBackgroundUrl;
             BadgePropertiesFilters.Deserialize<BadgeProperty>(Storage.BadgeFilter);
             ShowcasePropertiesFilters.Deserialize<ShowcaseProperty>(Storage.ShowcaseFilter);
 
@@ -434,6 +482,7 @@ namespace CardIdleRemastered
 
             AllowShowcaseSync = Storage.AllowShowcaseSync;
             ShowInTaskbar = Storage.ShowInTaskbar;
+            ShowBackground = Storage.ShowBackground;
 
             PropertyChanged += SaveConfiguration;
             Idler.PropertyChanged += SaveConfiguration;
@@ -459,6 +508,7 @@ namespace CardIdleRemastered
             foreach (var id in games)
             {
                 var game = await new SteamParser().GetGameInfo(id);
+                game.PropertyChanged += BadgeIdleStatusChanged;
                 Games.Insert(idx, game);
                 idx++;
             }
@@ -918,7 +968,7 @@ namespace CardIdleRemastered
                 }
                 else if (e.PropertyName == "BackgroundUrl")
                 {
-                    Storage.SteamBackgroundUrl = account.BackgroundUrl ?? string.Empty;
+                    Storage.SteamBackgroundUrl = account._backgroundUrl ?? string.Empty;
                     save = true;
                 }
 
@@ -950,6 +1000,11 @@ namespace CardIdleRemastered
                 else if (e.PropertyName == "ShowInTaskbar")
                 {
                     Storage.ShowInTaskbar = account.ShowInTaskbar;
+                    save = true;
+                }
+                else if (e.PropertyName == "ShowBackground")
+                {
+                    Storage.ShowBackground = account.ShowBackground;
                     save = true;
                 }
                 else if (e.PropertyName == "FavoriteBadge")

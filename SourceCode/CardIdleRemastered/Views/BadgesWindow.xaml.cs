@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Forms;
 using Application = System.Windows.Application;
 
@@ -13,21 +13,48 @@ namespace CardIdleRemastered
     public partial class BadgesWindow : Window
     {
         private NotifyIcon _ni;
+
         public BadgesWindow()
         {
             InitializeComponent();
             DataContextChanged += OnDataContextChanged;
+            Loaded += OnWindowLoaded;
 
             var icoUri = new Uri("pack://application:,,,/CardIdleRemastered;component/CardIdle.ico");
             var iconStream = Application.GetResourceStream(icoUri).Stream;
             _ni = new NotifyIcon
                   {
-                      Icon = new System.Drawing.Icon(iconStream),
+                      Icon = new Icon(iconStream),
                       Text = "Card Idle",
                       Visible = false
                   };
 
             _ni.DoubleClick += ExpandWindow;
+        }
+
+        void OnWindowLoaded(object sender, RoutedEventArgs e)
+        {
+            SizeChanged += OnWindowSizeChanged;
+            LocationChanged += OnWindowLocationChanged;
+        }
+
+        void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            SaveDimensions();
+        }
+
+        void OnWindowLocationChanged(object sender, EventArgs e)
+        {
+            SaveDimensions();
+        }
+
+        private void SaveDimensions()
+        {
+            if (Vm != null)
+            {
+                Vm.Storage.Dimensions = new Thickness(Left, Top, RenderSize.Width, RenderSize.Height).ToString();
+                Vm.Storage.Save();
+            }
         }
 
         protected override void OnStateChanged(EventArgs e)
@@ -59,6 +86,19 @@ namespace CardIdleRemastered
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             Vm = DataContext as AccountModel;
+            if (Vm != null)
+            {
+                string x = Vm.Storage.Dimensions;
+                if (String.IsNullOrWhiteSpace(x))
+                    return;
+
+                var d = (Thickness)(new ThicknessConverter().ConvertFromInvariantString(x));
+                WindowStartupLocation = WindowStartupLocation.Manual;
+                Left = Math.Max(0, d.Left);
+                Top = Math.Max(0, d.Top);
+                Width = d.Right;
+                Height = d.Bottom;
+            }
         }
 
         private void VmOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -77,11 +117,6 @@ namespace CardIdleRemastered
             Show();
             WindowState = WindowState.Normal;
             Activate();
-        }
-
-        private void SetLoadingRowNumber(object sender, DataGridRowEventArgs e)
-        {
-            e.Row.Header = (e.Row.GetIndex() + 1).ToString();
         }
     }
 }

@@ -1,0 +1,123 @@
+﻿<UserControl x:Class="CardIdleRemastered.Views.QueuePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:res="clr-namespace:CardIdleRemastered.Properties"
+             xmlns:local="clr-namespace:CardIdleRemastered"
+             mc:Ignorable="d"
+             d:DesignHeight="480" d:DesignWidth="640"
+             d:DataContext="{d:DesignInstance Type=local:AccountModel, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/SharedResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <DataGrid ItemsSource="{Binding Path=IdleQueueBadges}"
+                  CellStyle="{StaticResource GameCellStyle}"
+                  LoadingRow="SetLoadingRowNumber">
+
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="{x:Static res:Resources.Game}"
+                    CellTemplate="{StaticResource GameImgCell}"
+                    Width="Auto" MinWidth="230"/>
+                <DataGridTextColumn
+                    Header="{x:Static res:Resources.Hours}" Binding="{Binding Path=HoursPlayed}"
+                    IsReadOnly="True" CanUserSort="False"
+                    Width="*" ElementStyle="{StaticResource DataGridText}"/>
+                <DataGridTextColumn
+                    Header="{x:Static res:Resources.Cards}" Binding="{Binding Path=RemainingCard}"
+                    IsReadOnly="True" CanUserSort="False"
+                    Width="*" ElementStyle="{StaticResource DataGridText}"/>
+                <DataGridTextColumn
+                    Header="$" Binding="{Binding Path=CardPrice, StringFormat='\{0:0.00}'}"
+                    IsReadOnly="True" CanUserSort="False"
+                    Width="40" ElementStyle="{StaticResource DataGridText}"/>
+                <DataGridTemplateColumn Header="{x:Static res:Resources.Priority}" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                <Button Content="&#9650;"
+                                        ToolTip="{x:Static res:Resources.PriorityHigher}"
+                                        Command="{Binding Path=DataContext.SetHigherPriorityCmd, ElementName=LayoutRoot}"
+                                        CommandParameter="{Binding Path=.}"
+                                        Style="{StaticResource CmdButton}"/>
+                                <Button Content="&#9660;"
+                                        ToolTip="{x:Static res:Resources.PriorityLower}"
+                                        Command="{Binding Path=DataContext.SetLowerPriorityCmd, ElementName=LayoutRoot}"
+                                        CommandParameter="{Binding Path=.}"
+                                        Style="{StaticResource CmdButton}" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{x:Static res:Resources.DequeueHeader}" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding Path=DataContext.DequeueBadgeCmd, ElementName=LayoutRoot}"
+                                    CommandParameter="{Binding Path=.}"
+                                    Content="#" Style="{StaticResource CmdButton}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid Grid.Row="1" Margin="0,4,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
+                <Label Content="{x:Static res:Resources.ToolIdleMode}" Foreground="White"/>
+                <ComboBox
+                    MinWidth="100"
+                    VerticalContentAlignment="Center"
+                    ItemsSource="{Binding Path=Idler.IdleModes}"
+                    SelectedItem="{Binding Path=Idler.Mode, Converter={StaticResource EnumTranslator}}" >
+                </ComboBox>
+            </StackPanel>
+
+            <Button Content="{x:Static res:Resources.Start}"
+                    Command ="{Binding IdleCmd}" CommandParameter="1"
+                    Grid.Row="0" Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,10,0" Padding="10,4,10,4"
+                    
+                    FontSize="18"
+                    BorderThickness="2"
+                    Background="{DynamicResource DynIdleButtons}"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"/>
+
+            <Button Content="{x:Static res:Resources.Stop}"
+                    Command ="{Binding IdleCmd}" CommandParameter="0"
+                    Grid.Row="0" Grid.Column="3"
+                    HorizontalAlignment="Left"
+                    Margin="10,0,0,0" Padding="10,4,10,4"
+                    
+                    FontSize="18"
+                    BorderThickness="2"
+                    Background="{DynamicResource DynIdleButtons}"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"/>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -37,7 +37,13 @@ namespace CardIdleRemastered
         public byte SwitchSeconds { get; set; }
 
         public bool AllowShowcaseSync { get; set; }
+        
         public bool ShowInTaskbar { get; set; }
+        public bool ShowBackground { get; set; }
+        
+        public string Dimensions { get; set; }
+        
+        public int PricesCatalogDate { get; set; }
 
         public StringCollection IdleQueue { get; private set; }
 
@@ -58,6 +64,7 @@ namespace CardIdleRemastered
             Games = new StringCollection();
 
             ShowInTaskbar = true;
+            ShowBackground = true;
 
             ReadXml();
         }
@@ -107,6 +114,9 @@ namespace CardIdleRemastered
 
                     AllowShowcaseSync = ReadBool(xml.Element("AllowShowcaseSync"));
                     ShowInTaskbar = ReadBool(xml.Element("ShowInTaskbar"), true);
+                    ShowBackground = ReadBool(xml.Element("ShowBackground"), true);
+                    Dimensions = (string)xml.Element("Dimensions");
+                    PricesCatalogDate = ReadInt(xml.Element("PricesCatalogDate"));
 
                     IdleQueue.AddRange(GetStringList(xml.Element("IdleQueue")));
                     Blacklist.AddRange(GetStringList(xml.Element("Blacklist")));
@@ -184,6 +194,9 @@ namespace CardIdleRemastered
                 new XElement("SwitchSeconds", SwitchSeconds),
                 new XElement("AllowShowcaseSync", AllowShowcaseSync),
                 new XElement("ShowInTaskbar", ShowInTaskbar),
+                new XElement("ShowBackground", ShowBackground),
+                new XElement("Dimensions", Dimensions),
+                new XElement("PricesCatalogDate", PricesCatalogDate),
                 new XElement("IdleQueue", String.Join(",", IdleQueue.Cast<string>())),
                 new XElement("Blacklist", String.Join(",", Blacklist.Cast<string>())),
                 new XElement("ShowcaseBookmarks", String.Join(",", ShowcaseBookmarks.Cast<string>())),

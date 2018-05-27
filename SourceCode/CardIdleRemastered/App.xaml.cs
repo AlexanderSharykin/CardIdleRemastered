@@ -41,6 +41,7 @@ namespace CardIdleRemastered
             _account = new AccountModel();
             _account.Storage = storage;
             _account.ShowcaseStorage = new FileStorage("ShowcaseDb.txt");
+            _account.PricesStorage = new FileStorage(Path.Combine(appFolder, "PricesDb.txt"));
 
             Palette = PaletteItemsCollection.Create();
             if (storage.AppBrushes != null)
@@ -55,10 +56,7 @@ namespace CardIdleRemastered
             var w = new BadgesWindow { DataContext = _account };
             w.Show();
 
-            _account.InitSteamTimer();
-            _account.CheckLatestRelease();
-            _account.LoadCardIdleProfile();
-            _account.LoadAccount();
+            _account.Startup();
         }
 
         private void LogTaskSchedulerUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs arg)

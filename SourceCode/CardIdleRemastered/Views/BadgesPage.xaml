@@ -1,0 +1,194 @@
+﻿<UserControl x:Class="CardIdleRemastered.Views.BadgesPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:res="clr-namespace:CardIdleRemastered.Properties"
+             xmlns:local="clr-namespace:CardIdleRemastered"
+             xmlns:views="clr-namespace:CardIdleRemastered.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="480" d:DesignWidth="640"
+             d:DataContext="{d:DesignInstance Type=local:AccountModel, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/SharedResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.Resources>
+            <DataTemplate x:Key="ProgressCell" DataType="{x:Type local:BadgeModel}">
+                <Border Background="Transparent"
+                        Cursor="Hand" Padding="4"
+                        BorderBrush="{DynamicResource DynGridHeaders}" BorderThickness="1"
+                        VerticalAlignment="Center">
+                    <StackPanel>
+                        <TextBlock Text="{Binding Path=BadgeProgress}"
+                                   Foreground="Black"
+                                   TextWrapping="Wrap" TextAlignment="Center"/>
+                        <TextBlock TextAlignment="Center" Margin="0,2" Foreground="Black">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} / {1} ">
+                                    <Binding Path="CardsCurrent"/>
+                                    <Binding Path="CardsTotal"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <Border.InputBindings>
+                        <MouseBinding Gesture="MiddleClick"
+                                      Command="{StaticResource Redirect}"
+                                      CommandParameter="{Binding Path=BadgeUrl}" />
+                    </Border.InputBindings>
+                </Border>
+            </DataTemplate>
+
+            <DataTemplate x:Key="IdleCell" DataType="{x:Type local:BadgeModel}">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <Button Command="{Binding Path=DataContext.StartBadgeIdleCmd, ElementName=LayoutRoot}"
+                            CommandParameter="{Binding Path=.}"
+                            Content="&#9655;" ToolTip="{x:Static res:Resources.Start}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource CmdButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=HasTrial}" Value="True">
+                                        <Setter Property="Background" Value="Gold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Command="{Binding Path=DataContext.StopBadgeIdleCmd, ElementName=LayoutRoot}"
+                            CommandParameter="{Binding Path=.}"
+                            Content="&#10074;&#10074;"
+                            ToolTip="{x:Static res:Resources.Stop}"
+                            Style="{StaticResource CmdButton}" Margin="0,5,0,0"/>
+                </StackPanel>
+            </DataTemplate>
+
+            <DataTemplate x:Key="QueueCell" DataType="{x:Type local:BadgeModel}">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <Button Content="&#9650;"
+                            ToolTip="{x:Static res:Resources.EnqueueFirst}"
+                            Command="{Binding Path=DataContext.EnqueueBadgeHighCmd, ElementName=LayoutRoot}"
+                            CommandParameter="{Binding Path=.}"
+                            Style="{StaticResource CmdButton}"/>
+                    <Button Content="&#9660;"
+                            ToolTip="{x:Static res:Resources.EnqueueLast}"
+                            Command="{Binding Path=DataContext.EnqueueBadgeLowCmd, ElementName=LayoutRoot}"
+                            CommandParameter="{Binding Path=.}"
+                            Style="{StaticResource CmdButton}" Margin="0,5,0,0"/>
+                </StackPanel>
+            </DataTemplate>
+
+            <DataTemplate x:Key="BlacklistCell" DataType="{x:Type local:BadgeModel}">
+                <Button Command="{Binding Path=DataContext.BlacklistBadgeCmd, ElementName=LayoutRoot}"
+                        CommandParameter="{Binding Path=.}"
+                        Content="&#10761;">
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}"  BasedOn="{StaticResource CmdButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsBlacklisted}" Value="True">
+                                    <Setter Property="Background" Value="Black"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </DataTemplate>
+        </Grid.Resources>
+
+        <DataGrid ItemsSource="{Binding Path=Badges}"
+                  CellStyle="{StaticResource GameCellStyle}"
+                  LoadingRow="SetLoadingRowNumber">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="{x:Static res:Resources.Game}"
+                    CellTemplate="{StaticResource GameImgCell}"
+                    Width="Auto" MinWidth="230"/>
+                <DataGridTextColumn
+                    Header="{x:Static res:Resources.Hours}" Binding="{Binding Path=HoursPlayed}"
+                    IsReadOnly="True"
+                    Width="*" ElementStyle="{StaticResource DataGridText}"/>
+                <DataGridTextColumn
+                    Header="{x:Static res:Resources.Cards}" Binding="{Binding Path=RemainingCard}"
+                    IsReadOnly="True"
+                    Width="*" ElementStyle="{StaticResource DataGridText}"/>
+                <DataGridTextColumn
+                    Header="$" Binding="{Binding Path=CardPrice, StringFormat='\{0:0.00}'}"
+                    IsReadOnly="True"
+                    Width="40" ElementStyle="{StaticResource DataGridText}"/>
+                <DataGridTemplateColumn Header="{x:Static res:Resources.BadgeProgress}"
+                    CellTemplate="{StaticResource ProgressCell}"
+                    Width="*"/>
+                <DataGridTemplateColumn Header="{x:Static res:Resources.Idle}" CellTemplate="{StaticResource IdleCell}" Width="*"/>
+                <DataGridTemplateColumn Header="{x:Static res:Resources.QueueHeader}" CellTemplate="{StaticResource QueueCell}" Width="*"/>
+                <DataGridTemplateColumn Header="{x:Static res:Resources.Blacklist}" CellTemplate="{StaticResource BlacklistCell}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <DockPanel Grid.Row="1" Margin="0,4,0,5"
+                   HorizontalAlignment="Stretch">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <Label Content="{x:Static res:Resources.ToolSearch}" Foreground="White"/>
+                <TextBox Text="{Binding Path=GameTitle, Delay=400, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="100" Padding="5,0,5,0"
+                         VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+            </StackPanel>
+
+            <views:SearchPopup DockPanel.Dock="Left"
+                Content="{x:Static res:Resources.ToolShow}"
+                SearchOptions="{Binding Path=BadgePropertiesFilters}"
+                SearchOptionTemplate="{StaticResource PopupContent}"/>
+
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="&#9650;"
+                        Margin="10,0,0,0"
+                        ToolTip="{x:Static res:Resources.EnqueueTop}"
+                        Command="{Binding Path=EnqueueAllCmd}"
+                        VerticalContentAlignment="Stretch"
+                        CommandParameter="0"
+                        HorizontalAlignment="Right"
+                        Style="{StaticResource CmdButton}"/>
+                <Button Grid.Column="1" Margin="5,0,0,0"
+                        Content="&#9660;"
+                        ToolTip="{x:Static res:Resources.EnqueueBottom}"
+                        Command="{Binding Path=EnqueueAllCmd}"
+                        CommandParameter="1"
+                        Style="{StaticResource CmdButton}"
+                        HorizontalAlignment="Center">
+                </Button>
+                <Button Grid.Column="2" Margin="5,0,0,0"
+                        Content="#"
+                        FontSize="18"
+                        ToolTip="{x:Static res:Resources.DequeueAll}"
+                        Command="{Binding Path=DequeueAllCmd}"
+                        Style="{StaticResource CmdButton}"
+                        HorizontalAlignment="Center"/>
+                <Button Grid.Column="3" Margin="5,0,0,0"
+                        Content="&#10227;"
+                        FontSize="18"
+                        ToolTip="{x:Static res:Resources.SyncBadges}"
+                        Command="{Binding Path=ForceSyncCmd}"
+                        Style="{StaticResource CmdButton}"
+                        HorizontalAlignment="Center"/>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</UserControl>

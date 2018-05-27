@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using CardIdleRemastered.Converters;
 
 namespace CardIdleRemastered
 {

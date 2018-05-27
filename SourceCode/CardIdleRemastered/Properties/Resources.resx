@@ -181,6 +181,9 @@
   <data name="CfgPeriodicSwitchRepeatCount" xml:space="preserve">
     <value>Periodic Switch Repeat Count</value>
   </data>
+  <data name="CfgShowBackground" xml:space="preserve">
+    <value>Show Background</value>
+  </data>
   <data name="CfgShowInTaskBar" xml:space="preserve">
     <value>Show Icon in TaskBar</value>
   </data>

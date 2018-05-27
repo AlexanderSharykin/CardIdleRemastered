@@ -3,11 +3,11 @@
 namespace CardIdleRemastered.Views
 {
     /// <summary>
-    /// Interaction logic for CardIdlePage.xaml
+    /// Interaction logic for TimeIdlePage.xaml
     /// </summary>
-    public partial class CardIdlePage : UserControl
+    public partial class TimeIdlePage : UserControl
     {
-        public CardIdlePage()
+        public TimeIdlePage()
         {
             InitializeComponent();
         }

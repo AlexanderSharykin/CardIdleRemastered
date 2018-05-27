@@ -251,6 +251,15 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show Background.
+        /// </summary>
+        public static string CfgShowBackground {
+            get {
+                return ResourceManager.GetString("CfgShowBackground", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Icon in TaskBar.
         /// </summary>
         public static string CfgShowInTaskBar {

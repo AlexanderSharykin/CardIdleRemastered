@@ -23,6 +23,8 @@ OS Windows 7 and higher
 
 .Net Framework 4.5
 
+Stable Internet connection
+
 You should be logged into your Steam account via Steam client to start idling.
 
 ---

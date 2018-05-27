@@ -1,10 +1,12 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:CardIdleRemastered"
+                    xmlns:cvt="clr-namespace:CardIdleRemastered.Converters"
                     xmlns:commands="clr-namespace:CardIdleRemastered.Commands">
 
-    <local:EnumLocalizationConverter x:Key="EnumTranslator" />
-    <local:TranslationConverter x:Key="strTranslator" />
+    <cvt:EnumLocalizationConverter x:Key="EnumTranslator" />
+    <cvt:TranslationConverter x:Key="strTranslator" />
+    <cvt:BooleanToLengthConverter x:Key="LengthConverter" />
     <commands:NavigationCommand x:Key="Redirect"/>
 
     <!-- http://stackoverflow.com/questions/27045396/wpf-datagrid-highlight-selected-row-even-when-selecteditem-is-a-bound-property -->

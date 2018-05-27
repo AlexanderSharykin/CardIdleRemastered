@@ -177,6 +177,9 @@
   <data name="CfgPeriodicSwitchRepeatCount" xml:space="preserve">
     <value>Повторять переключения (раз)</value>
   </data>
+  <data name="CfgShowBackground" xml:space="preserve">
+    <value>Показывать фон профиля</value>
+  </data>
   <data name="CfgShowInTaskBar" xml:space="preserve">
     <value>Отображать в панели задач</value>
   </data>

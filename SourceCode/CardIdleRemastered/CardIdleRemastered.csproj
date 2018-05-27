@@ -67,6 +67,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -90,7 +91,10 @@
     </ApplicationDefinition>
     <Compile Include="AccountModel.cs" />
     <Compile Include="AccountUpdater.cs" />
+    <Compile Include="Badges\BadgeStockModel.cs" />
+    <Compile Include="Converters\BooleanToLengthConverter.cs" />
     <Compile Include="Info\ProfileInfo.cs" />
+    <Compile Include="PricesUpdater.cs" />
     <Compile Include="ViewModels\PaletteItemsCollection.cs" />
     <Compile Include="ViewModels\PaletteItemVm.cs" />
     <Compile Include="Badges\BadgeIdentity.cs" />
@@ -105,6 +109,12 @@
     <Compile Include="ShowcaseManager.cs" />
     <Compile Include="ViewModels\FilterStatesCollection.cs" />
     <Compile Include="ViewModels\SelectionItemVm.cs" />
+    <Compile Include="Views\AboutPage.xaml.cs">
+      <DependentUpon>AboutPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BadgesPage.xaml.cs">
+      <DependentUpon>BadgesPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\BadgesWindow.xaml.cs">
       <DependentUpon>BadgesWindow.xaml</DependentUpon>
     </Compile>
@@ -130,9 +140,21 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="Views\QueuePage.xaml.cs">
+      <DependentUpon>QueuePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SearchPopup.cs" />
     <Compile Include="Converters\TranslationConverter.cs" />
     <Compile Include="SteamParser.cs" />
+    <Compile Include="Views\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ShowcasesPage.xaml.cs">
+      <DependentUpon>ShowcasesPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TimeIdlePage.xaml.cs">
+      <DependentUpon>TimeIdlePage.xaml</DependentUpon>
+    </Compile>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -140,6 +162,14 @@
     <Page Include="Themes\SharedResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AboutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\BadgesPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\BadgesWindow.xaml">
       <SubType>Designer</SubType>
@@ -164,6 +194,22 @@
     <Page Include="Views\GameSelectionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\QueuePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ShowcasesPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TimeIdlePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

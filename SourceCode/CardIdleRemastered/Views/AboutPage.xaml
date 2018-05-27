@@ -1,0 +1,119 @@
+﻿<UserControl x:Class="CardIdleRemastered.Views.AboutPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:CardIdleRemastered"
+             mc:Ignorable="d"
+             d:DesignHeight="480" d:DesignWidth="640"
+             d:DataContext="{d:DesignInstance Type=local:AccountModel, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/SharedResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Name="LayoutRoot" Background="{StaticResource DarkTheme}" Opacity="0.8">
+        <Grid MaxHeight="480" Margin="20">
+            <Grid.Resources>
+                <Style TargetType="RowDefinition">
+                    <Setter Property="Height" Value="Auto"/>
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition Height="*"/>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition Height="*"/>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition Height="*"/>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock>
+                <Run Text="Card Idle Remastered" Foreground="{StaticResource TitleBrush}"/>
+                <Run Text="(&#xa9; ASh)" Foreground="{StaticResource NameBrush}" />
+            </TextBlock>
+            <TextBlock Grid.Row="1" Text="is a WPF remake of"/>
+            <TextBlock Grid.Row="2">
+                <Run Text="Idle Master" Foreground="{StaticResource TitleBrush}"/>
+                <Run Text="(&#xa9; jshackles)" Foreground="{StaticResource NameBrush}"/>
+            </TextBlock>
+
+            <TextBlock Grid.Row="4" Text="Source codes are available on GitHub"/>
+            <TextBlock Grid.Row="5" Name="LblCardIdle"
+                       Text="https://github.com/AlexanderSharykin/CardIdleRemastered"
+                       Style="{StaticResource Link}">
+                <TextBlock.InputBindings>
+                    <MouseBinding Gesture="LeftClick"
+                                  Command="{StaticResource Redirect}"
+                                  CommandParameter="{Binding ElementName=LblCardIdle, Path=Text}"/>
+                </TextBlock.InputBindings>
+            </TextBlock>
+            <TextBlock Grid.Row="6" Name="LblIm"
+                       Text="https://github.com/jshackles/idle_master"
+                       Style="{StaticResource Link}">
+                <TextBlock.InputBindings>
+                    <MouseBinding Gesture="LeftClick"
+                                  Command="{StaticResource Redirect}"
+                                  CommandParameter="{Binding ElementName=LblIm, Path=Text}"/>
+                </TextBlock.InputBindings>
+            </TextBlock>
+
+            <TextBlock Grid.Row="8" Text="Notifications about new releases in my Twitter"/>
+            <TextBlock Grid.Row="9" Name="LblTwitter"
+                       Text="https://twitter.com/Alex_Sharykin"
+                       Style="{StaticResource Link}">
+                <TextBlock.InputBindings>
+                    <MouseBinding Gesture="LeftClick"
+                                  Command="{StaticResource Redirect}"
+                                  CommandParameter="{Binding ElementName=LblTwitter, Path=Text}"/>
+                </TextBlock.InputBindings>
+            </TextBlock>
+            <TextBlock Grid.Row="10" Name="LblHashtag"
+                       Text="https://twitter.com/hashtag/CardIdleRemastered"
+                       Style="{StaticResource Link}">
+                <TextBlock.InputBindings>
+                    <MouseBinding Gesture="LeftClick"
+                                  Command="{StaticResource Redirect}"
+                                  CommandParameter="{Binding ElementName=LblHashtag, Path=Text}"/>
+                </TextBlock.InputBindings>
+            </TextBlock>
+
+            <StackPanel Grid.Row="12">
+                <TextBlock>
+                    <Run Text="Showcase data is obtained from"/>
+                    <Run Text="Steam Card Exchange .Net" Foreground="{StaticResource TitleBrush}"/>
+                </TextBlock>
+                <TextBlock>
+                    <Run Text="More details in"/>
+                    <Run Text="CardTrades" Foreground="{StaticResource TitleBrush}"/>
+                    <Run Text="Steam group"/>
+                </TextBlock>
+            </StackPanel>
+
+            <TextBlock Name="LblSce" Grid.Row="13"
+                       Text="http://steamcommunity.com/groups/card-trading-card-trades"
+                       Style="{StaticResource Link}">
+                <TextBlock.InputBindings>
+                    <MouseBinding Gesture="LeftClick"
+                                  Command="{StaticResource Redirect}"
+                                  CommandParameter="{Binding ElementName=LblSce, Path=Text}"/>
+                </TextBlock.InputBindings>
+            </TextBlock>
+        </Grid>
+    </Grid>
+</UserControl>

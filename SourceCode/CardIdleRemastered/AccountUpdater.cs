@@ -11,14 +11,16 @@ namespace CardIdleRemastered
     public class AccountUpdater
     {
         private AccountModel _account;
+        private PricesUpdater _pricesUpdater;
         private DispatcherTimer _tmSync;
         private DispatcherTimer _tmCounter;
         private TimeSpan _interval;
         private int _counter;
 
-        public AccountUpdater(AccountModel account)
+        public AccountUpdater(AccountModel account, PricesUpdater pricesUpdater)
         {
             _account = account;
+            _pricesUpdater = pricesUpdater;
 
             _tmSync = new DispatcherTimer();
             _tmSync.Tick += SyncBanges;
@@ -135,7 +137,9 @@ namespace CardIdleRemastered
                 if (badge.RemainingCard > 0)
                 {
                     if (b == null)
+                    {
                         _account.AddBadge(badge);
+                    }
                     else
                     {
                         b.RemainingCard = badge.RemainingCard;
@@ -148,6 +152,7 @@ namespace CardIdleRemastered
                     if (b != null)
                         _account.RemoveBadge(b);
                 }
+                badge.CardPrice = _pricesUpdater.GetCardPrice(badge.AppId);
             }
 
             _account.UpdateTotalValues();

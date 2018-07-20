@@ -11,7 +11,7 @@ It helps to get remaining card drops in games you own without wasting disk space
 
 I publish notifications about new Card Idle releases in Twitter [#CardIdleRemastered](https://twitter.com/hashtag/CardIdleRemastered?src=hash). Additionally Card Idle Remastered performs auto-check for new releases at startup.
 
-![](https://github.com/AlexanderSharykin/CardIdleRemastered/blob/master/Card_Idle_Main_Page.png)
+![](https://github.com/AlexanderSharykin/CardIdleRemastered/blob/master/Install/Card_Idle_Main_Page.png)
 
 Requirements
 -------
@@ -33,13 +33,13 @@ You should be logged into your Steam account via Steam client to start idling.
 
 Card Idle has an official Steam account: [CardIdleRemastered](https://steamcommunity.com/profiles/76561198801350858/). Invite to friends!
 
-![](https://github.com/AlexanderSharykin/CardIdleRemastered/blob/master/Card_Idle_Profile.png)
+![](https://github.com/AlexanderSharykin/CardIdleRemastered/blob/master/Install/Card_Idle_Profile.png)
 
 ---
 
 Card Idle has badges preview feature. Badges art is collected by community and available on SteamCardExchange site.
 
-![](https://github.com/AlexanderSharykin/CardIdleRemastered/blob/master/Card_Idle_Showcases.png)
+![](https://github.com/AlexanderSharykin/CardIdleRemastered/blob/master/Install/Card_Idle_Showcases.png)
 
 ---
 

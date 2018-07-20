@@ -517,7 +517,7 @@ namespace CardIdleRemastered
         private async Task<bool> CheckAuth()
         {
             bool registered = !String.IsNullOrWhiteSpace(Storage.SessionId) &&
-                              !String.IsNullOrWhiteSpace(Storage.SteamLogin) &&
+                              !String.IsNullOrWhiteSpace(Storage.SteamLoginSecure) &&
                               !String.IsNullOrWhiteSpace(Storage.SteamProfileUrl);
 
             if (registered)
@@ -587,7 +587,6 @@ namespace CardIdleRemastered
 
             // Clear the account settings
             Storage.SessionId = string.Empty;
-            Storage.SteamLogin = string.Empty;
             Storage.SteamLoginSecure = string.Empty;
             Storage.SteamParental = string.Empty;
             UserName =

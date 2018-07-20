@@ -192,7 +192,7 @@ namespace CardIdleRemastered
                 GetSessionCookies(cookies);
 
                 // Save all of the data to the program settings file, and close this form
-                if (false == String.IsNullOrWhiteSpace(Storage.SteamLogin))
+                if (false == String.IsNullOrWhiteSpace(Storage.SteamLoginSecure))
                 {
                     Storage.Save();
                     if (url.StartsWith(@"http://steamcommunity.com/id/") ||
@@ -216,20 +216,16 @@ namespace CardIdleRemastered
                 }
 
                 // Save the "steamLogin" cookie and construct and save the user's profile link
-                else if (cookie.Name == "steamLogin")
+                else if (cookie.Name == "steamLoginSecure")
                 {
                     string login = cookie.Value;
-                    Storage.SteamLogin = login;
+                    Storage.SteamLoginSecure = login;
 
                     var steamId = WebUtility.UrlDecode(login);
                     var index = steamId.IndexOf('|');
                     if (index >= 0)
                         steamId = steamId.Remove(index);
                     Storage.SteamProfileUrl = "https://steamcommunity.com/profiles/" + steamId;
-                }
-                else if (cookie.Name == "steamLoginSecure")
-                {
-                    Storage.SteamLoginSecure = cookie.Value;
                 }
                 else if (cookie.Name == "steamparental")
                 {

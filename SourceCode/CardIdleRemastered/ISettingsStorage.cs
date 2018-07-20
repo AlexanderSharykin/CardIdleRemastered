@@ -5,7 +5,6 @@ namespace CardIdleRemastered
     public interface ISettingsStorage
     {
         string SessionId { get; set; }
-        string SteamLogin { get; set; }
         string SteamLoginSecure { get; set; }
         string SteamProfileUrl { get; set; }
         string SteamParental { get; set; }
@@ -32,12 +31,12 @@ namespace CardIdleRemastered
         byte SwitchSeconds { get; set; }
 
         bool AllowShowcaseSync { get; set; }
-        
+
         bool ShowInTaskbar { get; set; }
         bool ShowBackground { get; set; }
-        
+
         string Dimensions { get; set; }
-        
+
         int PricesCatalogDate { get; set; }
 
         StringCollection IdleQueue { get; }

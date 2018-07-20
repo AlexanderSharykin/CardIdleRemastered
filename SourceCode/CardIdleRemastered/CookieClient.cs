@@ -22,7 +22,6 @@ namespace CardIdleRemastered
             var cookies = new CookieContainer();
             var target = new Uri("https://steamcommunity.com");
             cookies.Add(new Cookie("sessionid", Storage.SessionId ?? string.Empty) { Domain = target.Host });
-            cookies.Add(new Cookie("steamLogin", Storage.SteamLogin ?? string.Empty) { Domain = target.Host });
             cookies.Add(new Cookie("steamLoginSecure", Storage.SteamLoginSecure ?? string.Empty) { Domain = target.Host });
             cookies.Add(new Cookie("steamparental", Storage.SteamParental ?? string.Empty) { Domain = target.Host });
             cookies.Add(new Cookie("steamRememberLogin", Storage.SteamRememberLogin ?? string.Empty) { Domain = target.Host });
@@ -32,8 +31,8 @@ namespace CardIdleRemastered
 
         private static string GetSteamMachineAuthCookieName()
         {
-            if (Storage.SteamLogin != null && Storage.SteamLogin.Length > 17)
-                return string.Format("steamMachineAuth{0}", Storage.SteamLogin.Substring(0, 17));
+            if (Storage.SteamLoginSecure != null && Storage.SteamLoginSecure.Length > 17)
+                return string.Format("steamMachineAuth{0}", Storage.SteamLoginSecure.Substring(0, 17));
             return "steamMachineAuth";
         }
 
@@ -62,7 +61,6 @@ namespace CardIdleRemastered
                 if (login != null && login.Value == "deleted")
                 {
                     Storage.SessionId = string.Empty;
-                    Storage.SteamLogin = string.Empty;
                     Storage.SteamParental = string.Empty;
                     Storage.MachineAuth = string.Empty;
                     Storage.SteamRememberLogin = string.Empty;

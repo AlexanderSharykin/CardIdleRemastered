@@ -10,7 +10,6 @@ namespace CardIdleRemastered
     public class SettingsStorage : FileStorage, ISettingsStorage
     {
         public string SessionId { get; set; }
-        public string SteamLogin { get; set; }
         public string SteamLoginSecure { get; set; }
         public string SteamProfileUrl { get; set; }
         public string SteamParental { get; set; }
@@ -37,12 +36,12 @@ namespace CardIdleRemastered
         public byte SwitchSeconds { get; set; }
 
         public bool AllowShowcaseSync { get; set; }
-        
+
         public bool ShowInTaskbar { get; set; }
         public bool ShowBackground { get; set; }
-        
+
         public string Dimensions { get; set; }
-        
+
         public int PricesCatalogDate { get; set; }
 
         public StringCollection IdleQueue { get; private set; }
@@ -86,7 +85,6 @@ namespace CardIdleRemastered
                 if (xml != null)
                 {
                     SessionId = (string)xml.Element("SessionId");
-                    SteamLogin = (string)xml.Element("SteamLogin");
                     SteamLoginSecure = (string)xml.Element("SteamLoginSecure");
                     SteamProfileUrl = (string)xml.Element("SteamProfileUrl");
                     SteamParental = (string)xml.Element("SteamParental");
@@ -170,7 +168,6 @@ namespace CardIdleRemastered
         {
             var xe = new XElement("Settings",
                 new XElement("SessionId", SessionId),
-                new XElement("SteamLogin", SteamLogin),
                 new XElement("SteamLoginSecure", SteamLoginSecure),
                 new XElement("SteamProfileUrl", SteamProfileUrl),
                 new XElement("SteamParental", SteamParental),

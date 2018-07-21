@@ -90,9 +90,24 @@
                 <ComboBox
                     MinWidth="100"
                     VerticalContentAlignment="Center"
-                    ItemsSource="{Binding Path=Idler.IdleModes}"
-                    SelectedItem="{Binding Path=Idler.Mode, Converter={StaticResource EnumTranslator}}" >
+                    ItemsSource="{Binding Source={x:Type local:IdleMode}, Converter={StaticResource EnumValues}}"
+                    SelectedItem="{Binding Path=Idler.Mode}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EnumTranslator}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
                 </ComboBox>
+
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=Idler.IsActive}" Value="True">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
             </StackPanel>
 
             <Button Content="{x:Static res:Resources.Start}"

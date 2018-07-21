@@ -5,6 +5,7 @@
                     xmlns:commands="clr-namespace:CardIdleRemastered.Commands">
 
     <cvt:EnumLocalizationConverter x:Key="EnumTranslator" />
+    <cvt:EnumValuesConverter x:Key="EnumValues"/>
     <cvt:TranslationConverter x:Key="strTranslator" />
     <cvt:BooleanToLengthConverter x:Key="LengthConverter" />
     <commands:NavigationCommand x:Key="Redirect"/>
@@ -191,8 +192,8 @@
             <TextBlock Text="{Binding Path=Key, Converter={StaticResource EnumTranslator}}" Margin="5"/>
 
             <ListBox Grid.Column="1" BorderThickness="0"
-                        ItemsSource="{Binding Path=DataContext.FilterStates, ElementName=LayoutRoot}"
-                        SelectedItem="{Binding Path=Value, Converter={StaticResource EnumTranslator}}"
+                        ItemsSource="{Binding Source={x:Type local:FilterState}, Converter={StaticResource EnumValues}}"
+                        SelectedItem="{Binding Path=Value}"
                         ItemContainerStyle="{StaticResource ItemNoHighlight}">
 
                 <ListBox.ItemsPanel>
@@ -206,7 +207,7 @@
                         <Grid>
                             <RadioButton IsChecked="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, TargetNullValue=false}"
                                             Margin="5,0" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                            Content="{Binding .}"/>
+                                            Content="{Binding Converter={StaticResource EnumTranslator}}"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

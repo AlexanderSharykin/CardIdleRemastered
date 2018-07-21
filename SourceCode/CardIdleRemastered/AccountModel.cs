@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
-using CardIdleRemastered.Converters;
 using CardIdleRemastered.Commands;
 using CardIdleRemastered.ViewModels;
 
@@ -1061,11 +1060,6 @@ namespace CardIdleRemastered
         }
 
         #endregion
-
-        public IEnumerable<string> FilterStates
-        {
-            get { return Enums.GetValues<FilterState>().Select(e => EnumLocalizationConverter.GetLocalValue(e)); }
-        }
 
         #region Badges filters
         /// <summary>

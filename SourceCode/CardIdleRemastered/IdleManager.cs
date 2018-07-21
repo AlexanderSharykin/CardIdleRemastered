@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using CardIdleRemastered.Converters;
 
 namespace CardIdleRemastered
 {
@@ -53,16 +52,6 @@ namespace CardIdleRemastered
             {
                 _mode = value;
                 OnPropertyChanged();
-            }
-        }
-
-        public IEnumerable<string> IdleModes
-        {
-            get
-            {
-                return Enum.GetValues(typeof(IdleMode))
-                    .Cast<IdleMode>()
-                    .Select(e => EnumLocalizationConverter.GetLocalValue(e));
             }
         }
 

@@ -19,12 +19,11 @@
 
     <Style TargetType="{x:Type TabItem}">
         <Setter Property="FontSize" Value="18"/>
-        <Setter Property="ToolTip" Value="{Binding Path=Header, RelativeSource={RelativeSource Self}}"/>
         <Setter Property="Tag" Value="@"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Grid>
+                    <Grid ToolTip="{TemplateBinding Header}">
                         <Border Name="Border" Margin="5" Padding="5"                                    
                                     Background="#B0FFFFFF"                   
                                     BorderBrush="#B0FFFFFF" BorderThickness="2">

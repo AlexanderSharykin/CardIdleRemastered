@@ -6,13 +6,18 @@ using System.Linq;
 
 namespace CardIdleRemastered.ViewModels
 {
-    public class FilterStatesCollection : IEnumerable<SelectionItemVm<FilterState>>
+    public class FilterStatesCollection : ObservableModel, IEnumerable<SelectionItemVm<FilterState>>
     {
         private IList<SelectionItemVm<FilterState>> _items;
         private PropertyChangedEventHandler _notifier;
 
         private FilterStatesCollection()
         {
+        }
+
+        public bool HasActiveFilters
+        {
+            get { return _items.Any(x => x.Value != FilterState.Any); }
         }
 
         public static FilterStatesCollection Create<T>()
@@ -47,7 +52,10 @@ namespace CardIdleRemastered.ViewModels
                 _notifier = (sender, e) =>
                 {
                     if (e.PropertyName == "Value")
+                    {
                         handler();
+                        OnPropertyChanged("HasActiveFilters");
+                    }
                 };
 
                 foreach (var item in _items)
@@ -84,7 +92,7 @@ namespace CardIdleRemastered.ViewModels
                 {
                     var key = Enum.Parse(enumType, keyValue[0]);
                     var filter = _items.First(f => key.Equals(f.Key));
-                    filter.Item = value;
+                    filter.Value = value;
                 }
             }
         }

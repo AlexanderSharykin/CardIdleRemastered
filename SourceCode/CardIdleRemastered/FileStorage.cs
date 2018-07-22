@@ -41,5 +41,10 @@ namespace CardIdleRemastered
                 File.WriteAllText(FileName, content, Encoding.UTF8);
             }
         }
+
+        public override string ToString()
+        {
+            return FileName;
+        }
     }
 }

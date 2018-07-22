@@ -96,6 +96,8 @@ namespace CardIdleRemastered
             RemoveGameCmd = new BaseCommand(RemoveGame);
 
             BookmarkShowcaseCmd = new BaseCommand(BookmarkShowcase);
+
+            ShowSettingsFileCmd = new BaseCommand(ShowSettingsFile);
             #endregion
 
             _badges = CollectionViewSource.GetDefaultView(AllBadges);
@@ -1057,6 +1059,15 @@ namespace CardIdleRemastered
 
             if (save)
                 Storage.Save();
+        }
+
+        public ICommand ShowSettingsFileCmd { get; private set; }
+
+        public void ShowSettingsFile(object o)
+        {
+            string argument = "/select, \"" + Storage + "\"";
+
+            System.Diagnostics.Process.Start("explorer.exe", argument);
         }
 
         #endregion

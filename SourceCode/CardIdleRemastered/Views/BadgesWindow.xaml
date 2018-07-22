@@ -208,7 +208,14 @@
                 </TabItem>
 
                 <TabItem Header="{x:Static res:Resources.Settings}" Tag="&#x2699;">
-                    <views:SettingsPage/>
+                    <Grid>
+                        <views:SettingsPage/>
+                        <Button HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Style="{StaticResource CmdButton}"
+                                Command="{Binding ShowSettingsFileCmd}"
+                                ToolTip="{x:Static res:Resources.Settings}"
+                                Content="&#x2699;" Margin="8"/>
+                    </Grid>
                 </TabItem>
 
                 <TabItem Header="{x:Static res:Resources.AboutHeader}" Tag="&#x1f481;" 

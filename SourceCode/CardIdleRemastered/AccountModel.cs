@@ -63,12 +63,11 @@ namespace CardIdleRemastered
         {
             _pricesUpdater = new PricesUpdater();
             _updater = new AccountUpdater(this, _pricesUpdater);
-            _idler = new IdleManager(this);
+            _idler = new IdleManager();
             _showcaseManager = new ShowcaseManager();
             _updater.BadgeListSync += SyncShowcases;
 
             AllBadges = new ObservableCollection<BadgeModel>();
-            IdleQueueBadges = new ObservableCollection<BadgeModel>();
             Games = new ObservableCollection<BadgeModel> { new BadgeModel("-1", "new", "0", "0") };
             AllShowcases = new ObservableCollection<BadgeShowcase>();
 
@@ -270,7 +269,7 @@ namespace CardIdleRemastered
 
         public ObservableCollection<BadgeModel> AllBadges { get; private set; }
 
-        public ObservableCollection<BadgeModel> IdleQueueBadges { get; private set; }
+        public ObservableCollection<BadgeModel> IdleQueueBadges { get { return _idler.IdleQueueBadges; } }
 
         public ObservableCollection<BadgeModel> Games { get; private set; }
 

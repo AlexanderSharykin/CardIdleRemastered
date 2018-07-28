@@ -91,11 +91,13 @@
     </ApplicationDefinition>
     <Compile Include="AccountModel.cs" />
     <Compile Include="AccountUpdater.cs" />
+    <Compile Include="AppConstants.cs" />
     <Compile Include="Badges\BadgeStockModel.cs" />
     <Compile Include="Converters\BooleanToLengthConverter.cs" />
     <Compile Include="Converters\EnumValuesConverter.cs" />
     <Compile Include="Info\ProfileInfo.cs" />
     <Compile Include="PricesUpdater.cs" />
+    <Compile Include="XmlSettingsValue.cs" />
     <Compile Include="ViewModels\PaletteItemsCollection.cs" />
     <Compile Include="ViewModels\PaletteItemVm.cs" />
     <Compile Include="Badges\BadgeIdentity.cs" />

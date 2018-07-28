@@ -10,18 +10,9 @@ namespace CardIdleRemastered
 {
     public class IdleManager : ObservableModel
     {
-        public static readonly byte DefaultIdleInstanceCount = 16;
-        public static readonly byte DefaultSwitchSeconds = 10;
-
         private bool _isActive;
-        private IdleMode _mode;
-        private byte _periodicSwitchRepeatCount = 1;
-        private byte _maxIdleInstanceCount;
-        private double _trialPeriod;
-        private byte _switchMinutes;
-        private byte _switchSeconds;
 
-        private Random _rand = new Random();
+        private readonly Random _rand = new Random();
 
         private IdleMode _currentMode;
         private List<BadgeIdlingWrapper> _badgeBuffer;
@@ -30,8 +21,6 @@ namespace CardIdleRemastered
         public IdleManager()
         {
             IdleQueueBadges = new ObservableCollection<BadgeModel>();
-            _maxIdleInstanceCount = DefaultIdleInstanceCount;
-            _switchSeconds = DefaultSwitchSeconds;
         }
 
         public ObservableCollection<BadgeModel> IdleQueueBadges { get; private set; }
@@ -46,65 +35,17 @@ namespace CardIdleRemastered
             }
         }
 
-        public IdleMode Mode
-        {
-            get { return _mode; }
-            set
-            {
-                _mode = value;
-                OnPropertyChanged();
-            }
-        }
+        public IdleMode Mode { get; set; }
 
-        public byte MaxIdleInstanceCount
-        {
-            get { return _maxIdleInstanceCount; }
-            set
-            {
-                _maxIdleInstanceCount = value;
-                OnPropertyChanged();
-            }
-        }
+        public byte MaxIdleInstanceCount { get; set; }
 
-        public byte PeriodicSwitchRepeatCount
-        {
-            get { return _periodicSwitchRepeatCount; }
-            set
-            {
-                _periodicSwitchRepeatCount = value;
-                OnPropertyChanged();
-            }
-        }
+        public byte PeriodicSwitchRepeatCount { get; set; }
 
-        public double TrialPeriod
-        {
-            get { return _trialPeriod; }
-            set
-            {
-                _trialPeriod = Math.Round(value, 1);
-                OnPropertyChanged();
-            }
-        }
+        public double TrialPeriod { get; set; }
 
-        public byte SwitchMinutes
-        {
-            get { return _switchMinutes; }
-            set
-            {
-                _switchMinutes = value;
-                OnPropertyChanged();
-            }
-        }
+        public byte SwitchMinutes { get; set; }
 
-        public byte SwitchSeconds
-        {
-            get { return _switchSeconds; }
-            set
-            {
-                _switchSeconds = value;
-                OnPropertyChanged();
-            }
-        }
+        public byte SwitchSeconds { get; set; }
 
         public bool IsTrial(BadgeModel badge)
         {
@@ -141,7 +82,7 @@ namespace CardIdleRemastered
                 var repeats = 0;
                 var repeatCount = Math.Max(PeriodicSwitchRepeatCount, (byte)1);
 
-                int sec = Math.Max(SwitchMinutes * 60 + SwitchSeconds, DefaultSwitchSeconds);
+                int sec = Math.Max(SwitchMinutes * 60 + SwitchSeconds, AppConstants.DefaultSwitchSeconds);
                 var ts = TimeSpan.FromSeconds(sec);
 
                 do
@@ -181,7 +122,7 @@ namespace CardIdleRemastered
                         var next =
                             IdleQueueBadges.FirstOrDefault(b => IsTrial(b) == false && b.RemainingCard > 0);
 
-                        if (_mode == IdleMode.TrialFirst && trial.Length > 0 || next == null)
+                        if (Mode == IdleMode.TrialFirst && trial.Length > 0 || next == null)
                             await AddTrialGames(trial);
 
                         if (_badgeBuffer.Count == 0 && next != null)

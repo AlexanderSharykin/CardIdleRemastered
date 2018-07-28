@@ -53,7 +53,6 @@ namespace CardIdleRemastered
             if (Vm != null)
             {
                 Vm.Storage.Dimensions = new Thickness(Left, Top, RenderSize.Width, RenderSize.Height).ToString();
-                Vm.Storage.Save();
             }
         }
 

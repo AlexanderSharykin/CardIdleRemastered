@@ -32,8 +32,11 @@ namespace CardIdleRemastered
             if (Directory.Exists(appFolder) == false)
                 Directory.CreateDirectory(appFolder);
 
+            string storageFile = Path.Combine(appFolder, "Settings.txt");
+            IsNewUser = !File.Exists(storageFile);
+
             var storage = new SettingsStorage();
-            storage.FileName = Path.Combine(appFolder, "Settings.txt");
+            storage.FileName = storageFile;
             storage.Init();
 
             CookieClient.Storage = storage;
@@ -79,6 +82,8 @@ namespace CardIdleRemastered
         {
             get { return Current as App; }
         }
+
+        public bool IsNewUser { get; set; }
 
         private static string _appSystemName;
 

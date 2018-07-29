@@ -38,14 +38,16 @@
 
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="{x:Static res:Resources.Game}"
+                                        SortMemberPath="Title"
+                                        CanUserResize="False"
                     CellTemplate="{StaticResource GameImgCell}"
                     Width="Auto" MinWidth="230"/>
 
-                <DataGridTextColumn
-                    Header="$" Binding="{Binding Path=CardPrice, StringFormat='\{0:0.00}'}"
-                    IsReadOnly="True"
-                    Width="40"
-                    ElementStyle="{StaticResource DataGridText}"/>
+                <DataGridTemplateColumn 
+                    Header="$"
+                    SortMemberPath="BadgePrice"
+                    CellTemplate="{StaticResource PriceCell}"
+                    Width="55"/>
 
                 <DataGridTemplateColumn Header="{x:Static res:Resources.Levels}" Width="*">
                     <DataGridTemplateColumn.CellTemplate>

@@ -71,6 +71,7 @@ namespace CardIdleRemastered
             showcase.IsCompleted = badge.UnlockedBadge != null;
             showcase.CanCraft = badge.CanCraft;
             showcase.CardPrice = badge.CardPrice;
+            showcase.BadgePrice = badge.BadgePrice;
             foreach (var level in showcase.CommonBadges)
                 level.IsCompleted = level.Name == badge.UnlockedBadge;
         }

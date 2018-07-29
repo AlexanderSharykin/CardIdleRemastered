@@ -5,7 +5,8 @@ namespace CardIdleRemastered
     public abstract class BadgeIdentity : ObservableModel
     {
         private bool _canCraft;
-        double? _cardPrice;
+        private double? _badgePrice;
+        private double? _cardPrice;
 
         protected BadgeIdentity()
         {
@@ -25,6 +26,16 @@ namespace CardIdleRemastered
         /// Name of a completed badge (if any)
         /// </summary>
         public string UnlockedBadge { get; set; }
+
+        public double? BadgePrice
+        {
+            get { return _badgePrice; }
+            set
+            {
+                _badgePrice = value;
+                OnPropertyChanged();
+            }
+        }
 
         public double? CardPrice
         {

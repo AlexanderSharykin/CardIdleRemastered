@@ -6,8 +6,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -49,9 +47,6 @@ namespace CardIdleRemastered
         private int _totalCards;
         private int _totalGames;
 
-        private string _storePageUrl;
-        private BadgeModel _selectedGame;
-
         private string _gameTitle;
         private readonly ICollectionView _badges;
 
@@ -64,6 +59,10 @@ namespace CardIdleRemastered
         private ReleaseInfo _newestRelease;
         private bool _canUpdateApp;
 
+        private IDictionary<string, GameIdentity> _steamApps = new Dictionary<string, GameIdentity>();
+        private string _gameSearch;
+        private IList<GameIdentity> _gameSearchResults;
+
         #endregion
 
         public AccountModel()
@@ -75,7 +74,7 @@ namespace CardIdleRemastered
             _updater.BadgeListSync += SyncShowcases;
 
             AllBadges = new ObservableCollection<BadgeModel>();
-            Games = new ObservableCollection<BadgeModel> { new BadgeModel("-1", "new", "0", "0") };
+            Games = new ObservableCollection<BadgeModel>();
             AllShowcases = new ObservableCollection<BadgeShowcase>();
 
             #region Commands
@@ -98,7 +97,7 @@ namespace CardIdleRemastered
 
             IdleCmd = new BaseCommand(Idle, CanIdle);
 
-            AddGameCmd = new BaseCommand(o => AddGame());
+            AddGameCmd = new BaseCommand(AddGame);
             RemoveGameCmd = new BaseCommand(RemoveGame);
 
             BookmarkShowcaseCmd = new BaseCommand(BookmarkShowcase);
@@ -388,7 +387,6 @@ namespace CardIdleRemastered
             CanUpdateApp = NewestRelease.IsOlderThan(version);
         }
 
-
         public CardIdleProfileInfo CardIdleProfile
         {
             get { return _cardIdleProfile; }
@@ -508,12 +506,16 @@ namespace CardIdleRemastered
             if (IsAuthorized)
                 await InitProfile();
 
+            _steamApps = await SteamParser.GetSteamApps();
             // reload games list
             var games = Storage.Games.Cast<string>().ToList();
             int idx = 0;
             foreach (var id in games)
             {
-                var game = await new SteamParser().GetGameInfo(id);
+                GameIdentity app;
+                _steamApps.TryGetValue(id, out app);
+
+                var game = new BadgeModel(id, app != null ? app.name : "");
                 game.PropertyChanged += BadgeIdleStatusChanged;
                 Games.Insert(idx, game);
                 idx++;
@@ -857,23 +859,49 @@ namespace CardIdleRemastered
 
         #region Time Idle
 
+        public string GameSearch
+        {
+            get { return _gameSearch; }
+            set
+            {
+                _gameSearch = value;
+                OnPropertyChanged();
+                GameSearchResults = string.IsNullOrWhiteSpace(_gameSearch) == false
+                    ? _steamApps.Values
+                        .Where(g => g.Title.IndexOf(_gameSearch, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                        .Take(16)
+                        .ToList()
+                    : null;
+            }
+        }
+
+        public IList<GameIdentity> GameSearchResults
+        {
+            get { return _gameSearchResults; }
+            private set
+            {
+                _gameSearchResults = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand AddGameCmd { get; private set; }
 
-        private void AddGame()
+        private void AddGame(object o)
         {
-            var w = new GameSelectionWindow();
-            w.DataContext = this;
-            var res = w.ShowDialog();
-            if (res == true && SelectedGame != null)
-            {
-                if (Games.Any(g => g.AppId == SelectedGame.AppId))
-                    return;
-                Storage.Games.Add(SelectedGame.AppId);
-                Storage.Save();
-                SelectedGame.PropertyChanged += BadgeIdleStatusChanged;
-                Games.Insert(Games.Count - 1, SelectedGame);
-            }
-            StorePageUrl = String.Empty;
+            var selectedGame = o as GameIdentity;
+
+            if (selectedGame == null)
+                return;
+
+            if (Games.Any(g => g.AppId == selectedGame.appid))
+                return;
+            Storage.Games.Add(selectedGame.appid);
+            Storage.Save();
+            var game = new BadgeModel(selectedGame.appid, selectedGame.name);
+            game.PropertyChanged += BadgeIdleStatusChanged;
+            Games.Add(game);
+            GameSearch = string.Empty;
         }
 
 
@@ -891,46 +919,6 @@ namespace CardIdleRemastered
             Games.Remove(game);
         }
 
-
-        public string StorePageUrl
-        {
-            get { return _storePageUrl; }
-            set
-            {
-                _storePageUrl = value;
-
-                int id;
-                if (int.TryParse(_storePageUrl, out id) == false)
-                {
-                    var match = Regex.Match(_storePageUrl, @"store\.steampowered\.com/app/(\d+)");
-                    if (match.Success)
-                    {
-                        var stringId = match.Groups[1].Value;
-                        id = int.Parse(stringId);
-                    }
-                }
-
-                if (id > 0)
-                    SelectGame(id);
-                else
-                    SelectedGame = null;
-            }
-        }
-
-        private async void SelectGame(int id)
-        {
-            SelectedGame = await new SteamParser().GetGameInfo(id);
-        }
-
-        public BadgeModel SelectedGame
-        {
-            get { return _selectedGame; }
-            private set
-            {
-                _selectedGame = value;
-                OnPropertyChanged();
-            }
-        }
         #endregion
 
         #region Blacklist

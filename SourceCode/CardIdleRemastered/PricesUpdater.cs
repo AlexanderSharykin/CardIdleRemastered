@@ -31,7 +31,7 @@ namespace CardIdleRemastered
         {
             try
             {
-                string values = await new SteamParser().DownloadString("http://api.steamcardexchange.net/GetBadgePrices.json");
+                string values = await SteamParser.DownloadString("http://api.steamcardexchange.net/GetBadgePrices.json");
                 Storage.WriteContent(values);
                 _prices = null;
             }

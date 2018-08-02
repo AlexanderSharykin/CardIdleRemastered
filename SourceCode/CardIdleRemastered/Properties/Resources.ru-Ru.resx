@@ -126,9 +126,6 @@
   <data name="AllowSync" xml:space="preserve">
     <value>Разрешить загрузку</value>
   </data>
-  <data name="Apply" xml:space="preserve">
-    <value>Применить</value>
-  </data>
   <data name="BadgeProgress" xml:space="preserve">
     <value>Прогресс</value>
   </data>
@@ -152,9 +149,6 @@
   </data>
   <data name="Bookmark" xml:space="preserve">
     <value>В закладки</value>
-  </data>
-  <data name="Cancel" xml:space="preserve">
-    <value>Отменить</value>
   </data>
   <data name="Cards" xml:space="preserve">
     <value>Карточки</value>
@@ -239,12 +233,6 @@
   </data>
   <data name="Game" xml:space="preserve">
     <value>Игра</value>
-  </data>
-  <data name="GameSelectionLabel" xml:space="preserve">
-    <value>Введите URL страницы игры в Стиме или ID игры</value>
-  </data>
-  <data name="GameSelectionTitle" xml:space="preserve">
-    <value>Выберите игру</value>
   </data>
   <data name="GamesRunning" xml:space="preserve">
     <value>Игр запущено: {0}</value>

@@ -88,15 +88,6 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Apply.
-        /// </summary>
-        public static string Apply {
-            get {
-                return ResourceManager.GetString("Apply", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Avatar {
@@ -175,15 +166,6 @@ namespace CardIdleRemastered.Properties {
         public static string Bookmark {
             get {
                 return ResourceManager.GetString("Bookmark", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cancel.
-        /// </summary>
-        public static string Cancel {
-            get {
-                return ResourceManager.GetString("Cancel", resourceCulture);
             }
         }
         
@@ -409,24 +391,6 @@ namespace CardIdleRemastered.Properties {
         public static string Game {
             get {
                 return ResourceManager.GetString("Game", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enter store page URL or game ID.
-        /// </summary>
-        public static string GameSelectionLabel {
-            get {
-                return ResourceManager.GetString("GameSelectionLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Select a game to idle.
-        /// </summary>
-        public static string GameSelectionTitle {
-            get {
-                return ResourceManager.GetString("GameSelectionTitle", resourceCulture);
             }
         }
         

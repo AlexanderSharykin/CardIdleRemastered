@@ -25,7 +25,9 @@ namespace CardIdleRemastered
     {
         Completed,
         Bookmarked,
-        Collected
+        Collected,
+        Marketable,
+        Owned
     }
 
     public enum IdleMode

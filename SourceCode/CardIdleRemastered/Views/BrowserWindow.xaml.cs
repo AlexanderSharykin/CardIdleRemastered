@@ -197,7 +197,7 @@ namespace CardIdleRemastered
                     if (App.CardIdle.IsNewUser)
                     {
                         App.CardIdle.IsNewUser = false;
-                        Title = "Steam Trading Cards FAQ";
+                        Title = Properties.Resources.TradingCardsFAQ;
                         wbAuth.Navigate(new Uri("https://steamcommunity.com/tradingcards/faq"));
                     }
                     else if (url.StartsWith(@"https://steamcommunity.com/id/"))

@@ -7,6 +7,7 @@ namespace CardIdleRemastered
         private bool _canCraft;
         private double? _badgePrice;
         private double? _cardPrice;
+        private string _title;
 
         protected BadgeIdentity()
         {
@@ -20,7 +21,15 @@ namespace CardIdleRemastered
 
         public string AppId { get; set; }
 
-        public string Title { get; set; }
+        public string Title
+        {
+            get { return _title; }
+            set
+            {
+                _title = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Name of a completed badge (if any)

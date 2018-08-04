@@ -316,6 +316,12 @@
   <data name="ShowcaseProperty_Completed" xml:space="preserve">
     <value>Completed</value>
   </data>
+  <data name="ShowcaseProperty_Marketable" xml:space="preserve">
+    <value>Marketable</value>
+  </data>
+  <data name="ShowcaseProperty_Owned" xml:space="preserve">
+    <value>Owned</value>
+  </data>
   <data name="Showcases" xml:space="preserve">
     <value>Showcases</value>
   </data>
@@ -357,5 +363,8 @@
   </data>
   <data name="TotalGames" xml:space="preserve">
     <value>Games</value>
+  </data>
+  <data name="TradingCardsFAQ" xml:space="preserve">
+    <value>Steam Trading Cards FAQ</value>
   </data>
 </root>

@@ -8,6 +8,8 @@ namespace CardIdleRemastered
     {
         private bool _isCompleted;
         private bool _isBookmarked;
+        private bool _isMarketable = true;
+        private bool _isOwned;
 
         public BadgeShowcase(string appId, string title)
             : base(appId, title)
@@ -60,6 +62,30 @@ namespace CardIdleRemastered
             }
         }
 
+        public bool IsMarketable
+        {
+            get { return _isMarketable; }
+            set
+            {
+                if (_isMarketable == value)
+                    return;
+                _isMarketable = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsOwned
+        {
+            get { return _isOwned; }
+            set
+            {
+                if (_isOwned == value)
+                    return;
+                _isOwned = value;
+                OnPropertyChanged();
+            }
+        }
+
         public override bool CheckProperty(Enum property)
         {
             if (Equals(property, ShowcaseProperty.Completed))
@@ -70,6 +96,12 @@ namespace CardIdleRemastered
 
             if (Equals(property, ShowcaseProperty.Collected))
                 return CanCraft;
+
+            if (Equals(property, ShowcaseProperty.Marketable))
+                return IsMarketable;
+
+            if (Equals(property, ShowcaseProperty.Owned))
+                return IsOwned;
 
             return false;
         }

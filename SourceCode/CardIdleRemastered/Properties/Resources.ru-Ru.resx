@@ -321,6 +321,12 @@
   <data name="ShowcaseProperty_Completed" xml:space="preserve">
     <value>Собранные</value>
   </data>
+  <data name="ShowcaseProperty_Marketable" xml:space="preserve">
+    <value>Можно продать</value>
+  </data>
+  <data name="ShowcaseProperty_Owned" xml:space="preserve">
+    <value>Есть на аккаунте</value>
+  </data>
   <data name="Showcases" xml:space="preserve">
     <value>Витрины</value>
   </data>
@@ -362,5 +368,8 @@
   </data>
   <data name="TotalGames" xml:space="preserve">
     <value>Игр осталось</value>
+  </data>
+  <data name="TradingCardsFAQ" xml:space="preserve">
+    <value>Коллекционные карточки Steam. Частые вопросы</value>
   </data>
 </root>

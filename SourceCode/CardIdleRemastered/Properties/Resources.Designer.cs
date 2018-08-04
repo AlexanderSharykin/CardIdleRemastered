@@ -656,6 +656,24 @@ namespace CardIdleRemastered.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Marketable.
+        /// </summary>
+        public static string ShowcaseProperty_Marketable {
+            get {
+                return ResourceManager.GetString("ShowcaseProperty_Marketable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Owned.
+        /// </summary>
+        public static string ShowcaseProperty_Owned {
+            get {
+                return ResourceManager.GetString("ShowcaseProperty_Owned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Showcases.
         /// </summary>
         public static string Showcases {
@@ -778,6 +796,15 @@ namespace CardIdleRemastered.Properties {
         public static string TotalGames {
             get {
                 return ResourceManager.GetString("TotalGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Steam Trading Cards FAQ.
+        /// </summary>
+        public static string TradingCardsFAQ {
+            get {
+                return ResourceManager.GetString("TradingCardsFAQ", resourceCulture);
             }
         }
     }

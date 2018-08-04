@@ -27,9 +27,7 @@
 
         <TextBlock Foreground="White" Margin="5">
             <Run Text="{x:Static res:Resources.ToolSearch}"/>
-            <Run Text="[ AppId."/>
-            <Run Text="{x:Static res:Resources.Game}"/>
-            <Run Text="]"/>
+            <Run Text="{Binding Source={x:Static res:Resources.Game}, Mode=OneWay, StringFormat='\[AppId. \{0}]'}"/>
         </TextBlock>
 
         <StackPanel Grid.Row="1" Margin="5">

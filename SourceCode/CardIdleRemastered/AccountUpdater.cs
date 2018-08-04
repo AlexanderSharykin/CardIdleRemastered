@@ -155,7 +155,7 @@ namespace CardIdleRemastered
                 var stock = _pricesUpdater.GetStockModel(badge.AppId);
                 if (stock != null)
                 {
-                    badge.CardPrice = Math.Round(stock.Normal / stock.Count, 2);
+                    badge.CardPrice = stock.CardValue;
                     badge.BadgePrice = stock.Normal;
                 }
             }

@@ -1,4 +1,6 @@
-﻿namespace CardIdleRemastered.Badges
+﻿using System;
+
+namespace CardIdleRemastered.Badges
 {
     public class BadgeStockModel
     {
@@ -9,6 +11,11 @@
         public int Count { get; set; }
 
         public double Normal { get; set; }
+
+        public double CardValue
+        {
+            get { return Math.Round(Normal / Count, 2); }
+        }
 
         public double Foil { get; set; }
 

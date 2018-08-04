@@ -48,11 +48,11 @@ namespace CardIdleRemastered
         private int _totalGames;
 
         private string _gameTitle;
-        private readonly ICollectionView _badges;
+        private ICollectionView _badges;
 
         private bool _allowShowcaseSync;
         private string _showcaseTitle;
-        private readonly ICollectionView _showcases;
+        private ICollectionView _showcases;
 
         private CardIdleProfileInfo _cardIdleProfile;
 
@@ -70,12 +70,11 @@ namespace CardIdleRemastered
             _pricesUpdater = new PricesUpdater();
             _updater = new AccountUpdater(this, _pricesUpdater);
             _idler = new IdleManager();
-            _showcaseManager = new ShowcaseManager();
+            _showcaseManager = new ShowcaseManager(_pricesUpdater);
             _updater.BadgeListSync += SyncShowcases;
 
             AllBadges = new ObservableCollection<BadgeModel>();
             Games = new ObservableCollection<BadgeModel>();
-            AllShowcases = new ObservableCollection<BadgeShowcase>();
 
             #region Commands
             LoginCmd = new BaseCommand(_ => Login());
@@ -105,21 +104,7 @@ namespace CardIdleRemastered
             ShowSettingsFileCmd = new BaseCommand(ShowSettingsFile);
             #endregion
 
-            _badges = CollectionViewSource.GetDefaultView(AllBadges);
-            var quick = (ICollectionViewLiveShaping)_badges;
-            quick.LiveFilteringProperties.Add("IsBlacklisted");
-            quick.LiveFilteringProperties.Add("HasTrial");
-            quick.LiveFilteringProperties.Add("CardIdleActive");
-            quick.LiveFilteringProperties.Add("IsInQueue");
-            quick.IsLiveFiltering = true;
-
             BadgePropertiesFilters = FilterStatesCollection.Create<BadgeProperty>().SetNotifier(SetFilter);
-
-            _showcases = CollectionViewSource.GetDefaultView(AllShowcases);
-            quick = (ICollectionViewLiveShaping)_showcases;
-            quick.LiveFilteringProperties.Add("IsCompleted");
-            quick.LiveFilteringProperties.Add("IsBookmarked");
-            quick.IsLiveFiltering = true;
 
             ShowcasePropertiesFilters = FilterStatesCollection.Create<ShowcaseProperty>().SetNotifier(SetShowcaseFilter);
         }
@@ -283,7 +268,23 @@ namespace CardIdleRemastered
 
         #endregion
 
-        public ObservableCollection<BadgeModel> AllBadges { get; private set; }
+        private ObservableCollection<BadgeModel> _allBadges;
+        public ObservableCollection<BadgeModel> AllBadges
+        {
+            get { return _allBadges; }
+            private set
+            {
+                _allBadges = value;
+
+                _badges = CollectionViewSource.GetDefaultView(_allBadges);
+                var quick = (ICollectionViewLiveShaping)_badges;
+                quick.LiveFilteringProperties.Add("IsBlacklisted");
+                quick.LiveFilteringProperties.Add("HasTrial");
+                quick.LiveFilteringProperties.Add("CardIdleActive");
+                quick.LiveFilteringProperties.Add("IsInQueue");
+                quick.IsLiveFiltering = true;
+            }
+        }
 
         public ObservableCollection<BadgeModel> IdleQueueBadges { get { return _idler.IdleQueueBadges; } }
 
@@ -473,7 +474,6 @@ namespace CardIdleRemastered
 
             CustomBackgroundUrl = Storage.CustomBackgroundUrl;
             BadgePropertiesFilters.Deserialize<BadgeProperty>(Storage.BadgeFilter);
-            ShowcasePropertiesFilters.Deserialize<ShowcaseProperty>(Storage.ShowcaseFilter);
 
             Mode = (IdleMode)Storage.IdleMode;
 
@@ -493,6 +493,10 @@ namespace CardIdleRemastered
             ShowBackground = Storage.ShowBackground;
 
             IdleQueueBadges.CollectionChanged += IdleQueueItemsChanged;
+
+            AllShowcases = await _showcaseManager.GetShowcases();
+
+            ShowcasePropertiesFilters.Deserialize<ShowcaseProperty>(Storage.ShowcaseFilter);
 
             try
             {
@@ -611,6 +615,13 @@ namespace CardIdleRemastered
             IdleQueueBadges.Clear();
 
             Storage.Save();
+
+            foreach (var showcase in AllShowcases)
+            {
+                showcase.IsCompleted = false;
+                showcase.CanCraft = false;
+                showcase.IsOwned = false;
+            }
             Logger.Info("See you later");
         }
         #endregion
@@ -1120,7 +1131,25 @@ namespace CardIdleRemastered
             set { _showcaseManager.Storage = value; }
         }
 
-        public ObservableCollection<BadgeShowcase> AllShowcases { get; private set; }
+        private ObservableCollection<BadgeShowcase> _allShowcases;
+
+        public ObservableCollection<BadgeShowcase> AllShowcases
+        {
+            get { return _allShowcases; }
+            private set
+            {
+                _allShowcases = value;
+
+                _showcases = CollectionViewSource.GetDefaultView(_allShowcases);
+                var quick = (ICollectionViewLiveShaping)_showcases;
+                quick.LiveFilteringProperties.Add("IsCompleted");
+                quick.LiveFilteringProperties.Add("IsBookmarked");
+                quick.LiveFilteringProperties.Add("IsMarketable");
+                quick.LiveFilteringProperties.Add("IsOwned");
+                quick.IsLiveFiltering = true;
+                OnPropertyChanged();
+            }
+        }
 
         public bool AllowShowcaseSync
         {
@@ -1149,7 +1178,7 @@ namespace CardIdleRemastered
 
             try
             {
-                await _showcaseManager.LoadShowcases(_updater.CompleBadgeList, AllShowcases);
+                await _showcaseManager.LoadShowcases(_updater.CompleBadgeList);
 
                 // restore bookmarks
                 var bookmarks = Storage.ShowcaseBookmarks.Cast<string>()

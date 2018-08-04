@@ -1,25 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using CardIdleRemastered.Badges;
 
 namespace CardIdleRemastered
 {
     public class ShowcaseManager
     {
+        private readonly PricesUpdater _pricesUpdater;
         private Dictionary<string, BadgeShowcase> _cache;
+        private ObservableCollection<BadgeShowcase> _showcases;
+
+        public ShowcaseManager(PricesUpdater pricesUpdater)
+        {
+            _pricesUpdater = pricesUpdater;
+        }
+
+        public async Task<ObservableCollection<BadgeShowcase>> GetShowcases()
+        {
+            if (_showcases == null)
+            {
+                await ReadLocalStorage();
+                _showcases = new ObservableCollection<BadgeShowcase>(_cache.Values.OrderBy(x => x.Title));
+            }
+            return _showcases;
+        }
 
         public FileStorage Storage { get; set; }
 
-        public async Task LoadShowcases(IEnumerable<BadgeModel> badges, ICollection<BadgeShowcase> showcases)
+        public async Task LoadShowcases(IEnumerable<BadgeModel> badges)
         {
             var args = new Dictionary<string, string>();
             BadgeModel badge = null;
             int unknownBadges = 0;
 
-            ReadLocalStorage();
+            await ReadLocalStorage();
 
             try
             {
@@ -27,7 +46,9 @@ namespace CardIdleRemastered
                 {
                     badge = b;
 
-                    BadgeShowcase showcase = showcases.FirstOrDefault(s => s.AppId == b.AppId);
+                    BadgeShowcase showcase;
+                    _cache.TryGetValue(b.AppId, out showcase);
+
                     if (showcase != null)
                     {
                         UpdateCompletion(showcase, badge);
@@ -42,10 +63,9 @@ namespace CardIdleRemastered
                         _cache.Add(badge.AppId, showcase);
                     }
 
-                    showcase.Title = badge.Title;
                     UpdateCompletion(showcase, badge);
 
-                    showcases.Add(showcase);
+                    _showcases.Add(showcase);
 
                     if (unknownBadge)
                     {
@@ -67,16 +87,16 @@ namespace CardIdleRemastered
 
         private static void UpdateCompletion(BadgeShowcase showcase, BadgeModel badge)
         {
+            showcase.Title = badge.Title;
             showcase.UnlockedBadge = badge.UnlockedBadge;
             showcase.IsCompleted = badge.UnlockedBadge != null;
             showcase.CanCraft = badge.CanCraft;
-            showcase.CardPrice = badge.CardPrice;
-            showcase.BadgePrice = badge.BadgePrice;
+            showcase.IsOwned = true;
             foreach (var level in showcase.CommonBadges)
                 level.IsCompleted = level.Name == badge.UnlockedBadge;
         }
 
-        private void ReadLocalStorage()
+        private async Task ReadLocalStorage()
         {
             if (_cache != null)
                 return;
@@ -87,6 +107,8 @@ namespace CardIdleRemastered
             if (String.IsNullOrWhiteSpace(db))
                 return;
 
+            var apps = await SteamParser.GetSteamApps();
+
             try
             {
                 var xml = XDocument.Parse(db).Root;
@@ -95,8 +117,24 @@ namespace CardIdleRemastered
                     foreach (var xeBadge in xml.Elements("badge"))
                     {
                         var appId = (string)xeBadge.Attribute("app_id");
+                        string title = appId;
 
-                        var showcase = new BadgeShowcase(appId, appId);
+                        GameIdentity app;
+                        bool marketable = apps.TryGetValue(appId, out app);
+                        if (marketable)
+                        {
+                            title = app.name;
+                        }
+
+                        var showcase = new BadgeShowcase(appId, title);
+                        showcase.IsMarketable = marketable;
+
+                        BadgeStockModel stock;
+                        if (_pricesUpdater.Prices.TryGetValue(appId, out stock))
+                        {
+                            showcase.CardPrice = stock.CardValue;
+                            showcase.BadgePrice = stock.Normal;
+                        }
 
                         foreach (var xeLevel in xeBadge.Elements("level"))
                             showcase.CommonBadges.Add(BadgeFromXml(xeLevel));

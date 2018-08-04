@@ -3,6 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"    
     xmlns:views="clr-namespace:CardIdleRemastered.Views">
 
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
     <Style TargetType="{x:Type views:SearchPopup}">
         <Setter Property="Template">
             <Setter.Value>
@@ -11,8 +13,19 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
                         <StackPanel Orientation="Horizontal">
-                            <ToggleButton Content="{TemplateBinding Content}" Name="SearchButton" 
-                                          HorizontalAlignment="Left" Padding="5,0"/>
+                            <ToggleButton Name="SearchButton" 
+                                          HorizontalAlignment="Left" Padding="5,0">
+                                <ToggleButton.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ContentPresenter Content="{TemplateBinding Content}"/>
+                                        <TextBlock Text="&#9737;" 
+                                                   FontSize="20"
+                                                   Margin="5,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding Path=SearchOptions.HasActiveFilters, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    </StackPanel>
+                                </ToggleButton.Content>
+                            </ToggleButton>
 
                             <!--filter options-->
                             <Popup IsOpen="{Binding Path=IsChecked, ElementName=SearchButton}" 
@@ -25,7 +38,7 @@
                                             Background="White"
                                             Grid.IsSharedSizeScope="True"
                                             ItemsSource="{TemplateBinding SearchOptions}"
-                                        ItemTemplate="{TemplateBinding SearchOptionTemplate}">
+                                            ItemTemplate="{TemplateBinding SearchOptionTemplate}">
                                     </ItemsControl>
                                 </Border>
                             </Popup>

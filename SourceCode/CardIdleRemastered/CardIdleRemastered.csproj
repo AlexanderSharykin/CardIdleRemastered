@@ -60,7 +60,7 @@
       <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Steamworks.NET, Version=5.0.0.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Steamworks.NET, Version=7.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\Steamworks.NET.dll</HintPath>
     </Reference>
@@ -91,10 +91,14 @@
     </ApplicationDefinition>
     <Compile Include="AccountModel.cs" />
     <Compile Include="AccountUpdater.cs" />
+    <Compile Include="AppConstants.cs" />
     <Compile Include="Badges\BadgeStockModel.cs" />
+    <Compile Include="Badges\GameIdentity.cs" />
     <Compile Include="Converters\BooleanToLengthConverter.cs" />
+    <Compile Include="Converters\EnumValuesConverter.cs" />
     <Compile Include="Info\ProfileInfo.cs" />
     <Compile Include="PricesUpdater.cs" />
+    <Compile Include="XmlSettingsValue.cs" />
     <Compile Include="ViewModels\PaletteItemsCollection.cs" />
     <Compile Include="ViewModels\PaletteItemVm.cs" />
     <Compile Include="Badges\BadgeIdentity.cs" />
@@ -127,9 +131,6 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Views\CardIdlePage.xaml.cs">
       <DependentUpon>CardIdlePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\GameSelectionWindow.xaml.cs">
-      <DependentUpon>GameSelectionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="IdleManager.cs" />
     <Compile Include="IdleProcess.cs" />
@@ -188,10 +189,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\CardIdlePage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\GameSelectionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -5,6 +5,7 @@
                     xmlns:commands="clr-namespace:CardIdleRemastered.Commands">
 
     <cvt:EnumLocalizationConverter x:Key="EnumTranslator" />
+    <cvt:EnumValuesConverter x:Key="EnumValues"/>
     <cvt:TranslationConverter x:Key="strTranslator" />
     <cvt:BooleanToLengthConverter x:Key="LengthConverter" />
     <commands:NavigationCommand x:Key="Redirect"/>
@@ -18,12 +19,11 @@
 
     <Style TargetType="{x:Type TabItem}">
         <Setter Property="FontSize" Value="18"/>
-        <Setter Property="ToolTip" Value="{Binding Path=Header, RelativeSource={RelativeSource Self}}"/>
         <Setter Property="Tag" Value="@"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Grid>
+                    <Grid ToolTip="{TemplateBinding Header}">
                         <Border Name="Border" Margin="5" Padding="5"                                    
                                     Background="#B0FFFFFF"                   
                                     BorderBrush="#B0FFFFFF" BorderThickness="2">
@@ -139,6 +139,18 @@
         </Grid>
     </DataTemplate>
 
+    <DataTemplate x:Key="PriceCell" DataType="{x:Type local:BadgeIdentity}">
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="{Binding Path=BadgePrice, StringFormat='\{0:0.00}'}"
+                       Foreground="Black"
+                       TextAlignment="Center" Margin="3"/>
+            <TextBlock Text="{Binding Path=CardPrice, StringFormat='\{0:0.00}'}"
+                       Foreground="Black"
+                       TextAlignment="Center" Margin="3"/>
+        </StackPanel>
+    </DataTemplate>
+
+
     <DataTemplate x:Key="BadgeImageTile" DataType="{x:Type local:BadgeLevelData}">
         <Grid Margin="2,2,2,0">
             <Grid.Style>
@@ -191,8 +203,8 @@
             <TextBlock Text="{Binding Path=Key, Converter={StaticResource EnumTranslator}}" Margin="5"/>
 
             <ListBox Grid.Column="1" BorderThickness="0"
-                        ItemsSource="{Binding Path=DataContext.FilterStates, ElementName=LayoutRoot}"
-                        SelectedItem="{Binding Path=Value, Converter={StaticResource EnumTranslator}}"
+                        ItemsSource="{Binding Source={x:Type local:FilterState}, Converter={StaticResource EnumValues}}"
+                        SelectedItem="{Binding Path=Value}"
                         ItemContainerStyle="{StaticResource ItemNoHighlight}">
 
                 <ListBox.ItemsPanel>
@@ -206,7 +218,7 @@
                         <Grid>
                             <RadioButton IsChecked="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, TargetNullValue=false}"
                                             Margin="5,0" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                            Content="{Binding .}"/>
+                                            Content="{Binding Converter={StaticResource EnumTranslator}}"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

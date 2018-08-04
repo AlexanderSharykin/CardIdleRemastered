@@ -18,106 +18,102 @@
     </UserControl.Resources>
 
     <Grid Name="LayoutRoot">
-        <Grid.Resources>
-            <Style x:Key="TileBorder" TargetType="Border">
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="BorderBrush" Value="MediumPurple"/>
-                <Setter Property="Background" Value="#B0FFFFFF"/>
-                <Setter Property="Opacity" Value="1"/>
-                <Setter Property="Padding" Value="10"/>
-            </Style>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-            <DataTemplate x:Key="GameTile" DataType="{x:Type local:BadgeModel}">
-                <Border  Style="{StaticResource TileBorder}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+        <TextBlock Foreground="White" Margin="5">
+            <Run Text="{x:Static res:Resources.ToolSearch}"/>
+            <Run Text="{Binding Source={x:Static res:Resources.Game}, Mode=OneWay, StringFormat='\[AppId. \{0}]'}"/>
+        </TextBlock>
 
-                        <Image Source="{Binding Path=ImageUrl}"
-                               ToolTip="{Binding Path=Title}"
-                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                               Width="180" Height="85"/>
+        <StackPanel Grid.Row="1" Margin="5">
+            <TextBox Name="txtSearch"
+                     Text="{Binding GameSearch, Delay=400, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <StackPanel Grid.Row="1" Orientation="Horizontal"
-                                    Margin="0,10"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center">
-                            <Button Command="{Binding Path=DataContext.StartBadgeIdleCmd, ElementName=LayoutRoot}"
-                                    CommandParameter="{Binding Path=.}"
-                                    Content="&#9655;"
-                                    ToolTip="{x:Static res:Resources.Start}"
-                                    Style="{StaticResource CmdButton}" />
+            <Popup PlacementTarget="{Binding ElementName=txtSearch}"
+                   Placement="Bottom"
+                   MaxWidth="{Binding ElementName=txtSearch, Path=ActualWidth}"
+                   IsOpen="{Binding ElementName=txtSearch, Path=IsKeyboardFocused, Mode=OneWay}"
+                   StaysOpen="{Binding ElementName=txtSearch, Path=IsKeyboardFocused, Mode=OneWay}">
 
-                            <Button Command="{Binding Path=DataContext.StopBadgeIdleCmd, ElementName=LayoutRoot}"
-                                    CommandParameter="{Binding Path=.}"
-                                    Content="&#10074;&#10074;"
-                                    ToolTip="{x:Static res:Resources.Stop}"
-                                    Style="{StaticResource CmdButton}" Margin="10,0"/>
+                <ItemsControl ItemsSource="{Binding Path=GameSearchResults}" Background="Gainsboro">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                            <Button Command="{Binding Path=DataContext.RemoveGameCmd, ElementName=LayoutRoot}"
-                                    CommandParameter="{Binding Path=.}"
-                                    Content="&#10761;"
-                                    ToolTip="{x:Static res:Resources.RemoveGame}"
-                                    Style="{StaticResource CmdButton}"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-            </DataTemplate>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:GameIdentity}">
+                            <Border BorderBrush="Black" BorderThickness="1" 
+                                    Background="LightSteelBlue" 
+                                    Cursor="Hand"
+                                    MaxWidth="280" Margin="5" Padding="5">
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                        Command="{Binding ElementName=txtSearch, Path=DataContext.AddGameCmd}"
+                                                  CommandParameter="{Binding}"/>
+                                </Border.InputBindings>
 
-            <DataTemplate x:Key="NewTile" DataType="{x:Type local:BadgeModel}">
+                                <TextBlock Text="{Binding Title}" TextWrapping="Wrap" TextDecorations="Underline">
 
-                <Border Style="{StaticResource TileBorder}">
-                    <Grid VerticalAlignment="Top"
-                          ToolTip="{x:Static res:Resources.AddGame}"
-                          Cursor="Hand"
-                          Width="180">
+                                </TextBlock>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Popup>
+        </StackPanel>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="85"/>
-                            <RowDefinition Height="52"/>
-                        </Grid.RowDefinitions>
-
-                        <Border Background="Gray"/>
-
-                        <TextBlock Text="+" FontSize="32" FontWeight="Bold" Foreground="White"
-                                   Grid.Row="0"  Margin="0"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Center"/>
-
-                        <Grid.InputBindings>
-                            <MouseBinding Gesture="LeftClick" Command="{Binding Path=DataContext.AddGameCmd, ElementName=LayoutRoot}"/>
-                        </Grid.InputBindings>
-                    </Grid>
-
-                </Border>
-            </DataTemplate>
-        </Grid.Resources>
-
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Grid.Row="3">
             <ItemsControl ItemsSource="{Binding Path=Games}"
                           VerticalAlignment="Top" HorizontalAlignment="Stretch">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Columns="3"/>
+                        <WrapPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:BadgeModel}">
-                        <ContentControl Content="{Binding}" Margin="5">
-                            <ContentControl.Style>
-                                <Style TargetType="ContentControl">
-                                    <Setter Property="ContentTemplate" Value="{StaticResource GameTile}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding AppId}" Value="-1">
-                                            <Setter Property="ContentTemplate" Value="{StaticResource NewTile}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ContentControl.Style>
-                        </ContentControl>
+                        <Border Background="Gainsboro" Margin="5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ContentControl Grid.Column="0" Content="{Binding}"
+                                            ContentTemplate="{StaticResource GameImgCell}"/>
+
+                                <Grid Grid.Column="1" Margin="5">
+                                    <StackPanel VerticalAlignment="Top">
+                                        <Button Command="{Binding Path=DataContext.StartBadgeIdleCmd, ElementName=LayoutRoot}"
+                                                CommandParameter="{Binding Path=.}"
+                                                Content="&#9655;"
+                                                ToolTip="{x:Static res:Resources.Start}"
+                                                Style="{StaticResource CmdButton}" />
+
+                                        <Button Command="{Binding Path=DataContext.StopBadgeIdleCmd, ElementName=LayoutRoot}"
+                                                CommandParameter="{Binding Path=.}"
+                                                Content="&#10074;&#10074;"
+                                                ToolTip="{x:Static res:Resources.Stop}"
+                                                Style="{StaticResource CmdButton}" 
+                                                Margin="0,5"/>
+                                    </StackPanel>
+
+                                    <Button VerticalAlignment="Bottom"
+                                            Command="{Binding Path=DataContext.RemoveGameCmd, ElementName=LayoutRoot}"
+                                            CommandParameter="{Binding Path=.}"
+                                            Content="&#10761;"
+                                            ToolTip="{x:Static res:Resources.RemoveGame}"
+                                            Style="{StaticResource CmdButton}"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

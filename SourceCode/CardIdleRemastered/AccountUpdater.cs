@@ -152,7 +152,12 @@ namespace CardIdleRemastered
                     if (b != null)
                         _account.RemoveBadge(b);
                 }
-                badge.CardPrice = _pricesUpdater.GetCardPrice(badge.AppId);
+                var stock = _pricesUpdater.GetStockModel(badge.AppId);
+                if (stock != null)
+                {
+                    badge.CardPrice = stock.CardValue;
+                    badge.BadgePrice = stock.Normal;
+                }
             }
 
             _account.UpdateTotalValues();

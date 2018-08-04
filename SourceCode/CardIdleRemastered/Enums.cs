@@ -1,8 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CardIdleRemastered
 {
@@ -26,7 +25,9 @@ namespace CardIdleRemastered
     {
         Completed,
         Bookmarked,
-        Collected
+        Collected,
+        Marketable,
+        Owned
     }
 
     public enum IdleMode

@@ -39,10 +39,10 @@
                     Header="{x:Static res:Resources.Cards}" Binding="{Binding Path=RemainingCard}"
                     IsReadOnly="True" CanUserSort="False"
                     Width="*" ElementStyle="{StaticResource DataGridText}"/>
-                <DataGridTextColumn
-                    Header="$" Binding="{Binding Path=CardPrice, StringFormat='\{0:0.00}'}"
-                    IsReadOnly="True" CanUserSort="False"
-                    Width="40" ElementStyle="{StaticResource DataGridText}"/>
+                <DataGridTemplateColumn 
+                    Header="$"
+                    CellTemplate="{StaticResource PriceCell}"
+                    Width="55"/>
                 <DataGridTemplateColumn Header="{x:Static res:Resources.Priority}" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -90,9 +90,24 @@
                 <ComboBox
                     MinWidth="100"
                     VerticalContentAlignment="Center"
-                    ItemsSource="{Binding Path=Idler.IdleModes}"
-                    SelectedItem="{Binding Path=Idler.Mode, Converter={StaticResource EnumTranslator}}" >
+                    ItemsSource="{Binding Source={x:Type local:IdleMode}, Converter={StaticResource EnumValues}}"
+                    SelectedItem="{Binding Path=Idler.Mode}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EnumTranslator}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
                 </ComboBox>
+
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=Idler.IsActive}" Value="True">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
             </StackPanel>
 
             <Button Content="{x:Static res:Resources.Start}"

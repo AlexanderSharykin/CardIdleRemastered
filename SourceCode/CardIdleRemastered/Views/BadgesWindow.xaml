@@ -40,8 +40,8 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Row="0" Grid.Column="1" 
-              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="-10,0,-10,-10"
-              Background="#324252">
+                  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="-10,0,-10,-10"
+                  Background="#324252">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="3*"/>
@@ -49,7 +49,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Border Margin="25" Name="AvatarBorder"
-                    HorizontalAlignment="Left" VerticalAlignment="Top">
+                        HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image Source="{Binding Path=AvatarUrl}" 
                        MinWidth="10" MinHeight="10" 
                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
@@ -68,7 +68,7 @@
                 </Border>
 
                 <Grid Grid.Row="0" Grid.Column="1" Margin="0,25,0,0" 
-                  HorizontalAlignment="Left">
+                        HorizontalAlignment="Left">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -79,12 +79,12 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Content="{Binding Path=UserName}"  
-                       VerticalAlignment="Top"
-                       FontSize="24" Foreground="White"/>
+                           VerticalAlignment="Top"
+                           FontSize="24" Foreground="White"/>
                     <StackPanel Grid.Row="0" Grid.Column="1">
                         <Label Content="{x:Static res:Resources.Login}"
-                        Background="Transparent" BorderThickness="0"
-                        VerticalAlignment="Top" Margin="5" Padding="5">
+                                Background="Transparent" BorderThickness="0"
+                                VerticalAlignment="Top" Margin="5" Padding="5">
                             <Label.Style>
                                 <Style TargetType="{x:Type Label}">
                                     <Setter Property="Foreground" Value="White"/>
@@ -104,8 +104,8 @@
                         </Label>
 
                         <Label Content="{x:Static res:Resources.Logout}"
-                        Background="Transparent" BorderThickness="0"
-                        VerticalAlignment="Top" Margin="5" Padding="5">
+                                Background="Transparent" BorderThickness="0"
+                                VerticalAlignment="Top" Margin="5" Padding="5">
                             <Label.Style>
                                 <Style TargetType="{x:Type Label}">
                                     <Setter Property="Foreground" Value="White"/>
@@ -126,7 +126,7 @@
                     </StackPanel>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
-                           Foreground="{Binding BorderBrush, ElementName=AvatarBorder}">
+                                Foreground="{Binding BorderBrush, ElementName=AvatarBorder}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Text" Value="{x:Static res:Resources.NotInGame}"/>
@@ -147,10 +147,10 @@
 
                 <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,25,15,0" HorizontalAlignment="Right">
                     <Label Content="{x:Static res:Resources.SteamLevel}" HorizontalAlignment="Center" 
-                       FontSize="24" Foreground="White"/>
+                            FontSize="24" Foreground="White"/>
                     <Border BorderBrush="{DynamicResource DynLevelBorder}" BorderThickness="2" CornerRadius="18" 
-                        HorizontalAlignment="Center"
-                        MinWidth="36" MinHeight="36">
+                            HorizontalAlignment="Center"
+                            MinWidth="36" MinHeight="36">
                         <Label Content="{Binding Path=Level}" HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontSize="14" Foreground="White"/>
                     </Border>
@@ -160,9 +160,9 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Margin="20"
-                        Background="Transparent"
-                        Visibility="{Binding Path=CanUpdateApp, Converter={StaticResource BoolToVisible}}"
-                        HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                            Background="Transparent"
+                            Visibility="{Binding Path=CanUpdateApp, Converter={StaticResource BoolToVisible}}"
+                            HorizontalAlignment="Center" VerticalAlignment="Bottom">
                     <StackPanel.InputBindings>
                         <MouseBinding Gesture="LeftClick" Command="{StaticResource ResourceKey=Redirect}" 
                                   CommandParameter="https://github.com/AlexanderSharykin/CardIdleRemastered/releases"/>
@@ -179,13 +179,13 @@
             </Grid>
 
             <TabControl Name="Tabs" Grid.Column="1" Grid.Row="1" Margin="-50,0,0,0"
-                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                    Background="Transparent" BorderThickness="0"
-                    TabStripPlacement="Left">
+                        VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                        Background="Transparent" BorderThickness="0"
+                        TabStripPlacement="Left">
 
                 <TabItem Header="{x:Static res:Resources.BadgesHeader}" Tag="&#x1F4B3;"
-                     Visibility="{Binding IsAuthorized, Converter={StaticResource BoolToVisible}}"
-                     IsSelected="{Binding IsAuthorized, Mode=OneWay}">
+                         Visibility="{Binding IsAuthorized, Converter={StaticResource BoolToVisible}}"
+                         IsSelected="{Binding IsAuthorized, Mode=OneWay}">
                     <TabItem.InputBindings>
                         <KeyBinding Key="F5" Command="{Binding Path=ForceSyncCmd}"/>
                     </TabItem.InputBindings>
@@ -194,12 +194,11 @@
                 </TabItem>
 
                 <TabItem Header="{x:Static res:Resources.QueueHeader}" Tag="&#x2630;"
-                     Visibility="{Binding IsAuthorized, Converter={StaticResource BoolToVisible}}">
+                         Visibility="{Binding IsAuthorized, Converter={StaticResource BoolToVisible}}">
                     <views:QueuePage/>
                 </TabItem>
 
-                <TabItem Header="{x:Static res:Resources.Showcases}" Tag="&#x1F4BB;"
-                     Visibility="{Binding IsAuthorized, Converter={StaticResource BoolToVisible}}">
+                <TabItem Header="{x:Static res:Resources.Showcases}" Tag="&#x1F4BB;">
                     <views:ShowcasesPage/>
                 </TabItem>
 
@@ -208,11 +207,18 @@
                 </TabItem>
 
                 <TabItem Header="{x:Static res:Resources.Settings}" Tag="&#x2699;">
-                    <views:SettingsPage/>
+                    <Grid>
+                        <views:SettingsPage/>
+                        <Button HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Style="{StaticResource CmdButton}"
+                                Command="{Binding ShowSettingsFileCmd}"
+                                ToolTip="{x:Static res:Resources.Settings}"
+                                Content="&#x2699;" Margin="8"/>
+                    </Grid>
                 </TabItem>
 
                 <TabItem Header="{x:Static res:Resources.AboutHeader}" Tag="&#x1f481;" 
-                     IsSelected="{Binding IsUnknown, Mode=OneWay}">
+                         IsSelected="{Binding IsUnknown, Mode=OneWay}">
                     <views:AboutPage/>
                 </TabItem>
 
@@ -222,8 +228,8 @@
             </TabControl>
 
             <StackPanel Grid.Row="2" Grid.Column="1"                     
-                    Visibility="{Binding IsAuthorized, Converter={StaticResource BoolToVisible}}"
-                    Orientation="Horizontal" HorizontalAlignment="Center" Margin="15,0">
+                        Visibility="{Binding IsAuthorized, Converter={StaticResource BoolToVisible}}"
+                        Orientation="Horizontal" HorizontalAlignment="Center" Margin="15,0">
                 <Label Content ="{x:Static res:Resources.NextSync}" Style="{StaticResource PropName}"/>
                 <TextBlock Text ="{Binding Path=SyncTime}" Style="{StaticResource PropValue}"/>
 

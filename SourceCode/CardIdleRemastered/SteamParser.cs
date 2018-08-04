@@ -7,18 +7,20 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
+using CardIdleRemastered.Badges;
 using HtmlAgilityPack;
 
 namespace CardIdleRemastered
 {
     public class SteamParser
     {
-        public async Task<string> DownloadString(string url)
+        public static async Task<string> DownloadString(string url)
         {
             return await new WebClient().DownloadStringTaskAsync(url);
         }
 
-        public async Task<string> DownloadStringWithAuth(string url)
+        public static async Task<string> DownloadStringWithAuth(string url)
         {
             return await new CookieClient().DownloadStringTaskAsync(url);
         }
@@ -33,24 +35,18 @@ namespace CardIdleRemastered
             return document.DocumentNode.SelectSingleNode("//div[@class=\"responsive_menu_user_area\"]") != null;
         }
 
-        public async Task<BadgeModel> GetGameInfo(int id)
+        private static Dictionary<string, GameIdentity> _appsCache;
+        public static async Task<IDictionary<string, GameIdentity>> GetSteamApps()
         {
-            return await GetGameInfo(id.ToString());
-        }
-
-        public async Task<BadgeModel> GetGameInfo(string id)
-        {
-            var game = new BadgeModel(id, "Title", "0", "0");
-
-            // getting game title from store page
-            var response = await DownloadString(game.StorePageUrl);
-            var document = new HtmlDocument();
-            document.LoadHtml(response);
-            var titleNode = document.DocumentNode.SelectSingleNode("//div[@class=\"apphub_AppName\"]");
-            if (titleNode != null)
-                game.Title = titleNode.InnerText;
-
-            return game;
+            if (_appsCache == null)
+            {
+                var response = await DownloadString("http://api.steampowered.com/ISteamApps/GetAppList/v2");
+                var js = new JavaScriptSerializer();
+                js.MaxJsonLength = Int32.MaxValue;
+                var appList = js.Deserialize<SteamAppList>(response);
+                _appsCache = appList.applist.apps.ToDictionary(a => a.appid);
+            }
+            return _appsCache;
         }
 
         #region Profiles

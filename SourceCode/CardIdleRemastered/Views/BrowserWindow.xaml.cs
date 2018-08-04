@@ -194,9 +194,13 @@ namespace CardIdleRemastered
                 // Save all of the data to the program settings file, and close this form
                 if (false == String.IsNullOrWhiteSpace(Storage.SteamLoginSecure))
                 {
-                    Storage.Save();
-                    if (url.StartsWith(@"http://steamcommunity.com/id/") ||
-                        url.StartsWith(@"https://steamcommunity.com/id/"))
+                    if (App.CardIdle.IsNewUser)
+                    {
+                        App.CardIdle.IsNewUser = false;
+                        Title = Properties.Resources.TradingCardsFAQ;
+                        wbAuth.Navigate(new Uri("https://steamcommunity.com/tradingcards/faq"));
+                    }
+                    else if (url.StartsWith(@"https://steamcommunity.com/id/"))
                         Close();
                 }
             }

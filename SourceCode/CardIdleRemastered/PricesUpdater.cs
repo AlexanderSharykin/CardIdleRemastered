@@ -13,7 +13,7 @@ namespace CardIdleRemastered
 
         public FileStorage Storage { get; set; }
 
-        private Dictionary<string, BadgeStockModel> Prices
+        public Dictionary<string, BadgeStockModel> Prices
         {
             get
             {
@@ -31,7 +31,7 @@ namespace CardIdleRemastered
         {
             try
             {
-                string values = await new SteamParser().DownloadString("http://api.steamcardexchange.net/GetBadgePrices.json");
+                string values = await SteamParser.DownloadString("http://api.steamcardexchange.net/GetBadgePrices.json");
                 Storage.WriteContent(values);
                 _prices = null;
             }
@@ -43,13 +43,11 @@ namespace CardIdleRemastered
             return true;
         }
 
-        public double? GetCardPrice(string appId)
+        public BadgeStockModel GetStockModel(string id)
         {
-            BadgeStockModel badge;
-            Prices.TryGetValue(appId, out badge);
-            if (badge != null)
-                return Math.Round(badge.Normal / badge.Count, 2);
-            return null;
+            BadgeStockModel b;
+            Prices.TryGetValue(id, out b);
+            return b;
         }
     }
 }

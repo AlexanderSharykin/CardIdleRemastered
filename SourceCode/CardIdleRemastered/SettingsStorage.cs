@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 
@@ -9,63 +10,90 @@ namespace CardIdleRemastered
 {
     public class SettingsStorage : FileStorage, ISettingsStorage
     {
-        public string SessionId { get; set; }
-        public string SteamLoginSecure { get; set; }
-        public string SteamProfileUrl { get; set; }
-        public string SteamParental { get; set; }
-        public string SteamRememberLogin { get; set; }
-        public string MachineAuth { get; set; }
+        #region Fields
 
-        public bool IgnoreClient { get; set; }
+        private readonly StringSettingsValue _sessionId = new StringSettingsValue { Key = "SessionId" };
+        private readonly StringSettingsValue _steamLoginSecure = new StringSettingsValue { Key = "SteamLoginSecure" };
+        private readonly StringSettingsValue _steamProfileUrl = new StringSettingsValue { Key = "SteamProfileUrl" };
+        private readonly StringSettingsValue _steamParental = new StringSettingsValue { Key = "SteamParental" };
+        private readonly StringSettingsValue _steamRememberLogin = new StringSettingsValue { Key = "SteamRememberLogin" };
+        private readonly StringSettingsValue _machineAuth = new StringSettingsValue { Key = "MachineAuth" };
 
-        public string SteamAvatarUrl { get; set; }
-        public string SteamBackgroundUrl { get; set; }
-        public string SteamUserName { get; set; }
-        public string SteamLevel { get; set; }
-        public string CustomBackgroundUrl { get; set; }
-        public string SteamBadgeUrl { get; set; }
-        public string SteamBadgeTitle { get; set; }
+        private readonly StringSettingsValue _steamAvatarUrl = new StringSettingsValue { Key = "SteamAvatarUrl" };
+        private readonly StringSettingsValue _steamBackgroundUrl = new StringSettingsValue { Key = "SteamBackgroundUrl" };
+        private readonly StringSettingsValue _steamUserName = new StringSettingsValue { Key = "SteamUserName" };
+        private readonly StringSettingsValue _steamLevel = new StringSettingsValue { Key = "SteamLevel" };
+        private readonly StringSettingsValue _customBackgroundUrl = new StringSettingsValue { Key = "CustomBackgroundUrl" };
+        private readonly StringSettingsValue _steamBadgeUrl = new StringSettingsValue { Key = "SteamBadgeUrl" };
+        private readonly StringSettingsValue _steamBadgeTitle = new StringSettingsValue { Key = "SteamBadgeTitle" };
 
-        public int IdleMode { get; set; }
-        public string BadgeFilter { get; set; }
-        public string ShowcaseFilter { get; set; }
-        public byte MaxIdleProcessCount { get; set; }
-        public byte PeriodicSwitchRepeatCount { get; set; }
-        public double TrialPeriod { get; set; }
-        public byte SwitchMinutes { get; set; }
-        public byte SwitchSeconds { get; set; }
+        private readonly StringSettingsValue _dimensions = new StringSettingsValue { Key = "Dimensions" };
+        private readonly StringSettingsValue _showcaseFilter = new StringSettingsValue { Key = "ShowcaseFilter" };
+        private readonly StringSettingsValue _badgeFilter = new StringSettingsValue { Key = "BadgeFilter" };
 
-        public bool AllowShowcaseSync { get; set; }
+        private readonly BoolSettingsValue _showBackground = new BoolSettingsValue { Key = "ShowBackground", DefaultValue = true };
+        private readonly BoolSettingsValue _showInTaskbar = new BoolSettingsValue { Key = "ShowInTaskbar", DefaultValue = true };
+        private readonly BoolSettingsValue _allowShowcaseSync = new BoolSettingsValue { Key = "AllowShowcaseSync", DefaultValue = true };
+        private readonly BoolSettingsValue _ignoreClient = new BoolSettingsValue { Key = "IgnoreClient" };
 
-        public bool ShowInTaskbar { get; set; }
-        public bool ShowBackground { get; set; }
+        private readonly ByteSettingsValue _maxIdleProcessCount = new ByteSettingsValue { Key = "MaxIdleProcessCount", Minimum = 1, DefaultValue = AppConstants.DefaultIdleInstanceCount };
+        private readonly ByteSettingsValue _periodicSwitchRepeatCount = new ByteSettingsValue { Key = "PeriodicSwitchRepeatCount", DefaultValue = 1, Minimum = 1 };
+        private readonly ByteSettingsValue _switchMinutes = new ByteSettingsValue { Key = "SwitchMinutes" };
+        private readonly ByteSettingsValue _switchSeconds = new ByteSettingsValue { Key = "SwitchSeconds", DefaultValue = AppConstants.DefaultSwitchSeconds };
 
-        public string Dimensions { get; set; }
+        private readonly IntSettingsValue _pricesCatalogDate = new IntSettingsValue { Key = "PricesCatalogDate" };
+        private readonly IntSettingsValue _idleMode = new IntSettingsValue { Key = "IdleMode" };
 
-        public int PricesCatalogDate { get; set; }
+        private readonly DoibleSettingsValue _trialPeriod = new DoibleSettingsValue { Key = "TrialPeriod", Minimum = 0.1, DefaultValue = AppConstants.DefaultTrialPeriod };
+        private readonly StringCollectionSettingsValue _appBrushes = new StringCollectionSettingsValue { Key = "AppBrushes" };
+        private readonly StringCollectionSettingsValue _games = new StringCollectionSettingsValue { Key = "Games" };
+        private readonly StringCollectionSettingsValue _showcaseBookmarks = new StringCollectionSettingsValue { Key = "ShowcaseBookmarks" };
+        private readonly StringCollectionSettingsValue _blacklist = new StringCollectionSettingsValue { Key = "Blacklist" };
+        private readonly StringCollectionSettingsValue _idleQueue = new StringCollectionSettingsValue { Key = "IdleQueue" };
 
-        public StringCollection IdleQueue { get; private set; }
+        #endregion
 
-        public StringCollection Blacklist { get; private set; }
-
-        public StringCollection ShowcaseBookmarks { get; private set; }
-
-        public StringCollection Games { get; private set; }
-
-        public StringCollection AppBrushes { get; private set; }
+        private List<IXmlSettings> _settings;
 
         public void Init()
         {
-            Blacklist = new StringCollection();
-            ShowcaseBookmarks = new StringCollection();
-            AppBrushes = new StringCollection();
-            IdleQueue = new StringCollection();
-            Games = new StringCollection();
-
-            ShowInTaskbar = true;
-            ShowBackground = true;
+            Type ts = typeof(IXmlSettings);
+            _settings = typeof(SettingsStorage).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                .Where(fi => ts.IsAssignableFrom(fi.FieldType))
+                .Select(fi => fi.GetValue(this))
+                .OfType<IXmlSettings>()
+                .ToList();
 
             ReadXml();
+
+            foreach (IXmlSettings xs in _settings)
+            {
+                xs.ValueChanged += (sender, args) => this.Save();
+            }
+        }
+
+        private void ReadXml()
+        {
+            var content = ReadContent();
+
+            XElement xml = null;
+            try
+            {
+                if (false == String.IsNullOrWhiteSpace(content))
+                    xml = XDocument.Parse(content).Root;
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex, "Settings storage");
+            }
+
+            foreach (var setting in _settings)
+            {
+                var xe = xml != null ? xml.Element(setting.Key) : null;
+                setting.FromXml(xe);
+            }
+
+            Logger.Info("Settings storage initialized");
         }
 
         public void Save()
@@ -73,135 +101,211 @@ namespace CardIdleRemastered
             WriteXml();
         }
 
-        private void ReadXml()
-        {
-            var content = ReadContent();
-            if (String.IsNullOrWhiteSpace(content))
-                return;
-
-            try
-            {
-                var xml = XDocument.Parse(content).Root;
-                if (xml != null)
-                {
-                    SessionId = (string)xml.Element("SessionId");
-                    SteamLoginSecure = (string)xml.Element("SteamLoginSecure");
-                    SteamProfileUrl = (string)xml.Element("SteamProfileUrl");
-                    SteamParental = (string)xml.Element("SteamParental");
-                    SteamRememberLogin = (string)xml.Element("SteamRememberLogin");
-                    MachineAuth = (string)xml.Element("MachineAuth");
-
-                    IgnoreClient = ReadBool(xml.Element("IgnoreClient"));
-
-                    SteamAvatarUrl = (string)xml.Element("SteamAvatarUrl");
-                    SteamBackgroundUrl = (string)xml.Element("SteamBackgroundUrl");
-                    SteamUserName = (string)xml.Element("SteamUserName");
-                    SteamLevel = (string)xml.Element("SteamLevel");
-                    CustomBackgroundUrl = (string)xml.Element("CustomBackgroundUrl");
-                    SteamBadgeTitle = (string)xml.Element("SteamBadgeTitle");
-                    SteamBadgeUrl = (string)xml.Element("SteamBadgeUrl");
-
-                    BadgeFilter = (string)xml.Element("BadgeFilter");
-                    ShowcaseFilter = (string)xml.Element("ShowcaseFilter");
-                    IdleMode = ReadInt(xml.Element("IdleMode"));
-                    MaxIdleProcessCount = ReadByte(xml.Element("MaxIdleProcessCount"));
-                    PeriodicSwitchRepeatCount = ReadByte(xml.Element("PeriodicSwitchRepeatCount"));
-                    TrialPeriod = ReadDouble(xml.Element("TrialPeriod"));
-                    SwitchMinutes = ReadByte(xml.Element("SwitchMinutes"));
-                    SwitchSeconds = ReadByte(xml.Element("SwitchSeconds"));
-
-                    AllowShowcaseSync = ReadBool(xml.Element("AllowShowcaseSync"));
-                    ShowInTaskbar = ReadBool(xml.Element("ShowInTaskbar"), true);
-                    ShowBackground = ReadBool(xml.Element("ShowBackground"), true);
-                    Dimensions = (string)xml.Element("Dimensions");
-                    PricesCatalogDate = ReadInt(xml.Element("PricesCatalogDate"));
-
-                    IdleQueue.AddRange(GetStringList(xml.Element("IdleQueue")));
-                    Blacklist.AddRange(GetStringList(xml.Element("Blacklist")));
-                    ShowcaseBookmarks.AddRange(GetStringList(xml.Element("ShowcaseBookmarks")));
-                    Games.AddRange(GetStringList(xml.Element("Games")));
-                    AppBrushes.AddRange(GetStringList(xml.Element("AppBrushes")));
-                }
-
-                Logger.Info("Settings storage initialized");
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception(ex, "Settings storage");
-            }
-        }
-
-        private double ReadDouble(XElement xe)
-        {
-            double? i = (double?)xe;
-            return i ?? 0;
-        }
-
-        private int ReadInt(XElement xe)
-        {
-            int? i = (int?)xe;
-            return i ?? 0;
-        }
-
-        private bool ReadBool(XElement xe, bool missingValue = false)
-        {
-            bool? b = (bool?)xe;
-            return b ?? missingValue;
-        }
-
-        private byte ReadByte(XElement xe)
-        {
-            int? i = (int?)xe;
-            if (i.HasValue)
-                return (byte)i.Value;
-            return 0;
-        }
-
-        private string[] GetStringList(XElement xe)
-        {
-            if (xe == null)
-                return new string[0];
-            return xe.Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-        }
-
         private void WriteXml()
         {
-            var xe = new XElement("Settings",
-                new XElement("SessionId", SessionId),
-                new XElement("SteamLoginSecure", SteamLoginSecure),
-                new XElement("SteamProfileUrl", SteamProfileUrl),
-                new XElement("SteamParental", SteamParental),
-                new XElement("SteamRememberLogin", SteamRememberLogin),
-                new XElement("MachineAuth", MachineAuth),
-                new XElement("IgnoreClient", IgnoreClient),
-                new XElement("SteamAvatarUrl", SteamAvatarUrl),
-                new XElement("SteamBackgroundUrl", SteamBackgroundUrl),
-                new XElement("SteamUserName", SteamUserName),
-                new XElement("SteamLevel", SteamLevel),
-                new XElement("CustomBackgroundUrl", CustomBackgroundUrl),
-                new XElement("SteamBadgeUrl", SteamBadgeUrl),
-                new XElement("SteamBadgeTitle", SteamBadgeTitle),
-                new XElement("BadgeFilter", BadgeFilter),
-                new XElement("ShowcaseFilter", ShowcaseFilter),
-                new XElement("IdleMode", IdleMode),
-                new XElement("MaxIdleProcessCount", MaxIdleProcessCount),
-                new XElement("PeriodicSwitchRepeatCount", PeriodicSwitchRepeatCount),
-                new XElement("TrialPeriod", TrialPeriod),
-                new XElement("SwitchMinutes", SwitchMinutes),
-                new XElement("SwitchSeconds", SwitchSeconds),
-                new XElement("AllowShowcaseSync", AllowShowcaseSync),
-                new XElement("ShowInTaskbar", ShowInTaskbar),
-                new XElement("ShowBackground", ShowBackground),
-                new XElement("Dimensions", Dimensions),
-                new XElement("PricesCatalogDate", PricesCatalogDate),
-                new XElement("IdleQueue", String.Join(",", IdleQueue.Cast<string>())),
-                new XElement("Blacklist", String.Join(",", Blacklist.Cast<string>())),
-                new XElement("ShowcaseBookmarks", String.Join(",", ShowcaseBookmarks.Cast<string>())),
-                new XElement("Games", String.Join(",", Games.Cast<string>())),
-                new XElement("AppBrushes", String.Join(",", AppBrushes.Cast<string>()))
-                );
-
+            var xe = new XElement("Settings");
+            foreach (var setting in _settings)
+            {
+                xe.Add(setting.ToXml());
+            }
             WriteContent(xe.ToString());
         }
+
+        #region Properties
+
+        public string SessionId
+        {
+            get { return _sessionId.Value; }
+            set { _sessionId.Value = value; }
+        }
+
+        public string SteamLoginSecure
+        {
+            get { return _steamLoginSecure.Value; }
+            set { _steamLoginSecure.Value = value; }
+        }
+
+        public string SteamProfileUrl
+        {
+            get { return _steamProfileUrl.Value; }
+            set { _steamProfileUrl.Value = value; }
+        }
+
+        public string SteamParental
+        {
+            get { return _steamParental.Value; }
+            set { _steamParental.Value = value; }
+        }
+
+        public string SteamRememberLogin
+        {
+            get { return _steamRememberLogin.Value; }
+            set { _steamRememberLogin.Value = value; }
+        }
+
+        public string MachineAuth
+        {
+            get { return _machineAuth.Value; }
+            set { _machineAuth.Value = value; }
+        }
+
+        public bool IgnoreClient
+        {
+            get { return _ignoreClient.Value; }
+            set { _ignoreClient.Value = value; }
+        }
+
+        public string SteamAvatarUrl
+        {
+            get { return _steamAvatarUrl.Value; }
+            set { _steamAvatarUrl.Value = value; }
+        }
+
+        public string SteamBackgroundUrl
+        {
+            get { return _steamBackgroundUrl.Value; }
+            set { _steamBackgroundUrl.Value = value; }
+        }
+
+        public string SteamUserName
+        {
+            get { return _steamUserName.Value; }
+            set { _steamUserName.Value = value; }
+        }
+
+        public string SteamLevel
+        {
+            get { return _steamLevel.Value; }
+            set { _steamLevel.Value = value; }
+        }
+
+        public string CustomBackgroundUrl
+        {
+            get { return _customBackgroundUrl.Value; }
+            set { _customBackgroundUrl.Value = value; }
+        }
+
+        public string SteamBadgeUrl
+        {
+            get { return _steamBadgeUrl.Value; }
+            set { _steamBadgeUrl.Value = value; }
+        }
+
+        public string SteamBadgeTitle
+        {
+            get { return _steamBadgeTitle.Value; }
+            set { _steamBadgeTitle.Value = value; }
+        }
+
+        public int IdleMode
+        {
+            get { return _idleMode.Value; }
+            set { _idleMode.Value = value; }
+        }
+
+        public string BadgeFilter
+        {
+            get { return _badgeFilter.Value; }
+            set { _badgeFilter.Value = value; }
+        }
+
+        public string ShowcaseFilter
+        {
+            get { return _showcaseFilter.Value; }
+            set { _showcaseFilter.Value = value; }
+        }
+
+        public byte MaxIdleProcessCount
+        {
+            get { return _maxIdleProcessCount.Value; }
+            set { _maxIdleProcessCount.Value = value; }
+        }
+
+        public byte PeriodicSwitchRepeatCount
+        {
+            get { return _periodicSwitchRepeatCount.Value; }
+            set { _periodicSwitchRepeatCount.Value = value; }
+        }
+
+        public double TrialPeriod
+        {
+            get { return _trialPeriod.Value; }
+            set { _trialPeriod.Value = value; }
+        }
+
+        public byte SwitchMinutes
+        {
+            get { return _switchMinutes.Value; }
+            set { _switchMinutes.Value = value; }
+        }
+
+        public byte SwitchSeconds
+        {
+            get { return _switchSeconds.Value; }
+            set { _switchSeconds.Value = value; }
+        }
+
+        public bool AllowShowcaseSync
+        {
+            get { return _allowShowcaseSync.Value; }
+            set { _allowShowcaseSync.Value = value; }
+        }
+
+        public bool ShowInTaskbar
+        {
+            get { return _showInTaskbar.Value; }
+            set { _showInTaskbar.Value = value; }
+        }
+
+        public bool ShowBackground
+        {
+            get { return _showBackground.Value; }
+            set { _showBackground.Value = value; }
+        }
+
+        public string Dimensions
+        {
+            get { return _dimensions.Value; }
+            set { _dimensions.Value = value; }
+        }
+
+        public int PricesCatalogDate
+        {
+            get { return _pricesCatalogDate.Value; }
+            set { _pricesCatalogDate.Value = value; }
+        }
+
+        public StringCollection IdleQueue
+        {
+            get { return _idleQueue.Value; }
+            private set { _idleQueue.Value = value; }
+        }
+
+        public StringCollection Blacklist
+        {
+            get { return _blacklist.Value; }
+            private set { _blacklist.Value = value; }
+        }
+
+        public StringCollection ShowcaseBookmarks
+        {
+            get { return _showcaseBookmarks.Value; }
+            private set { _showcaseBookmarks.Value = value; }
+        }
+
+        public StringCollection Games
+        {
+            get { return _games.Value; }
+            private set { _games.Value = value; }
+        }
+
+        public StringCollection AppBrushes
+        {
+            get { return _appBrushes.Value; }
+            private set { _appBrushes.Value = value; }
+        }
+
+        #endregion
+
     }
 }

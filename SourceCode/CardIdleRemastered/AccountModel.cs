@@ -6,13 +6,10 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
-using CardIdleRemastered.Converters;
 using CardIdleRemastered.Commands;
 using CardIdleRemastered.ViewModels;
 
@@ -36,6 +33,13 @@ namespace CardIdleRemastered
         private string _customBackgroundUrl;
         private BadgeLevelData _favoriteBadge;
 
+        private IdleMode _mode;
+        private byte _maxIdleInstanceCount;
+        private byte _periodicSwitchRepeatCount;
+        private byte _switchSeconds;
+        private byte _switchMinutes;
+        private double _trialPeriod;
+
         private bool _isAuthorized;
         private bool _showInTaskbar = true;
         private bool _showBackground = true;
@@ -43,20 +47,21 @@ namespace CardIdleRemastered
         private int _totalCards;
         private int _totalGames;
 
-        private string _storePageUrl;
-        private BadgeModel _selectedGame;
-
         private string _gameTitle;
-        private readonly ICollectionView _badges;
+        private ICollectionView _badges;
 
         private bool _allowShowcaseSync;
         private string _showcaseTitle;
-        private readonly ICollectionView _showcases;
+        private ICollectionView _showcases;
 
         private CardIdleProfileInfo _cardIdleProfile;
 
         private ReleaseInfo _newestRelease;
         private bool _canUpdateApp;
+
+        private IDictionary<string, GameIdentity> _steamApps = new Dictionary<string, GameIdentity>();
+        private string _gameSearch;
+        private IList<GameIdentity> _gameSearchResults;
 
         #endregion
 
@@ -64,14 +69,12 @@ namespace CardIdleRemastered
         {
             _pricesUpdater = new PricesUpdater();
             _updater = new AccountUpdater(this, _pricesUpdater);
-            _idler = new IdleManager(this);
-            _showcaseManager = new ShowcaseManager();
+            _idler = new IdleManager();
+            _showcaseManager = new ShowcaseManager(_pricesUpdater);
             _updater.BadgeListSync += SyncShowcases;
 
             AllBadges = new ObservableCollection<BadgeModel>();
-            IdleQueueBadges = new ObservableCollection<BadgeModel>();
-            Games = new ObservableCollection<BadgeModel> { new BadgeModel("-1", "new", "0", "0") };
-            AllShowcases = new ObservableCollection<BadgeShowcase>();
+            Games = new ObservableCollection<BadgeModel>();
 
             #region Commands
             LoginCmd = new BaseCommand(_ => Login());
@@ -93,27 +96,15 @@ namespace CardIdleRemastered
 
             IdleCmd = new BaseCommand(Idle, CanIdle);
 
-            AddGameCmd = new BaseCommand(o => AddGame());
+            AddGameCmd = new BaseCommand(AddGame);
             RemoveGameCmd = new BaseCommand(RemoveGame);
 
             BookmarkShowcaseCmd = new BaseCommand(BookmarkShowcase);
+
+            ShowSettingsFileCmd = new BaseCommand(ShowSettingsFile);
             #endregion
 
-            _badges = CollectionViewSource.GetDefaultView(AllBadges);
-            var quick = (ICollectionViewLiveShaping)_badges;
-            quick.LiveFilteringProperties.Add("IsBlacklisted");
-            quick.LiveFilteringProperties.Add("HasTrial");
-            quick.LiveFilteringProperties.Add("CardIdleActive");
-            quick.LiveFilteringProperties.Add("IsInQueue");
-            quick.IsLiveFiltering = true;
-
             BadgePropertiesFilters = FilterStatesCollection.Create<BadgeProperty>().SetNotifier(SetFilter);
-
-            _showcases = CollectionViewSource.GetDefaultView(AllShowcases);
-            quick = (ICollectionViewLiveShaping)_showcases;
-            quick.LiveFilteringProperties.Add("IsCompleted");
-            quick.LiveFilteringProperties.Add("IsBookmarked");
-            quick.IsLiveFiltering = true;
 
             ShowcasePropertiesFilters = FilterStatesCollection.Create<ShowcaseProperty>().SetNotifier(SetShowcaseFilter);
         }
@@ -126,7 +117,7 @@ namespace CardIdleRemastered
             get { return String.IsNullOrWhiteSpace(_userName) ? "Card Idle" : _userName; }
             set
             {
-                _userName = value;
+                Storage.SteamUserName = _userName = value;
                 OnPropertyChanged();
             }
         }
@@ -164,7 +155,7 @@ namespace CardIdleRemastered
             get { return _showInTaskbar; }
             set
             {
-                _showInTaskbar = value;
+                Storage.ShowInTaskbar = _showInTaskbar = value;
                 OnPropertyChanged();
             }
         }
@@ -174,7 +165,7 @@ namespace CardIdleRemastered
             get { return _showBackground; }
             set
             {
-                _showBackground = value;
+                Storage.ShowBackground = _showBackground = value;
                 OnPropertyChanged();
                 OnPropertyChanged("BackgroundUrl");
             }
@@ -212,7 +203,7 @@ namespace CardIdleRemastered
             get { return String.IsNullOrWhiteSpace(_avatarUrl) ? "../Resources/Avatar.png" : _avatarUrl; }
             set
             {
-                _avatarUrl = value;
+                Storage.SteamAvatarUrl = _avatarUrl = value;
                 OnPropertyChanged();
             }
         }
@@ -229,7 +220,7 @@ namespace CardIdleRemastered
             }
             set
             {
-                _backgroundUrl = value;
+                Storage.SteamBackgroundUrl = _backgroundUrl = value;
                 OnPropertyChanged();
             }
         }
@@ -239,7 +230,7 @@ namespace CardIdleRemastered
             get { return _customBackgroundUrl; }
             set
             {
-                _customBackgroundUrl = value;
+                Storage.CustomBackgroundUrl = _customBackgroundUrl = value;
                 OnPropertyChanged();
                 OnPropertyChanged("BackgroundUrl");
             }
@@ -250,7 +241,7 @@ namespace CardIdleRemastered
             get { return String.IsNullOrWhiteSpace(_level) ? "0" : _level; }
             set
             {
-                _level = value;
+                Storage.SteamLevel = _level = value;
                 OnPropertyChanged();
             }
         }
@@ -262,14 +253,40 @@ namespace CardIdleRemastered
             {
                 _favoriteBadge = value;
                 OnPropertyChanged();
+
+                if (_favoriteBadge != null)
+                {
+                    Storage.SteamBadgeUrl = _favoriteBadge.PictureUrl;
+                    Storage.SteamBadgeTitle = _favoriteBadge.Name;
+                }
+                else
+                {
+                    Storage.SteamBadgeUrl = Storage.SteamBadgeTitle = null;
+                }
             }
         }
 
         #endregion
 
-        public ObservableCollection<BadgeModel> AllBadges { get; private set; }
+        private ObservableCollection<BadgeModel> _allBadges;
+        public ObservableCollection<BadgeModel> AllBadges
+        {
+            get { return _allBadges; }
+            private set
+            {
+                _allBadges = value;
 
-        public ObservableCollection<BadgeModel> IdleQueueBadges { get; private set; }
+                _badges = CollectionViewSource.GetDefaultView(_allBadges);
+                var quick = (ICollectionViewLiveShaping)_badges;
+                quick.LiveFilteringProperties.Add("IsBlacklisted");
+                quick.LiveFilteringProperties.Add("HasTrial");
+                quick.LiveFilteringProperties.Add("CardIdleActive");
+                quick.LiveFilteringProperties.Add("IsInQueue");
+                quick.IsLiveFiltering = true;
+            }
+        }
+
+        public ObservableCollection<BadgeModel> IdleQueueBadges { get { return _idler.IdleQueueBadges; } }
 
         public ObservableCollection<BadgeModel> Games { get; private set; }
 
@@ -371,7 +388,6 @@ namespace CardIdleRemastered
             CanUpdateApp = NewestRelease.IsOlderThan(version);
         }
 
-
         public CardIdleProfileInfo CardIdleProfile
         {
             get { return _cardIdleProfile; }
@@ -430,7 +446,6 @@ namespace CardIdleRemastered
                 if (success)
                 {
                     Storage.PricesCatalogDate = dayNum;
-                    Storage.Save();
                 }
             }
         }
@@ -459,24 +474,17 @@ namespace CardIdleRemastered
 
             CustomBackgroundUrl = Storage.CustomBackgroundUrl;
             BadgePropertiesFilters.Deserialize<BadgeProperty>(Storage.BadgeFilter);
-            ShowcasePropertiesFilters.Deserialize<ShowcaseProperty>(Storage.ShowcaseFilter);
 
-            Idler.Mode = (IdleMode)Storage.IdleMode;
+            Mode = (IdleMode)Storage.IdleMode;
 
-            if (Storage.MaxIdleProcessCount > 0)
-                Idler.MaxIdleInstanceCount = Storage.MaxIdleProcessCount;
+            MaxIdleInstanceCount = Storage.MaxIdleProcessCount;
 
-            if (Storage.PeriodicSwitchRepeatCount > 0)
-                Idler.PeriodicSwitchRepeatCount = Storage.PeriodicSwitchRepeatCount;
+            PeriodicSwitchRepeatCount = Storage.PeriodicSwitchRepeatCount;
 
-            if (Storage.TrialPeriod > 0)
-                Idler.TrialPeriod = Storage.TrialPeriod;
-            else
-                Idler.TrialPeriod = 2;
+            TrialPeriod = Storage.TrialPeriod;
 
-            Idler.SwitchMinutes = Storage.SwitchMinutes;
-            if (Storage.SwitchSeconds > 0)
-                Idler.SwitchSeconds = Storage.SwitchSeconds;
+            SwitchMinutes = Storage.SwitchMinutes;
+            SwitchSeconds = Storage.SwitchSeconds;
 
             IgnoreClient = Storage.IgnoreClient;
 
@@ -484,11 +492,11 @@ namespace CardIdleRemastered
             ShowInTaskbar = Storage.ShowInTaskbar;
             ShowBackground = Storage.ShowBackground;
 
-            PropertyChanged += SaveConfiguration;
-            Idler.PropertyChanged += SaveConfiguration;
-            Idler.PropertyChanged += TrialPeriodChanged;
-
             IdleQueueBadges.CollectionChanged += IdleQueueItemsChanged;
+
+            AllShowcases = await _showcaseManager.GetShowcases();
+
+            ShowcasePropertiesFilters.Deserialize<ShowcaseProperty>(Storage.ShowcaseFilter);
 
             try
             {
@@ -502,12 +510,16 @@ namespace CardIdleRemastered
             if (IsAuthorized)
                 await InitProfile();
 
+            _steamApps = await SteamParser.GetSteamApps();
             // reload games list
             var games = Storage.Games.Cast<string>().ToList();
             int idx = 0;
             foreach (var id in games)
             {
-                var game = await new SteamParser().GetGameInfo(id);
+                GameIdentity app;
+                _steamApps.TryGetValue(id, out app);
+
+                var game = new BadgeModel(id, app != null ? app.name : "");
                 game.PropertyChanged += BadgeIdleStatusChanged;
                 Games.Insert(idx, game);
                 idx++;
@@ -603,6 +615,13 @@ namespace CardIdleRemastered
             IdleQueueBadges.Clear();
 
             Storage.Save();
+
+            foreach (var showcase in AllShowcases)
+            {
+                showcase.IsCompleted = false;
+                showcase.CanCraft = false;
+                showcase.IsOwned = false;
+            }
             Logger.Info("See you later");
         }
         #endregion
@@ -851,23 +870,49 @@ namespace CardIdleRemastered
 
         #region Time Idle
 
+        public string GameSearch
+        {
+            get { return _gameSearch; }
+            set
+            {
+                _gameSearch = value;
+                OnPropertyChanged();
+                GameSearchResults = string.IsNullOrWhiteSpace(_gameSearch) == false
+                    ? _steamApps.Values
+                        .Where(g => g.Title.IndexOf(_gameSearch, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                        .Take(16)
+                        .ToList()
+                    : null;
+            }
+        }
+
+        public IList<GameIdentity> GameSearchResults
+        {
+            get { return _gameSearchResults; }
+            private set
+            {
+                _gameSearchResults = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand AddGameCmd { get; private set; }
 
-        private void AddGame()
+        private void AddGame(object o)
         {
-            var w = new GameSelectionWindow();
-            w.DataContext = this;
-            var res = w.ShowDialog();
-            if (res == true && SelectedGame != null)
-            {
-                if (Games.Any(g => g.AppId == SelectedGame.AppId))
-                    return;
-                Storage.Games.Add(SelectedGame.AppId);
-                Storage.Save();
-                SelectedGame.PropertyChanged += BadgeIdleStatusChanged;
-                Games.Insert(Games.Count - 1, SelectedGame);
-            }
-            StorePageUrl = String.Empty;
+            var selectedGame = o as GameIdentity;
+
+            if (selectedGame == null)
+                return;
+
+            if (Games.Any(g => g.AppId == selectedGame.appid))
+                return;
+            Storage.Games.Add(selectedGame.appid);
+            Storage.Save();
+            var game = new BadgeModel(selectedGame.appid, selectedGame.name);
+            game.PropertyChanged += BadgeIdleStatusChanged;
+            Games.Add(game);
+            GameSearch = string.Empty;
         }
 
 
@@ -885,46 +930,6 @@ namespace CardIdleRemastered
             Games.Remove(game);
         }
 
-
-        public string StorePageUrl
-        {
-            get { return _storePageUrl; }
-            set
-            {
-                _storePageUrl = value;
-
-                int id;
-                if (int.TryParse(_storePageUrl, out id) == false)
-                {
-                    var match = Regex.Match(_storePageUrl, @"store\.steampowered\.com/app/(\d+)");
-                    if (match.Success)
-                    {
-                        var stringId = match.Groups[1].Value;
-                        id = int.Parse(stringId);
-                    }
-                }
-
-                if (id > 0)
-                    SelectGame(id);
-                else
-                    SelectedGame = null;
-            }
-        }
-
-        private async void SelectGame(int id)
-        {
-            SelectedGame = await new SteamParser().GetGameInfo(id);
-        }
-
-        public BadgeModel SelectedGame
-        {
-            get { return _selectedGame; }
-            private set
-            {
-                _selectedGame = value;
-                OnPropertyChanged();
-            }
-        }
         #endregion
 
         #region Blacklist
@@ -947,125 +952,83 @@ namespace CardIdleRemastered
 
         #region Settings
 
-        private void SaveConfiguration(object sender, PropertyChangedEventArgs e)
+        #region Idle settings
+
+        public IdleMode Mode
         {
-            bool save = false;
-
-            var account = sender as AccountModel;
-
-            if (account != null)
+            get { return _mode; }
+            set
             {
-                if (e.PropertyName == "UserName")
-                {
-                    Storage.SteamUserName = account.UserName ?? string.Empty;
-                    save = true;
-                }
-                else if (e.PropertyName == "Level")
-                {
-                    Storage.SteamLevel = account.Level;
-                    save = true;
-                }
-                else if (e.PropertyName == "BackgroundUrl")
-                {
-                    Storage.SteamBackgroundUrl = account._backgroundUrl ?? string.Empty;
-                    save = true;
-                }
-
-                else if (e.PropertyName == "AvatarUrl")
-                {
-                    Storage.SteamAvatarUrl = account.AvatarUrl ?? string.Empty;
-                    save = true;
-                }
-                else if (e.PropertyName == "CustomBackgroundUrl")
-                {
-                    Storage.CustomBackgroundUrl = account.CustomBackgroundUrl ?? string.Empty;
-                    save = true;
-                }
-                else if (e.PropertyName == "Filter")
-                {
-                    Storage.BadgeFilter = account.BadgePropertiesFilters.Serialize();
-                    save = true;
-                }
-                else if (e.PropertyName == "ShowcaseFilter")
-                {
-                    Storage.ShowcaseFilter = account.ShowcasePropertiesFilters.Serialize();
-                    save = true;
-                }
-                else if (e.PropertyName == "AllowShowcaseSync")
-                {
-                    Storage.AllowShowcaseSync = account.AllowShowcaseSync;
-                    save = true;
-                }
-                else if (e.PropertyName == "ShowInTaskbar")
-                {
-                    Storage.ShowInTaskbar = account.ShowInTaskbar;
-                    save = true;
-                }
-                else if (e.PropertyName == "ShowBackground")
-                {
-                    Storage.ShowBackground = account.ShowBackground;
-                    save = true;
-                }
-                else if (e.PropertyName == "FavoriteBadge")
-                {
-                    if (account.FavoriteBadge != null)
-                    {
-                        Storage.SteamBadgeUrl = account.FavoriteBadge.PictureUrl;
-                        Storage.SteamBadgeTitle = account.FavoriteBadge.Name;
-                    }
-                    else
-                    {
-                        Storage.SteamBadgeUrl =
-                            Storage.SteamBadgeTitle = null;
-                    }
-                    save = true;
-                }
+                _idler.Mode = _mode = value;
+                Storage.IdleMode = (int)_mode;
+                OnPropertyChanged();
             }
-            else
+        }
+
+        public byte MaxIdleInstanceCount
+        {
+            get { return _maxIdleInstanceCount; }
+            set
             {
-                var idler = (IdleManager)sender;
-                if (e.PropertyName == "Mode")
-                {
-                    Storage.IdleMode = (int)idler.Mode;
-                    save = true;
-                }
-                else if (e.PropertyName == "MaxIdleInstanceCount")
-                {
-                    Storage.MaxIdleProcessCount = idler.MaxIdleInstanceCount;
-                    save = true;
-                }
-                else if (e.PropertyName == "PeriodicSwitchRepeatCount")
-                {
-                    Storage.PeriodicSwitchRepeatCount = idler.PeriodicSwitchRepeatCount;
-                    save = true;
-                }
-                else if (e.PropertyName == "TrialPeriod")
-                {
-                    Storage.TrialPeriod = idler.TrialPeriod;
-                    save = true;
-                }
-                else if (e.PropertyName == "SwitchMinutes")
-                {
-                    Storage.SwitchMinutes = idler.SwitchMinutes;
-                    save = true;
-                }
-                else if (e.PropertyName == "SwitchSeconds")
-                {
-                    Storage.SwitchSeconds = idler.SwitchSeconds;
-                    save = true;
-                }
+                Storage.MaxIdleProcessCount = _idler.MaxIdleInstanceCount = _maxIdleInstanceCount = value;
+                OnPropertyChanged();
             }
+        }
 
-            if (save)
-                Storage.Save();
+        public byte PeriodicSwitchRepeatCount
+        {
+            get { return _periodicSwitchRepeatCount; }
+            set
+            {
+                Storage.PeriodicSwitchRepeatCount = _idler.PeriodicSwitchRepeatCount = _periodicSwitchRepeatCount = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public byte SwitchMinutes
+        {
+            get { return _switchMinutes; }
+            set
+            {
+                Storage.SwitchMinutes = _idler.SwitchMinutes = _switchMinutes = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public byte SwitchSeconds
+        {
+            get { return _switchSeconds; }
+            set
+            {
+                Storage.SwitchSeconds = _idler.SwitchSeconds = _switchSeconds = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double TrialPeriod
+        {
+            get { return _trialPeriod; }
+            set
+            {
+                Storage.TrialPeriod = _idler.TrialPeriod = _trialPeriod = Math.Round(value, 1);
+                OnPropertyChanged();
+
+                UpdateTrialStatus();
+            }
         }
 
         #endregion
 
-        public IEnumerable<string> FilterStates
+        public ICommand ShowSettingsFileCmd { get; private set; }
+
+        public void ShowSettingsFile(object o)
         {
-            get { return Enums.GetValues<FilterState>().Select(e => EnumLocalizationConverter.GetLocalValue(e)); }
+            string argument = "/select, \"" + Storage + "\"";
+
+            System.Diagnostics.Process.Start("explorer.exe", argument);
         }
+
+        #endregion
 
         #region Badges filters
         /// <summary>
@@ -1100,7 +1063,8 @@ namespace CardIdleRemastered
             else
                 _badges.Filter = o => titleSearch(o) && propertySearch(o);
 
-            OnPropertyChanged("Filter");
+            Storage.BadgeFilter = BadgePropertiesFilters.Serialize();
+
             UpdateTotalValues();
         }
 
@@ -1157,12 +1121,6 @@ namespace CardIdleRemastered
             }
         }
 
-        private void TrialPeriodChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "TrialPeriod")
-                UpdateTrialStatus();
-        }
-
         #endregion
 
         #region Showcases
@@ -1173,14 +1131,32 @@ namespace CardIdleRemastered
             set { _showcaseManager.Storage = value; }
         }
 
-        public ObservableCollection<BadgeShowcase> AllShowcases { get; private set; }
+        private ObservableCollection<BadgeShowcase> _allShowcases;
+
+        public ObservableCollection<BadgeShowcase> AllShowcases
+        {
+            get { return _allShowcases; }
+            private set
+            {
+                _allShowcases = value;
+
+                _showcases = CollectionViewSource.GetDefaultView(_allShowcases);
+                var quick = (ICollectionViewLiveShaping)_showcases;
+                quick.LiveFilteringProperties.Add("IsCompleted");
+                quick.LiveFilteringProperties.Add("IsBookmarked");
+                quick.LiveFilteringProperties.Add("IsMarketable");
+                quick.LiveFilteringProperties.Add("IsOwned");
+                quick.IsLiveFiltering = true;
+                OnPropertyChanged();
+            }
+        }
 
         public bool AllowShowcaseSync
         {
             get { return _allowShowcaseSync; }
             set
             {
-                _allowShowcaseSync = value;
+                Storage.AllowShowcaseSync = _allowShowcaseSync = value;
                 OnPropertyChanged();
 
                 if (_allowShowcaseSync)
@@ -1202,7 +1178,7 @@ namespace CardIdleRemastered
 
             try
             {
-                await _showcaseManager.LoadShowcases(_updater.CompleBadgeList, AllShowcases);
+                await _showcaseManager.LoadShowcases(_updater.CompleBadgeList);
 
                 // restore bookmarks
                 var bookmarks = Storage.ShowcaseBookmarks.Cast<string>()
@@ -1243,7 +1219,7 @@ namespace CardIdleRemastered
             else
                 _showcases.Filter = o => titleSearch(o) && propertySearch(o);
 
-            OnPropertyChanged("ShowcaseFilter");
+            Storage.ShowcaseFilter = ShowcasePropertiesFilters.Serialize();
         }
 
         public ICommand BookmarkShowcaseCmd { get; private set; }

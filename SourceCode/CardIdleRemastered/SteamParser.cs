@@ -16,7 +16,9 @@ namespace CardIdleRemastered
     {
         public static async Task<string> DownloadString(string url)
         {
-            return await new WebClient().DownloadStringTaskAsync(url);
+            var wc = new WebClient();
+            wc.Encoding = Encoding.UTF8;
+            return await wc.DownloadStringTaskAsync(url);
         }
 
         public static async Task<string> DownloadStringWithAuth(string url)

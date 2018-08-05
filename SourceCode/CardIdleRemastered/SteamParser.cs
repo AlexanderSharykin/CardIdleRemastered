@@ -7,9 +7,8 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
-using CardIdleRemastered.Badges;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 
 namespace CardIdleRemastered
 {
@@ -40,11 +39,20 @@ namespace CardIdleRemastered
         {
             if (_appsCache == null)
             {
-                var response = await DownloadString("http://api.steampowered.com/ISteamApps/GetAppList/v2");
-                var js = new JavaScriptSerializer();
-                js.MaxJsonLength = Int32.MaxValue;
-                var appList = js.Deserialize<SteamAppList>(response);
-                _appsCache = appList.applist.apps.ToDictionary(a => a.appid);
+                string response = String.Empty;
+                try
+                {
+                    response = await DownloadString("http://api.steampowered.com/ISteamApps/GetAppList/v2");
+                    var appList = JsonConvert.DeserializeObject<SteamAppList>(response);
+                    _appsCache = appList.applist.apps.ToDictionary(a => a.appid);
+                }
+                catch (Exception ex)
+                {
+                    _appsCache = new Dictionary<string, GameIdentity>();
+                    Logger.Exception(ex, "GetSteamApps");
+                    if (!String.IsNullOrWhiteSpace(response))
+                        File.WriteAllText("AppList.json", response, Encoding.UTF8);
+                }
             }
             return _appsCache;
         }

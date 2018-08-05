@@ -134,6 +134,8 @@ namespace CardIdleRemastered
                         {
                             showcase.CardPrice = stock.CardValue;
                             showcase.BadgePrice = stock.Normal;
+                            if (!marketable)
+                                showcase.Title = stock.Name;
                         }
 
                         foreach (var xeLevel in xeBadge.Elements("level"))

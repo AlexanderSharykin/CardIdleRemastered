@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using CardIdleRemastered.Badges;
+using Newtonsoft.Json;
 
 namespace CardIdleRemastered
 {
@@ -20,8 +20,7 @@ namespace CardIdleRemastered
                 if (_prices == null)
                 {
                     var values = Storage.ReadContent();
-                    var js = new JavaScriptSerializer();
-                    _prices = js.Deserialize<Dictionary<string, BadgeStockModel>>(values);
+                    _prices = JsonConvert.DeserializeObject<Dictionary<string, BadgeStockModel>>(values);
                 }
                 return _prices;
             }
